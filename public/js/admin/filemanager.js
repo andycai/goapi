@@ -1,311 +1,210 @@
-$(document).ready(function() {
-    let currentPath = './';
+function filemanager() {
+    return {
+        items: [],
+        currentPath: '',
+        showUploadModal: false,
+        showFolderModal: false,
+        showRenameModal: false,
+        selectedFiles: [],
+        folderName: '',
+        newName: '',
+        currentItem: null,
 
-    // Load initial file list
-    loadFileList(currentPath);
+        init() {
+            this.fetchItems();
+        },
 
-    // Handle breadcrumb navigation
-    $('#pathBreadcrumb').on('click', 'a', function(e) {
-        e.preventDefault();
-        currentPath = $(this).data('path');
-        loadFileList(currentPath);
-    });
+        get sortedItems() {
+            return [...this.items].sort((a, b) => {
+                // 文件夹优先
+                if (a.is_dir && !b.is_dir) return -1;
+                if (!a.is_dir && b.is_dir) return 1;
+                // 按名称排序
+                return a.name.localeCompare(b.name);
+            });
+        },
 
-    // Upload file button
-    $('#btnUpload').click(function() {
-        $('#uploadModal').modal('show');
-    });
+        async fetchItems() {
+            try {
+                const response = await fetch(`/api/filemanager/list?path=${encodeURIComponent(this.currentPath)}`);
+                if (!response.ok) throw new Error('获取文件列表失败');
+                this.items = await response.json();
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
 
-    // Create directory button
-    $('#btnCreateDir').click(function() {
-        $('#createDirModal').modal('show');
-    });
+        uploadFile() {
+            this.selectedFiles = [];
+            this.showUploadModal = true;
+        },
 
-    // Create file button
-    $('#btnCreateFile').click(function() {
-        $('#createFileModal').modal('show');
-    });
+        handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            this.selectedFiles = [...this.selectedFiles, ...files];
+        },
 
-    // Confirm upload
-    $('#btnConfirmUpload').click(function() {
-        const formData = new FormData();
-        const fileInput = $('#fileInput')[0];
-        if (fileInput.files.length === 0) {
-            toastr.error('请选择文件');
-            return;
+        removeFile(index) {
+            this.selectedFiles.splice(index, 1);
+        },
+
+        async submitUpload() {
+            try {
+                const formData = new FormData();
+                formData.append('path', this.currentPath);
+                this.selectedFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                const response = await fetch('/api/filemanager/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '上传失败');
+                }
+
+                await this.fetchItems();
+                this.showUploadModal = false;
+                this.selectedFiles = [];
+                Alpine.store('notification').show('文件上传成功', 'success');
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        createFolder() {
+            this.folderName = '';
+            this.showFolderModal = true;
+        },
+
+        async submitFolder() {
+            try {
+                const response = await fetch('/api/filemanager/mkdir', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        path: this.currentPath,
+                        name: this.folderName
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '创建文件夹失败');
+                }
+
+                await this.fetchItems();
+                this.showFolderModal = false;
+                Alpine.store('notification').show('文件夹创建成功', 'success');
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        renameItem(item) {
+            this.currentItem = item;
+            this.newName = item.name;
+            this.showRenameModal = true;
+        },
+
+        async submitRename() {
+            try {
+                const response = await fetch('/api/filemanager/rename', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        path: this.currentItem.path,
+                        new_name: this.newName
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '重命名失败');
+                }
+
+                await this.fetchItems();
+                this.showRenameModal = false;
+                Alpine.store('notification').show('重命名成功', 'success');
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        async deleteItem(item) {
+            if (!confirm(`确定要删除${item.is_dir ? '文件夹' : '文件'} "${item.name}" 吗？`)) return;
+
+            try {
+                const response = await fetch('/api/filemanager/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        path: item.path
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '删除失败');
+                }
+
+                await this.fetchItems();
+                Alpine.store('notification').show('删除成功', 'success');
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        async downloadFile(item) {
+            try {
+                const response = await fetch(`/api/filemanager/download?path=${encodeURIComponent(item.path)}`);
+                if (!response.ok) throw new Error('下载失败');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = item.name;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        navigateTo(path) {
+            this.currentPath = path;
+            this.fetchItems();
+        },
+
+        formatSize(size) {
+            if (size === 0) return '0 B';
+            const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const k = 1024;
+            const i = Math.floor(Math.log(size) / Math.log(k));
+            return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + units[i];
+        },
+
+        formatDate(timestamp) {
+            if (!timestamp) return '';
+            return new Date(timestamp * 1000).toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
-        formData.append('file', fileInput.files[0]);
-        formData.append('path', currentPath);
-
-        $.ajax({
-            url: '/api/filemanager/upload',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                $('#uploadModal').modal('hide');
-                $('#uploadForm')[0].reset();
-                toastr.success('文件上传成功');
-                loadFileList(currentPath);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '上传失败');
-            }
-        });
-    });
-
-    // Confirm create directory
-    $('#btnConfirmCreateDir').click(function() {
-        const dirName = $('#dirName').val();
-        if (!dirName) {
-            toastr.error('请输入文件夹名称');
-            return;
-        }
-
-        $.ajax({
-            url: '/api/filemanager/create',
-            type: 'POST',
-            data: {
-                path: currentPath + dirName,
-                is_dir: 'true'
-            },
-            success: function(response) {
-                $('#createDirModal').modal('hide');
-                $('#createDirForm')[0].reset();
-                toastr.success('文件夹创建成功');
-                loadFileList(currentPath);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '创建失败');
-            }
-        });
-    });
-
-    // Confirm create file
-    $('#btnConfirmCreateFile').click(function() {
-        const fileName = $('#fileName').val();
-        if (!fileName) {
-            toastr.error('请输入文件名称');
-            return;
-        }
-
-        $.ajax({
-            url: '/api/filemanager/create',
-            type: 'POST',
-            data: {
-                path: currentPath + fileName,
-                is_dir: 'false'
-            },
-            success: function(response) {
-                $('#createFileModal').modal('hide');
-                $('#createFileForm')[0].reset();
-                toastr.success('文件创建成功');
-                loadFileList(currentPath);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '创建失败');
-            }
-        });
-    });
-
-    // File list event delegation
-    $('#fileList').on('click', '.btn-rename', function() {
-        const path = $(this).data('path');
-        const name = $(this).data('name');
-        $('#renameModal').data('path', path).modal('show');
-        $('#newName').val(name);
-    });
-
-    $('#fileList').on('click', '.btn-move', function() {
-        const path = $(this).data('path');
-        $('#moveModal').data('path', path).modal('show');
-    });
-
-    $('#fileList').on('click', '.btn-delete', function() {
-        const path = $(this).data('path');
-        if (confirm('确定要删除吗？')) {
-            deleteFile(path);
-        }
-    });
-
-    $('#fileList').on('click', '.btn-download', function() {
-        const path = $(this).data('path');
-        window.location.href = '/api/filemanager/download?path=' + encodeURIComponent(path);
-    });
-
-    // Confirm rename
-    $('#btnConfirmRename').click(function() {
-        const oldPath = $('#renameModal').data('path');
-        const newName = $('#newName').val();
-        if (!newName) {
-            toastr.error('请输入新名称');
-            return;
-        }
-
-        const pathParts = oldPath.split('/');
-        pathParts.pop();
-        const newPath = pathParts.join('/') + '/' + newName;
-
-        $.ajax({
-            url: '/api/filemanager/rename',
-            type: 'POST',
-            data: {
-                old_path: oldPath,
-                new_path: newPath
-            },
-            success: function(response) {
-                $('#renameModal').modal('hide');
-                toastr.success('重命名成功');
-                loadFileList(currentPath);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '重命名失败');
-            }
-        });
-    });
-
-    // Confirm move
-    $('#btnConfirmMove').click(function() {
-        const sourcePath = $('#moveModal').data('path');
-        const destPath = $('#destPath').val();
-        if (!destPath) {
-            toastr.error('请输入目标路径');
-            return;
-        }
-
-        $.ajax({
-            url: '/api/filemanager/move',
-            type: 'POST',
-            data: {
-                source_path: sourcePath,
-                dest_path: destPath
-            },
-            success: function(response) {
-                $('#moveModal').modal('hide');
-                $('#moveForm')[0].reset();
-                toastr.success('移动成功');
-                loadFileList(currentPath);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '移动失败');
-            }
-        });
-    });
-
-    // Confirm copy
-    $('#btnConfirmCopy').click(function() {
-        const sourcePath = $('#moveModal').data('path');
-        const destPath = $('#destPath').val();
-        if (!destPath) {
-            toastr.error('请输入目标路径');
-            return;
-        }
-
-        $.ajax({
-            url: '/api/filemanager/copy',
-            type: 'POST',
-            data: {
-                source_path: sourcePath,
-                dest_path: destPath
-            },
-            success: function(response) {
-                $('#moveModal').modal('hide');
-                $('#moveForm')[0].reset();
-                toastr.success('复制成功');
-                loadFileList(currentPath);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '复制失败');
-            }
-        });
-    });
-
-    // Load file list function
-    function loadFileList(path) {
-        $.ajax({
-            url: '/api/filemanager/list',
-            type: 'GET',
-            data: { path: path },
-            success: function(response) {
-                updateBreadcrumb(path);
-                updateFileList(response.files);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '加载失败');
-            }
-        });
-    }
-
-    // Update breadcrumb function
-    function updateBreadcrumb(path) {
-        const parts = path.split('/').filter(p => p !== '');
-        let html = '<li class="breadcrumb-item"><a href="#" data-path="./">根目录</a></li>';
-        let currentPath = './';
-
-        parts.forEach(part => {
-            currentPath += part + '/';
-            html += `<li class="breadcrumb-item"><a href="#" data-path="${currentPath}">${part}</a></li>`;
-        });
-
-        $('#pathBreadcrumb').html(html);
-    }
-
-    // Update file list function
-    function updateFileList(files) {
-        let html = '';
-        files.forEach(file => {
-            const icon = file.is_dir ? 'fa-folder' : 'fa-file';
-            const size = file.is_dir ? '-' : formatFileSize(file.size);
-            const downloadBtn = file.is_dir ? '' : `<button class="btn btn-success btn-sm btn-download" data-path="${file.path}"><i class="fas fa-download"></i></button>`;
-
-            html += `
-                <tr>
-                    <td><i class="fas ${icon} mr-2"></i>${file.name}</td>
-                    <td>${size}</td>
-                    <td>${new Date(file.mod_time).toLocaleString()}</td>
-                    <td>${file.mode}</td>
-                    <td>
-                        ${downloadBtn}
-                        <button class="btn btn-primary btn-sm btn-rename" data-path="${file.path}" data-name="${file.name}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-info btn-sm btn-move" data-path="${file.path}">
-                            <i class="fas fa-arrows-alt"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm btn-delete" data-path="${file.path}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        $('#fileList').html(html);
-    }
-
-    // Delete file function
-    function deleteFile(path) {
-        $.ajax({
-            url: '/api/filemanager/delete',
-            type: 'POST',
-            data: { path: path },
-            success: function(response) {
-                toastr.success('删除成功');
-                loadFileList(currentPath);
-            },
-            error: function(xhr) {
-                toastr.error(xhr.responseJSON?.error || '删除失败');
-            }
-        });
-    }
-
-    // Format file size function
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-}); 
+    };
+} 
