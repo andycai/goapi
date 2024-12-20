@@ -52,5 +52,17 @@ INSERT INTO permissions (id, name, description) VALUES
 (43, 'svn:log', 'SVN日志'),
 (44, 'svn:revert', 'SVN还原'),
 (45, 'svn:add', 'SVN添加'),
-(46, 'svn:delete', 'SVN删除');
+(46, 'svn:delete', 'SVN删除'),
+(47, 'git:list', 'Git列表'),
+(48, 'git:clone', 'Git克隆'),
+(49, 'git:pull', 'Git拉取'),
+(50, 'git:push', 'Git推送'),
+(51, 'git:status', 'Git状态'),
+(52, 'git:log', 'Git日志'),
+(53, 'git:commit', 'Git提交'),
+(54, 'git:checkout', 'Git检出'),
+(55, 'git:branch', 'Git分支'),
+(56, 'git:merge', 'Git合并'),
+(57, 'git:reset', 'Git重置'),
+(58, 'git:stash', 'Git暂存');
 
