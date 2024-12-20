@@ -42,5 +42,15 @@ INSERT INTO permissions (id, name, description) VALUES
 (33, 'citask:create', '创建任务'),
 (34, 'citask:update', '更新任务'),
 (35, 'citask:delete', '删除任务'),
-(36, 'citask:run', '执行任务'); 
+(36, 'citask:run', '执行任务'),
+(37, 'svn:list', 'SVN列表'),
+(38, 'svn:checkout', 'SVN检出'),
+(39, 'svn:update', 'SVN更新'),
+(40, 'svn:commit', 'SVN提交'),
+(41, 'svn:status', 'SVN状态'),
+(42, 'svn:info', 'SVN信息'),
+(43, 'svn:log', 'SVN日志'),
+(44, 'svn:revert', 'SVN还原'),
+(45, 'svn:add', 'SVN添加'),
+(46, 'svn:delete', 'SVN删除');
 

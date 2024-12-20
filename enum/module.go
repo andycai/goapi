@@ -16,4 +16,5 @@ const (
 	ModulePriorityCitask     = 100
 	ModulePriorityNote       = 50
 	ModulePriorityUnibuild   = 40
+	ModulePrioritySVN        = 30
 )
