@@ -106,3 +106,10 @@ INSERT INTO permissions (id, name, description) VALUES
 (80, 'bugtracker:comment:update', '评论管理-更新'),
 (81, 'bugtracker:comment:delete', '评论管理-删除');
 
+-- luban module permissions
+INSERT INTO permissions (name, code, description) VALUES ('查看游戏配置表', 'luban:list', '查看游戏配置表列表和详情');
+INSERT INTO permissions (name, code, description) VALUES ('创建游戏配置表', 'luban:create', '创建新的游戏配置表');
+INSERT INTO permissions (name, code, description) VALUES ('更新游戏配置表', 'luban:update', '更新游戏配置表信息');
+INSERT INTO permissions (name, code, description) VALUES ('删除游戏配置表', 'luban:delete', '删除游戏配置表');
+INSERT INTO permissions (name, code, description) VALUES ('导出游戏配置表', 'luban:export', '导出游戏配置表数据');
+
