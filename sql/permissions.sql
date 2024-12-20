@@ -77,3 +77,13 @@ INSERT INTO permission (name, description) VALUES ('filemanager:copy', '文件�
 INSERT INTO permission (name, description) VALUES ('filemanager:download', '文件管理-下载');
 INSERT INTO permission (name, description) VALUES ('filemanager:info', '文件管理-信息');
 
+-- Imagemanager permissions
+INSERT INTO permissions (id, name, description) VALUES
+(59, 'imagemanager:list', '图片管理-列表'),
+(60, 'imagemanager:upload', '图片管理-上传'),
+(61, 'imagemanager:delete', '图片管理-删除'),
+(62, 'imagemanager:rename', '图片管理-重命名'),
+(63, 'imagemanager:move', '图片管理-移动'),
+(64, 'imagemanager:copy', '图片管理-复制'),
+(65, 'imagemanager:info', '图片管理-信息');
+

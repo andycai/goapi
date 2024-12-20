@@ -8,6 +8,7 @@ require (
 	github.com/gofiber/storage/memory v1.3.4
 	github.com/gofiber/storage/mysql/v2 v2.0.1
 	github.com/gofiber/template/html/v2 v2.1.2
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d
 	golang.org/x/crypto v0.17.0
