@@ -1,4 +1,4 @@
-function filemanager() {
+function filemanagerManagement() {
     return {
         items: [],
         currentPath: '',

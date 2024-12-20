@@ -1,4 +1,4 @@
-function bugtracker() {
+function bugtrackerManagement() {
     return {
         projects: [],
         currentProject: null,

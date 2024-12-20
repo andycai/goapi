@@ -1,4 +1,4 @@
-function imagemanager() {
+function imagemanagerManagement() {
     return {
         images: [],
         showUploadModal: false,
