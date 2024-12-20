@@ -1,0 +1,181 @@
+{{define "admin/filemanager"}}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">文件管理</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary btn-sm" id="btnUpload">
+                            <i class="fas fa-upload"></i> 上传文件
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnCreateDir">
+                            <i class="fas fa-folder-plus"></i> 新建文件夹
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm" id="btnCreateFile">
+                            <i class="fas fa-file-plus"></i> 新建文件
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb" id="pathBreadcrumb">
+                                    <li class="breadcrumb-item"><a href="#" data-path="./">根目录</a></li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>大小</th>
+                                    <th>修改时间</th>
+                                    <th>权限</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fileList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">上传文件</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label>选择文件</label>
+                        <input type="file" class="form-control-file" id="fileInput" name="file" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmUpload">上传</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Directory Modal -->
+<div class="modal fade" id="createDirModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新建文件夹</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createDirForm">
+                    <div class="form-group">
+                        <label>文件夹名称</label>
+                        <input type="text" class="form-control" id="dirName" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmCreateDir">创建</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create File Modal -->
+<div class="modal fade" id="createFileModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新建文件</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createFileForm">
+                    <div class="form-group">
+                        <label>文件名称</label>
+                        <input type="text" class="form-control" id="fileName" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmCreateFile">创建</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rename Modal -->
+<div class="modal fade" id="renameModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">重命名</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="renameForm">
+                    <div class="form-group">
+                        <label>新名称</label>
+                        <input type="text" class="form-control" id="newName" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmRename">重命名</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Move/Copy Modal -->
+<div class="modal fade" id="moveModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">移动/复制</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="moveForm">
+                    <div class="form-group">
+                        <label>目标路径</label>
+                        <input type="text" class="form-control" id="destPath" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmMove">移动</button>
+                <button type="button" class="btn btn-info" id="btnConfirmCopy">复制</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}} 

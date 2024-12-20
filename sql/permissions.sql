@@ -66,3 +66,14 @@ INSERT INTO permissions (id, name, description) VALUES
 (57, 'git:reset', 'Git重置'),
 (58, 'git:stash', 'Git暂存');
 
+-- Filemanager permissions
+INSERT INTO permission (name, description) VALUES ('filemanager:list', '文件管理-列表');
+INSERT INTO permission (name, description) VALUES ('filemanager:upload', '文件管理-上传');
+INSERT INTO permission (name, description) VALUES ('filemanager:create', '文件管理-创建');
+INSERT INTO permission (name, description) VALUES ('filemanager:delete', '文件管理-删除');
+INSERT INTO permission (name, description) VALUES ('filemanager:rename', '文件管理-重命名');
+INSERT INTO permission (name, description) VALUES ('filemanager:move', '文件管理-移动');
+INSERT INTO permission (name, description) VALUES ('filemanager:copy', '文件管理-复制');
+INSERT INTO permission (name, description) VALUES ('filemanager:download', '文件管理-下载');
+INSERT INTO permission (name, description) VALUES ('filemanager:info', '文件管理-信息');
+
