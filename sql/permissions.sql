@@ -87,3 +87,22 @@ INSERT INTO permissions (id, name, description) VALUES
 (64, 'imagemanager:copy', '图片管理-复制'),
 (65, 'imagemanager:info', '图片管理-信息');
 
+-- Bugtracker permissions
+INSERT INTO permissions (id, name, description) VALUES
+(66, 'bugtracker:project:list', '项目管理-列表'),
+(67, 'bugtracker:project:create', '项目管理-创建'),
+(68, 'bugtracker:project:update', '项目管理-更新'),
+(69, 'bugtracker:project:delete', '项目管理-删除'),
+(70, 'bugtracker:iteration:list', '迭代管理-列表'),
+(71, 'bugtracker:iteration:create', '迭代管理-创建'),
+(72, 'bugtracker:iteration:update', '迭代管理-更新'),
+(73, 'bugtracker:iteration:delete', '迭代管理-删除'),
+(74, 'bugtracker:issue:list', '问题管理-列表'),
+(75, 'bugtracker:issue:create', '问题管理-创建'),
+(76, 'bugtracker:issue:update', '问题管理-更新'),
+(77, 'bugtracker:issue:delete', '问题管理-删除'),
+(78, 'bugtracker:comment:list', '评论管理-列表'),
+(79, 'bugtracker:comment:create', '评论管理-创建'),
+(80, 'bugtracker:comment:update', '评论管理-更新'),
+(81, 'bugtracker:comment:delete', '评论管理-删除');
+

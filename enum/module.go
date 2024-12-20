@@ -14,6 +14,7 @@ const (
 	ModulePriorityShell        = 300
 	ModulePriorityBrowse       = 200
 	ModulePriorityCitask       = 100
+	ModulePriorityBugtracker   = 90
 	ModulePriorityNote         = 50
 	ModulePriorityUnibuild     = 40
 	ModulePrioritySVN          = 30
