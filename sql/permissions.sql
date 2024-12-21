@@ -113,3 +113,9 @@ INSERT INTO permissions (name, code, description) VALUES ('更新游戏配置表
 INSERT INTO permissions (name, code, description) VALUES ('删除游戏配置表', 'luban:delete', '删除游戏配置表');
 INSERT INTO permissions (name, code, description) VALUES ('导出游戏配置表', 'luban:export', '导出游戏配置表数据');
 
+-- 游戏配置管理权限
+INSERT INTO permissions (name, code, description) VALUES ('查看游戏配置', 'gameconf:list', '查看游戏配置');
+INSERT INTO permissions (name, code, description) VALUES ('创建游戏配置', 'gameconf:create', '创建游戏配置');
+INSERT INTO permissions (name, code, description) VALUES ('更新游戏配置', 'gameconf:update', '更新游戏配置');
+INSERT INTO permissions (name, code, description) VALUES ('删除游戏配置', 'gameconf:delete', '删除游戏配置');
+

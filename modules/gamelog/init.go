@@ -13,7 +13,7 @@ type gamelogModule struct {
 }
 
 func init() {
-	core.RegisterModule(&gamelogModule{}, enum.ModulePriorityGamelog)
+	core.RegisterModule(&gamelogModule{}, enum.ModulePriorityGameLog)
 }
 
 func (m *gamelogModule) Awake(a *core.App) error {
