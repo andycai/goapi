@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/andycai/unitool/modules/adminlog"
-	"github.com/andycai/unitool/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jlaffaye/ftp"
 	"github.com/saintfish/chardet"
@@ -302,7 +301,7 @@ func uploadToFTP(localPath string, fileType string) error {
 	}
 	defer conn.Quit()
 
-	username, password, err := utils.ReadFromBinaryFile(app.Config.Server.UserDataPath)
+	username, password, err := ReadFromBinaryFile(app.Config.Server.UserDataPath)
 	if err != nil {
 		writeUploadLog(localPath, fileType, false, fmt.Sprintf("读取用户数据失败: %v", err))
 		return fmt.Errorf("读取用户数据失败: %v", err)
