@@ -13,7 +13,7 @@ type bugtrackerModule struct {
 }
 
 func init() {
-	core.RegisterModule(&bugtrackerModule{}, enum.ModulePriorityBugtracker)
+	core.RegisterModule(&bugtrackerModule{}, enum.ModulePriorityBugTracker)
 }
 
 func (m *bugtrackerModule) Awake(a *core.App) error {

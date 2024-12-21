@@ -13,7 +13,7 @@ type filemanagerModule struct {
 }
 
 func init() {
-	core.RegisterModule(&filemanagerModule{}, enum.ModulePriorityFilemanager)
+	core.RegisterModule(&filemanagerModule{}, enum.ModulePriorityFileManager)
 }
 
 func (m *filemanagerModule) Awake(a *core.App) error {

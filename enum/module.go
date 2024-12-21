@@ -7,19 +7,20 @@ const (
 	ModulePriorityPermission   = 980
 	ModulePriorityLogin        = 970
 	ModulePriorityMenu         = 960
-	ModulePriorityAdminlog     = 950
+	ModulePriorityAdminLog     = 950
 	ModulePriorityStats        = 800
-	ModulePriorityGamelog      = 790
-	ModulePriorityServerconf   = 780
+	ModulePriorityGameLog      = 790
+	ModulePriorityServerConf   = 780
 	ModulePriorityShell        = 770
 	ModulePriorityBrowse       = 760
 	ModulePriorityUnibuild     = 750
 	ModulePrioritySVN          = 740
 	ModulePriorityGit          = 730
-	ModulePriorityCitask       = 600
-	ModulePriorityBugtracker   = 500
+	ModulePriorityCiTask       = 600
+	ModulePriorityBugTracker   = 500
 	ModulePriorityNote         = 400
-	ModulePriorityFilemanager  = 300
-	ModulePriorityImagemanager = 200
+	ModulePriorityFileManager  = 300
+	ModulePriorityImageManager = 200
 	ModulePriorityLuban        = 100
+	ModulePriorityGameConf     = 90 // 游戏配置模块
 )

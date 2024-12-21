@@ -13,7 +13,7 @@ type imagemanagerModule struct {
 }
 
 func init() {
-	core.RegisterModule(&imagemanagerModule{}, enum.ModulePriorityImagemanager)
+	core.RegisterModule(&imagemanagerModule{}, enum.ModulePriorityImageManager)
 }
 
 func (m *imagemanagerModule) Awake(a *core.App) error {

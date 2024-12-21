@@ -13,7 +13,7 @@ type taskModule struct {
 }
 
 func init() {
-	core.RegisterModule(&taskModule{}, enum.ModulePriorityCitask)
+	core.RegisterModule(&taskModule{}, enum.ModulePriorityCiTask)
 }
 
 func (m *taskModule) Awake(a *core.App) error {

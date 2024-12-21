@@ -13,7 +13,7 @@ type serverconfModule struct {
 }
 
 func init() {
-	core.RegisterModule(&serverconfModule{}, enum.ModulePriorityServerconf)
+	core.RegisterModule(&serverconfModule{}, enum.ModulePriorityServerConf)
 }
 
 func (m *serverconfModule) Awake(a *core.App) error {

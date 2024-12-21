@@ -14,7 +14,7 @@ type adminlogModule struct {
 }
 
 func init() {
-	core.RegisterModule(&adminlogModule{}, enum.ModulePriorityAdminlog)
+	core.RegisterModule(&adminlogModule{}, enum.ModulePriorityAdminLog)
 }
 
 func (m *adminlogModule) Awake(a *core.App) error {
