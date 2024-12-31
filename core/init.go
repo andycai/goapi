@@ -32,7 +32,7 @@ func (m *BaseModule) AddAuthRouters() error {
 	return nil
 }
 
-var modules = collections.NewPriorityQueue[Module]()
+var modules = collections.NewMinPriorityQueue[Module]()
 
 // RegisterModule 注册模块
 func RegisterModule(module Module, priority int) {
