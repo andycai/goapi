@@ -114,7 +114,7 @@ func (s *SQLiteStorage) Close() error {
 }
 
 // SessionSetup 初始化session存储
-func SessionSetup(dbDriver string, db *sql.DB, dsn, tableName string) {
+func SessionSetup(dbDriver string, db *sql.DB, dsn, tableName string, expiry time.Duration) {
 	var storage fiber.Storage
 
 	// 根据数据库类型选择存储方式
@@ -145,7 +145,7 @@ func SessionSetup(dbDriver string, db *sql.DB, dsn, tableName string) {
 	// 创建session存储
 	store = session.New(session.Config{
 		Storage:        storage,
-		Expiration:     24 * time.Hour, // 默认session过期时间
+		Expiration:     expiry, // 默认session过期时间
 		KeyLookup:      "cookie:" + sessionName,
 		CookieSecure:   IsSecureMode(), // 根据安全模式配置决定是否启用secure
 		CookieHTTPOnly: true,

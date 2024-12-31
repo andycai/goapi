@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"github.com/andycai/unitool/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -28,7 +30,8 @@ func (a *App) Start(dbs []*gorm.DB, fiberApp *fiber.App) {
 	a.FiberApp = fiberApp
 
 	sqlDb, _ := a.DB.DB()
-	SessionSetup(config.Database.Driver, sqlDb, config.Database.DSN, "sessions")
+	expiry := time.Duration(a.Config.Auth.TokenExpire) * time.Second
+	SessionSetup(config.Database.Driver, sqlDb, config.Database.DSN, "sessions", expiry)
 
 	// 注册静态路由
 	serverConfig := a.Config.Server
