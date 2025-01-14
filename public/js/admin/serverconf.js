@@ -19,6 +19,11 @@ function serverConfig() {
         serverInfo: {
             fields: []
         },
+        noticeList: [],
+        noticeNum: {
+            noticenum: 0,
+            eject: 0
+        },
 
         init() {
             this.loadServerList();
@@ -182,6 +187,118 @@ function serverConfig() {
                 await this.loadServerInfo();
             } catch (error) {
                 console.error('保存服务器信息失败:', error);
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        addServer() {
+            this.serverList.serverlist.push({
+                server_id: '',
+                name: '',
+                server_status: '',
+                available: '1',
+                mergeid: '0',
+                online: String(Math.floor(Date.now() / 1000)),
+                server_port: '',
+                server_ip: ''
+            });
+        },
+
+        removeServer(index) {
+            this.serverList.serverlist.splice(index, 1);
+        },
+
+        addLastServerItem() {
+            this.lastServer.lastserver.last_server.push({
+                server_id: '',
+                name: '',
+                server_status: '',
+                server_port: '',
+                server_ip: ''
+            });
+        },
+
+        removeLastServerItem(index) {
+            this.lastServer.lastserver.last_server.splice(index, 1);
+        },
+
+        addNotice() {
+            this.noticeList.push({
+                title: '',
+                content: ''
+            });
+        },
+
+        removeNotice(index) {
+            this.noticeList.splice(index, 1);
+        },
+
+        async saveServerList() {
+            try {
+                const response = await fetch('/api/game/serverlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.serverList),
+                });
+                if (!response.ok) throw new Error('保存失败');
+                Alpine.store('notification').show('服务器列表保存成功', 'success');
+            } catch (error) {
+                console.error('保存服务器列表失败:', error);
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        async saveLastServer() {
+            try {
+                const response = await fetch('/api/game/lastserver', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.lastServer),
+                });
+                if (!response.ok) throw new Error('保存失败');
+                Alpine.store('notification').show('最后登录服务器保存成功', 'success');
+            } catch (error) {
+                console.error('保存最后登录服务器失败:', error);
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        async saveNoticeList() {
+            try {
+                const response = await fetch('/api/game/noticelist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.noticeList),
+                });
+                if (!response.ok) throw new Error('保存失败');
+                Alpine.store('notification').show('公告列表保存成功', 'success');
+            } catch (error) {
+                console.error('保存公告列表失败:', error);
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        async saveNoticeNum() {
+            try {
+                const response = await fetch('/api/game/noticenum', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.noticeNum),
+                });
+                if (!response.ok) throw new Error('保存失败');
+                Alpine.store('notification').show('公告数量保存成功', 'success');
+
+                await this.loadServerInfo();
+            } catch (error) {
+                console.error('保存公告数量失败:', error);
                 Alpine.store('notification').show(error.message, 'error');
             }
         }
