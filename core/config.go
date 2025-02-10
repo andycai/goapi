@@ -13,6 +13,7 @@ type Config struct {
 	JSONPaths JSONPathConfig `toml:"json_paths"`
 	FTP       FTPConfig      `toml:"ftp"`
 	Auth      AuthConfig     `toml:"auth"`
+	Cors      CorsConfig     `toml:"cors"`
 }
 
 type ServerConfig struct {
@@ -66,6 +67,15 @@ type AuthConfig struct {
 type AppConfig struct {
 	IsDev    bool `toml:"is_dev"`    // 是否为开发环境
 	IsSecure bool `toml:"is_secure"` // 是否启用安全模式
+}
+
+type CorsConfig struct {
+	Enabled          bool     `toml:"enabled"`           // 是否启用跨域
+	AllowedOrigins   []string `toml:"allowed_origins"`   // 允许的源
+	AllowedMethods   []string `toml:"allowed_methods"`   // 允许的 HTTP 方法
+	AllowedHeaders   []string `toml:"allowed_headers"`   // 允许的请求头
+	AllowCredentials bool     `toml:"allow_credentials"` // 是否允许携带认证信息
+	MaxAge           int      `toml:"max_age"`           // 预检请求结果缓存时间（小时）
 }
 
 var config Config
@@ -166,6 +176,10 @@ func GetFTPConfig() FTPConfig {
 
 func GetJSONPathConfig() JSONPathConfig {
 	return config.JSONPaths
+}
+
+func GetCorsConfig() CorsConfig {
+	return config.Cors
 }
 
 func UpdateServerConfig(newConfig ServerConfig) {

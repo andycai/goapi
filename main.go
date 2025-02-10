@@ -6,11 +6,13 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/andycai/unitool/core"
 	"github.com/andycai/unitool/lib/database"
 	_ "github.com/andycai/unitool/modules"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html/v2"
 	"gorm.io/gorm"
 )
@@ -94,6 +96,18 @@ func main() {
 			}
 		},
 	})
+
+	// 配置 CORS 中间件
+	corsConfig := core.GetCorsConfig()
+	if corsConfig.Enabled {
+		fiberApp.Use(cors.New(cors.Config{
+			AllowOrigins:     strings.Join(corsConfig.AllowedOrigins, ","),
+			AllowMethods:     strings.Join(corsConfig.AllowedMethods, ","),
+			AllowHeaders:     strings.Join(corsConfig.AllowedHeaders, ","),
+			AllowCredentials: corsConfig.AllowCredentials,
+			MaxAge:           int(time.Duration(corsConfig.MaxAge) * time.Hour),
+		}))
+	}
 
 	app := core.NewApp()
 	app.Start([]*gorm.DB{db}, fiberApp)
