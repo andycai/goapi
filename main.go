@@ -9,10 +9,12 @@ import (
 	"time"
 
 	"github.com/andycai/unitool/core"
+	_ "github.com/andycai/unitool/docs" // 导入 swagger docs
 	"github.com/andycai/unitool/lib/database"
 	_ "github.com/andycai/unitool/modules"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/swagger"
 	"github.com/gofiber/template/html/v2"
 	"gorm.io/gorm"
 )
@@ -22,6 +24,20 @@ var (
 	BuildTime string
 )
 
+// @title UnityTool API
+// @version 1.0
+// @description Unity游戏开发辅助工具API文档
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url https://github.com/andycai/unitool
+// @contact.email your-email@example.com
+
+// @license.name MIT
+// @license.url https://github.com/andycai/unitool/blob/main/LICENSE
+
+// @host localhost:3000
+// @BasePath /api/v1
 func main() {
 	// 加载配置文件
 	if err := core.LoadConfig(); err != nil {
@@ -108,6 +124,13 @@ func main() {
 			MaxAge:           int(time.Duration(corsConfig.MaxAge) * time.Hour),
 		}))
 	}
+
+	// 添加 Swagger 路由
+	fiberApp.Get("/swagger/*", swagger.New(swagger.Config{
+		Title:        "UnityTool API",
+		DeepLinking:  true,
+		DocExpansion: "list",
+	}))
 
 	app := core.NewApp()
 	app.Start([]*gorm.DB{db}, fiberApp)

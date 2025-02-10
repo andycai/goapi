@@ -13,6 +13,65 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// StatsResponse 统计数据响应
+type StatsResponse struct {
+	ID          int64   `json:"id"`
+	LoginID     string  `json:"login_id"`
+	AppID       string  `json:"app_id"`
+	PackageName string  `json:"package_name"`
+	RoleName    string  `json:"role_name"`
+	DeviceName  string  `json:"device_name"`
+	SystemCPU   string  `json:"system_cpu"`
+	SystemMem   float64 `json:"system_mem"`
+	GraphicsGPU string  `json:"graphics_gpu"`
+	GraphicsMem float64 `json:"graphics_mem"`
+	CreatedAt   string  `json:"created_at"`
+}
+
+// @Summary 获取统计数据列表
+// @Description 获取游戏性能统计数据列表
+// @Tags stats
+// @Accept json
+// @Produce json
+// @Param page query int false "页码" default(1)
+// @Param limit query int false "每页数量" default(10)
+// @Param search query string false "搜索关键词"
+// @Success 200 {array} StatsResponse
+// @Router /api/v1/stats [get]
+func GetStatsList(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"message": "获取统计数据列表",
+	})
+}
+
+// @Summary 获取统计数据详情
+// @Description 获取单条游戏性能统计数据详情
+// @Tags stats
+// @Accept json
+// @Produce json
+// @Param id path int true "统计数据ID"
+// @Success 200 {object} StatsResponse
+// @Router /api/v1/stats/{id} [get]
+func GetStatsDetail(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"message": "获取统计数据详情",
+	})
+}
+
+// @Summary 删除统计数据
+// @Description 删除指定的统计数据
+// @Tags stats
+// @Accept json
+// @Produce json
+// @Param id path int true "统计数据ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /api/v1/stats/{id} [delete]
+func DeleteStats(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"message": "删除统计数据成功",
+	})
+}
+
 // 创建资源占用记录
 func CreateStats(c *fiber.Ctx) error {
 	var record models.StatsRecord

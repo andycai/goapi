@@ -19,7 +19,7 @@ allowed_origins = [
 ] # 允许的源，["*"] 表示允许所有，或指定域名 ["http://localhost:3000", "https://example.com"]
 allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"] # 允许的 HTTP 方法
 allowed_headers = ["Origin", "Content-Type", "Accept", "Authorization"] # 允许的请求头
-allow_credentials = true # 是否允许携带认证信息
+allow_credentials = false # 是否允许携带认证信息
 max_age = 24 # 预检请求结果缓存时间（小时）
 
 # 静态路径配置改为数组
@@ -57,4 +57,4 @@ max_log_size = 20971520
 
 [auth]
 jwt_secret = "your-secret-key"
-token_expire = 259200          # 72小时
+token_expire = 604800          # 7天
