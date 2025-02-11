@@ -31,7 +31,7 @@ var (
 
 // @contact.name API Support
 // @contact.url https://github.com/andycai/unitool
-// @contact.email your-email@example.com
+// @contact.email huayicai@gamil.com
 
 // @license.name MIT
 // @license.url https://github.com/andycai/unitool/blob/main/LICENSE
