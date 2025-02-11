@@ -10,6 +10,12 @@ port = 3000
 output = "../publish/output"
 script_path = "sh"
 user_data_path = "./user_data.bin"
+# 静态路径配置改为数组
+static_paths = [
+    { route = "/static", path = "./public" },
+    { route = "/uploads", path = "./uploads" },
+    { route = "/cdn", path = "./cdn" },
+]
 
 # CORS 跨域配置
 [cors]
@@ -21,13 +27,6 @@ allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"] # 允许的 HTTP �
 allowed_headers = ["Origin", "Content-Type", "Accept", "Authorization"] # 允许的请求头
 allow_credentials = false # 是否允许携带认证信息
 max_age = 24 # 预检请求结果缓存时间（小时）
-
-# 静态路径配置改为数组
-static_paths = [
-    { route = "/static", path = "./public" },
-    { route = "/uploads", path = "./uploads" },
-    { route = "/cdn", path = "./cdn" },
-]
 
 [database]
 driver = "sqlite"
