@@ -7,29 +7,29 @@ LDFLAGS='-s -w -X "main.Version='${VERSION}'" -X "main.BuildTime='${BUILD_TIME}'
 
 # 打包 release 版本的 go 程序，windows 平台
 echo "Building for Windows..."
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="${LDFLAGS}" -trimpath -o unitool_serve_windows.exe
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="${LDFLAGS}" -trimpath -o bin/unitool_serve_windows.exe
 if [ $? -eq 0 ]; then
     echo "Windows build successful"
     # 使用 UPX 进一步压缩（如果安装了 UPX）
     if command -v upx &> /dev/null; then
-        upx --best --lzma unitool_serve_windows.exe
+        upx --best --lzma bin/unitool_serve_windows.exe
     fi
 fi
 
 # 打包 release 版本的 go 程序，linux 平台
 echo "Building for Linux..."
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="${LDFLAGS}" -trimpath -o unitool_serve_linux
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="${LDFLAGS}" -trimpath -o bin/unitool_serve_linux
 if [ $? -eq 0 ]; then
     echo "Linux build successful"
     # 使用 UPX 进一步压缩（如果安装了 UPX）
     if command -v upx &> /dev/null; then
-        upx --best --lzma unitool_serve_linux
+        upx --best --lzma bin/unitool_serve_linux
     fi
 fi
 
 # 打包 release 版本的 go 程序，mac 平台
 echo "Building for macOS..."
-CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="${LDFLAGS}" -trimpath -o unitool_serve_mac
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="${LDFLAGS}" -trimpath -o bin/unitool_serve_mac
 if [ $? -eq 0 ]; then
     echo "macOS build successful"
     # macOS 二进制文件不建议使用 UPX 压缩，可能会导致签名问题
