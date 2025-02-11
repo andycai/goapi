@@ -13,66 +13,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// StatsResponse 统计数据响应
-type StatsResponse struct {
-	ID          int64   `json:"id"`
-	LoginID     string  `json:"login_id"`
-	AppID       string  `json:"app_id"`
-	PackageName string  `json:"package_name"`
-	RoleName    string  `json:"role_name"`
-	DeviceName  string  `json:"device_name"`
-	SystemCPU   string  `json:"system_cpu"`
-	SystemMem   float64 `json:"system_mem"`
-	GraphicsGPU string  `json:"graphics_gpu"`
-	GraphicsMem float64 `json:"graphics_mem"`
-	CreatedAt   string  `json:"created_at"`
-}
-
-// @Summary 获取统计数据列表
-// @Description 获取游戏性能统计数据列表
+// @Summary 创建统计记录（含图片）
+// @Description 创建新的统计记录，支持图片上传（base64编码）
 // @Tags stats
 // @Accept json
 // @Produce json
-// @Param page query int false "页码" default(1)
-// @Param limit query int false "每页数量" default(10)
-// @Param search query string false "搜索关键词"
-// @Success 200 {array} StatsResponse
-// @Router /api/v1/stats [get]
-func GetStatsList(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "获取统计数据列表",
-	})
-}
-
-// @Summary 获取统计数据详情
-// @Description 获取单条游戏性能统计数据详情
-// @Tags stats
-// @Accept json
-// @Produce json
-// @Param id path int true "统计数据ID"
-// @Success 200 {object} StatsResponse
-// @Router /api/v1/stats/{id} [get]
-func GetStatsDetail(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "获取统计数据详情",
-	})
-}
-
-// @Summary 删除统计数据
-// @Description 删除指定的统计数据
-// @Tags stats
-// @Accept json
-// @Produce json
-// @Param id path int true "统计数据ID"
-// @Success 200 {object} map[string]interface{}
-// @Router /api/v1/stats/{id} [delete]
-func DeleteStats(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "删除统计数据成功",
-	})
-}
-
-// 创建资源占用记录
+// @Param body body models.StatsRecord true "统计记录数据"
+// @Success 201 {object} models.StatsRecord
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/stats [post]
 func CreateStats(c *fiber.Ctx) error {
 	var record models.StatsRecord
 	if err := c.BodyParser(&record); err != nil {
@@ -137,7 +87,18 @@ func CreateStats(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(record)
 }
 
-// 获取资源占用记录
+// @Summary 获取统计列表
+// @Description 获取分页统计记录列表
+// @Tags stats
+// @Accept json
+// @Produce json
+// @Param page query int false "页码" default(1)
+// @Param pageSize query int false "每页数量" default(20)
+// @Param search query string false "搜索关键词"
+// @Param date query string false "过滤日期 (格式: YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "包含统计列表和分页信息"
+// @Failure 500 {object} map[string]string
+// @Router /api/stats [get]
 func getStats(c *fiber.Ctx) error {
 	page := c.QueryInt("page", 1)
 	pageSize := c.QueryInt("pageSize", 20)
@@ -175,7 +136,16 @@ func getStats(c *fiber.Ctx) error {
 	})
 }
 
-// 删除资源占用记录
+// @Summary 删除历史统计
+// @Description 删除指定日期前的所有统计记录
+// @Tags stats
+// @Accept json
+// @Produce json
+// @Param date query string true "删除截止日期 (格式: YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/stats/before [delete]
 func deleteStatsBefore(c *fiber.Ctx) error {
 	dateStr := c.Query("date")
 	if dateStr == "" {
@@ -228,7 +198,17 @@ func deleteStatsBefore(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"code": 0, "message": "records deleted successfully", "count": result.RowsAffected})
 }
 
-// 获取资源占用详情
+// @Summary 获取统计详情
+// @Description 根据登录ID获取详细统计信息
+// @Tags stats
+// @Accept json
+// @Produce json
+// @Param login_id query string true "用户登录ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/stats/details [get]
 func getStatDetails(c *fiber.Ctx) error {
 	loginID := c.Query("login_id")
 	if loginID == "" {
@@ -251,7 +231,17 @@ func getStatDetails(c *fiber.Ctx) error {
 	})
 }
 
-// 删除单条统计记录
+// @Summary 删除单个统计
+// @Description 根据ID删除统计记录及其关联数据
+// @Tags stats
+// @Accept json
+// @Produce json
+// @Param id path int true "统计记录ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/stats/{id} [delete]
 func deleteStat(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {

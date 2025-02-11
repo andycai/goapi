@@ -13,7 +13,7 @@ const docTemplate = `{
         "contact": {
             "name": "API Support",
             "url": "https://github.com/andycai/unitool",
-            "email": "your-email@example.com"
+            "email": "huayicai@gamil.com"
         },
         "license": {
             "name": "MIT",
@@ -24,9 +24,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/stats": {
+        "/api/stats": {
             "get": {
-                "description": "获取游戏性能统计数据列表",
+                "description": "获取分页统计记录列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -36,7 +36,7 @@ const docTemplate = `{
                 "tags": [
                     "stats"
                 ],
-                "summary": "获取统计数据列表",
+                "summary": "获取统计列表",
                 "parameters": [
                     {
                         "type": "integer",
@@ -47,9 +47,9 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "default": 10,
+                        "default": 20,
                         "description": "每页数量",
-                        "name": "limit",
+                        "name": "pageSize",
                         "in": "query"
                     },
                     {
@@ -57,24 +57,35 @@ const docTemplate = `{
                         "description": "搜索关键词",
                         "name": "search",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "过滤日期 (格式: YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "包含统计列表和分页信息",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/stats.StatsResponse"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     }
                 }
-            }
-        },
-        "/api/v1/stats/{id}": {
-            "get": {
-                "description": "获取单条游戏性能统计数据详情",
+            },
+            "post": {
+                "description": "创建新的统计记录，支持图片上传（base64编码）",
                 "consumes": [
                     "application/json"
                 ],
@@ -84,13 +95,65 @@ const docTemplate = `{
                 "tags": [
                     "stats"
                 ],
-                "summary": "获取统计数据详情",
+                "summary": "创建统计记录（含图片）",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "统计数据ID",
-                        "name": "id",
-                        "in": "path",
+                        "description": "统计记录数据",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.StatsRecord"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.StatsRecord"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/stats/before": {
+            "delete": {
+                "description": "删除指定日期前的所有统计记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "删除历史统计",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "删除截止日期 (格式: YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -98,13 +161,34 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/stats.StatsResponse"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "删除指定的统计数据",
+            }
+        },
+        "/api/stats/details": {
+            "get": {
+                "description": "根据登录ID获取详细统计信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -114,11 +198,71 @@ const docTemplate = `{
                 "tags": [
                     "stats"
                 ],
-                "summary": "删除统计数据",
+                "summary": "获取统计详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户登录ID",
+                        "name": "login_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/stats/{id}": {
+            "delete": {
+                "description": "根据ID删除统计记录及其关联数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stats"
+                ],
+                "summary": "删除单个统计",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "统计数据ID",
+                        "description": "统计记录ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -131,37 +275,70 @@ const docTemplate = `{
                             "type": "object",
                             "additionalProperties": true
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "stats.StatsResponse": {
+        "models.StatsRecord": {
             "type": "object",
             "properties": {
                 "app_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "device_name": {
                     "type": "string"
                 },
-                "graphics_gpu": {
+                "graphics_divice": {
                     "type": "string"
                 },
                 "graphics_mem": {
-                    "type": "number"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "login_id": {
-                    "type": "string"
+                    "type": "integer"
+                },
+                "mtime": {
+                    "type": "integer"
                 },
                 "package_name": {
+                    "type": "string"
+                },
+                "product_name": {
                     "type": "string"
                 },
                 "role_name": {
@@ -171,7 +348,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "system_mem": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         }

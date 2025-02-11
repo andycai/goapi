@@ -1,34 +1,38 @@
 basePath: /api/v1
 definitions:
-  stats.StatsResponse:
+  models.StatsRecord:
     properties:
       app_id:
-        type: string
+        type: integer
       created_at:
-        type: string
+        type: integer
       device_name:
         type: string
-      graphics_gpu:
+      graphics_divice:
         type: string
       graphics_mem:
-        type: number
+        type: integer
       id:
         type: integer
       login_id:
-        type: string
+        type: integer
+      mtime:
+        type: integer
       package_name:
+        type: string
+      product_name:
         type: string
       role_name:
         type: string
       system_cpu:
         type: string
       system_mem:
-        type: number
+        type: integer
     type: object
 host: localhost:3000
 info:
   contact:
-    email: your-email@example.com
+    email: huayicai@gamil.com
     name: API Support
     url: https://github.com/andycai/unitool
   description: Unity游戏开发辅助工具API文档
@@ -39,45 +43,87 @@ info:
   title: UnityTool API
   version: "1.0"
 paths:
-  /api/v1/stats:
+  /api/stats:
     get:
       consumes:
       - application/json
-      description: 获取游戏性能统计数据列表
+      description: 获取分页统计记录列表
       parameters:
       - default: 1
         description: 页码
         in: query
         name: page
         type: integer
-      - default: 10
+      - default: 20
         description: 每页数量
         in: query
-        name: limit
+        name: pageSize
         type: integer
       - description: 搜索关键词
         in: query
         name: search
         type: string
+      - description: '过滤日期 (格式: YYYY-MM-DD)'
+        in: query
+        name: date
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 包含统计列表和分页信息
           schema:
-            items:
-              $ref: '#/definitions/stats.StatsResponse'
-            type: array
-      summary: 获取统计数据列表
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取统计列表
       tags:
       - stats
-  /api/v1/stats/{id}:
+    post:
+      consumes:
+      - application/json
+      description: 创建新的统计记录，支持图片上传（base64编码）
+      parameters:
+      - description: 统计记录数据
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.StatsRecord'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.StatsRecord'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 创建统计记录（含图片）
+      tags:
+      - stats
+  /api/stats/{id}:
     delete:
       consumes:
       - application/json
-      description: 删除指定的统计数据
+      description: 根据ID删除统计记录及其关联数据
       parameters:
-      - description: 统计数据ID
+      - description: 统计记录ID
         in: path
         name: id
         required: true
@@ -90,27 +136,99 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: 删除统计数据
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 删除单个统计
       tags:
       - stats
-    get:
+  /api/stats/before:
+    delete:
       consumes:
       - application/json
-      description: 获取单条游戏性能统计数据详情
+      description: 删除指定日期前的所有统计记录
       parameters:
-      - description: 统计数据ID
-        in: path
-        name: id
+      - description: '删除截止日期 (格式: YYYY-MM-DD)'
+        in: query
+        name: date
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/stats.StatsResponse'
-      summary: 获取统计数据详情
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 删除历史统计
+      tags:
+      - stats
+  /api/stats/details:
+    get:
+      consumes:
+      - application/json
+      description: 根据登录ID获取详细统计信息
+      parameters:
+      - description: 用户登录ID
+        in: query
+        name: login_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 获取统计详情
       tags:
       - stats
 swagger: "2.0"

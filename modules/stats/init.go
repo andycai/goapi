@@ -25,17 +25,19 @@ func (m *statsModule) Awake(a *core.App) error {
 }
 
 func (m *statsModule) AddPublicRouters() error {
-	// public
 	app.RouterPublicApi.Post("/stats", CreateStats)
 
 	return nil
 }
 
 func (m *statsModule) AddAuthRouters() error {
-	// api
+
 	app.RouterApi.Get("/stats", app.HasPermission("stats:list"), getStats)
+
 	app.RouterApi.Delete("/stats/before", app.HasPermission("stats:delete"), deleteStatsBefore)
+
 	app.RouterApi.Get("/stats/details", app.HasPermission("stats:list"), getStatDetails)
+
 	app.RouterApi.Delete("/stats/:id", app.HasPermission("stats:delete"), deleteStat)
 
 	// admin
