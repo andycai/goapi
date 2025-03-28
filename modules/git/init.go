@@ -21,7 +21,7 @@ func (m *gitModule) Awake(a *core.App) error {
 	app = a
 
 	// Initialize Git service
-	Srv = InitService()
+	Srv = initService()
 
 	return nil
 }

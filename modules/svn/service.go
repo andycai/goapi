@@ -15,7 +15,7 @@ type SVNService struct {
 	svnCmd string
 }
 
-func InitService() *SVNService {
+func initService() *SVNService {
 	srv = &SVNService{
 		svnCmd: getSVNCommand(),
 	}

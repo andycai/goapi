@@ -15,7 +15,7 @@ type GitService struct {
 	gitCmd string
 }
 
-func InitService() *GitService {
+func initService() *GitService {
 	srv = &GitService{
 		gitCmd: getGitCommand(),
 	}

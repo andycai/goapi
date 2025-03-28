@@ -21,7 +21,7 @@ func (m *svnModule) Awake(a *core.App) error {
 	app = a
 
 	// Initialize SVN service
-	Srv = InitService()
+	Srv = initService()
 
 	return nil
 }
