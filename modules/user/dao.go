@@ -274,6 +274,35 @@ func initData() error {
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
+			// 仓库同步
+			{
+				Name:        "仓库同步查看",
+				Code:        "reposync:list",
+				Description: "查看仓库同步",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "仓库同步配置",
+				Code:        "reposync:config",
+				Description: "配置仓库同步参数",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "仓库签出",
+				Code:        "reposync:checkout",
+				Description: "签出仓库",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "仓库同步",
+				Code:        "reposync:sync",
+				Description: "执行仓库同步",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
 		}
 
 		if err := tx.Create(&permissions).Error; err != nil {

@@ -206,6 +206,17 @@ func initData() error {
 			CreatedAt:  now,
 			UpdatedAt:  now,
 		},
+		{
+			ParentID:   toolsManage.ID,
+			Name:       "仓库同步",
+			Path:       "/admin/reposync",
+			Icon:       "reposync",
+			Sort:       4,
+			Permission: "reposync:list",
+			IsShow:     true,
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
 	}
 
 	if err := app.DB.Create(&toolsMenus).Error; err != nil {
