@@ -18,7 +18,13 @@ func init() {
 
 func (m *serverconfModule) Awake(a *core.App) error {
 	app = a
-	return nil
+	// 数据迁移
+	if err := autoMigrate(); err != nil {
+		return err
+	}
+
+	// 初始化数据
+	return initData()
 }
 
 func (m *serverconfModule) AddPublicRouters() error {

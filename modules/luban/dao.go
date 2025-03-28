@@ -1,12 +1,69 @@
 package luban
 
 import (
+	"log"
+	"time"
+
 	"github.com/andycai/unitool/models"
+	"gorm.io/gorm"
 )
 
 // 数据迁移
 func autoMigrate() error {
 	return app.DB.AutoMigrate(&models.ConfigProject{}, &models.ConfigTable{}, &models.ConfigExport{})
+}
+
+// 初始化数据
+func initData() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("luban") {
+		log.Println("Luban模块数据库已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建Luban相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "Luban配置列表",
+				Code:        "luban:list",
+				Description: "查看Luban配置列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Luban配置管理",
+				Code:        "luban:manage",
+				Description: "管理Luban配置",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Luban导出配置",
+				Code:        "luban:export",
+				Description: "导出Luban配置",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "luban",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 // 获取项目列表

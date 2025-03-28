@@ -1,4 +1,4 @@
-package gamelog
+package imagemanager
 
 import (
 	"log"
@@ -10,39 +10,39 @@ import (
 
 // 数据迁移
 func autoMigrate() error {
-	return app.DB.AutoMigrate(&models.GameLog{})
+	return nil
 }
 
 // 初始化数据
 func initData() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("gamelog") {
-		log.Println("游戏日志模块数据库已初始化，跳过")
+	if app.IsInitializedModule("imagemanager") {
+		log.Println("图片管理模块数据库已初始化，跳过")
 		return nil
 	}
 
 	// 开始事务
 	return app.DB.Transaction(func(tx *gorm.DB) error {
-		// 创建游戏日志相关权限
+		// 创建图片管理相关权限
 		permissions := []models.Permission{
 			{
-				Name:        "游戏日志列表",
-				Code:        "gamelog:list",
-				Description: "查看游戏日志列表",
+				Name:        "图片管理列表",
+				Code:        "imagemanager:list",
+				Description: "查看图片管理列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "游戏日志搜索",
-				Code:        "gamelog:search",
-				Description: "搜索游戏日志",
+				Name:        "图片上传",
+				Code:        "imagemanager:upload",
+				Description: "上传图片",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "游戏日志导出",
-				Code:        "gamelog:export",
-				Description: "导出游戏日志",
+				Name:        "图片删除",
+				Code:        "imagemanager:delete",
+				Description: "删除图片",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
@@ -54,7 +54,7 @@ func initData() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "gamelog",
+			Module:      "imagemanager",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

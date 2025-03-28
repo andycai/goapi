@@ -1,4 +1,4 @@
-package gamelog
+package unibuild
 
 import (
 	"log"
@@ -10,39 +10,39 @@ import (
 
 // 数据迁移
 func autoMigrate() error {
-	return app.DB.AutoMigrate(&models.GameLog{})
+	return nil
 }
 
 // 初始化数据
 func initData() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("gamelog") {
-		log.Println("游戏日志模块数据库已初始化，跳过")
+	if app.IsInitializedModule("unibuild") {
+		log.Println("构建任务模块数据库已初始化，跳过")
 		return nil
 	}
 
 	// 开始事务
 	return app.DB.Transaction(func(tx *gorm.DB) error {
-		// 创建游戏日志相关权限
+		// 创建构建任务相关权限
 		permissions := []models.Permission{
 			{
-				Name:        "游戏日志列表",
-				Code:        "gamelog:list",
-				Description: "查看游戏日志列表",
+				Name:        "构建任务列表",
+				Code:        "unibuild:list",
+				Description: "查看构建任务列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "游戏日志搜索",
-				Code:        "gamelog:search",
-				Description: "搜索游戏日志",
+				Name:        "创建构建任务",
+				Code:        "unibuild:create",
+				Description: "创建新的构建任务",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "游戏日志导出",
-				Code:        "gamelog:export",
-				Description: "导出游戏日志",
+				Name:        "执行构建任务",
+				Code:        "unibuild:execute",
+				Description: "执行构建任务",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
@@ -54,7 +54,7 @@ func initData() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "gamelog",
+			Module:      "unibuild",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

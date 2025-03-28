@@ -17,7 +17,13 @@ func init() {
 
 func (m *uniBuildModule) Awake(a *core.App) error {
 	app = a
-	return nil
+	// 数据迁移
+	if err := autoMigrate(); err != nil {
+		return err
+	}
+
+	// 初始化数据
+	return initData()
 }
 
 func (m *uniBuildModule) AddPublicRouters() error {

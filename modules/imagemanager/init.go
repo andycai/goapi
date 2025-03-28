@@ -18,11 +18,16 @@ func init() {
 
 func (m *imagemanagerModule) Awake(a *core.App) error {
 	app = a
+	// 数据迁移
+	if err := autoMigrate(); err != nil {
+		return err
+	}
 
 	// Initialize Imagemanager service
 	initService()
 
-	return nil
+	// 初始化数据
+	return initData()
 }
 
 func (m *imagemanagerModule) AddAuthRouters() error {
