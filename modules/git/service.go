@@ -63,8 +63,8 @@ func (s *GitService) isValidGitPath(path string) bool {
 	return true
 }
 
-// execGitCommand executes a Git command and returns its output
-func (s *GitService) execGitCommand(dir string, args ...string) (string, error) {
+// ExecGitCommand executes a Git command and returns its output
+func (s *GitService) ExecGitCommand(dir string, args ...string) (string, error) {
 	cmd := exec.Command(s.gitCmd, args...)
 	if dir != "" {
 		cmd.Dir = dir
@@ -99,7 +99,7 @@ func (s *GitService) Clone(url, path, branch string, username, password string) 
 	}
 
 	args = append(args, url, path)
-	_, err := s.execGitCommand("", args...)
+	_, err := s.ExecGitCommand("", args...)
 	return err
 }
 
@@ -109,7 +109,7 @@ func (s *GitService) Pull(path string) error {
 		return fmt.Errorf("invalid path: %s", path)
 	}
 
-	_, err := s.execGitCommand(path, "pull")
+	_, err := s.ExecGitCommand(path, "pull")
 	return err
 }
 
@@ -124,7 +124,7 @@ func (s *GitService) Push(path string, branch string) error {
 		args = append(args, "origin", branch)
 	}
 
-	_, err := s.execGitCommand(path, args...)
+	_, err := s.ExecGitCommand(path, args...)
 	return err
 }
 
@@ -134,7 +134,7 @@ func (s *GitService) Status(path string) (string, error) {
 		return "", fmt.Errorf("invalid path: %s", path)
 	}
 
-	return s.execGitCommand(path, "status")
+	return s.ExecGitCommand(path, "status")
 }
 
 // Log gets Git commit history
@@ -148,7 +148,7 @@ func (s *GitService) Log(path string, limit int) (string, error) {
 		args = append(args, fmt.Sprintf("-%d", limit))
 	}
 
-	return s.execGitCommand(path, args...)
+	return s.ExecGitCommand(path, args...)
 }
 
 // Commit performs Git commit operation
@@ -157,7 +157,7 @@ func (s *GitService) Commit(path, message string) error {
 		return fmt.Errorf("invalid path: %s", path)
 	}
 
-	_, err := s.execGitCommand(path, "commit", "-m", message)
+	_, err := s.ExecGitCommand(path, "commit", "-m", message)
 	return err
 }
 
@@ -173,7 +173,7 @@ func (s *GitService) Checkout(path, branch string, create bool) error {
 	}
 	args = append(args, branch)
 
-	_, err := s.execGitCommand(path, args...)
+	_, err := s.ExecGitCommand(path, args...)
 	return err
 }
 
@@ -186,12 +186,12 @@ func (s *GitService) Branch(path string, create bool, name string) (string, erro
 	args := []string{"branch"}
 	if create && name != "" {
 		args = append(args, name)
-		_, err := s.execGitCommand(path, args...)
+		_, err := s.ExecGitCommand(path, args...)
 		return "", err
 	}
 
 	// List branches if not creating
-	return s.execGitCommand(path, args...)
+	return s.ExecGitCommand(path, args...)
 }
 
 // Merge performs Git merge operation
@@ -200,7 +200,7 @@ func (s *GitService) Merge(path, branch string) error {
 		return fmt.Errorf("invalid path: %s", path)
 	}
 
-	_, err := s.execGitCommand(path, "merge", branch)
+	_, err := s.ExecGitCommand(path, "merge", branch)
 	return err
 }
 
@@ -215,7 +215,7 @@ func (s *GitService) Reset(path string, hard bool) error {
 		args = append(args, "--hard")
 	}
 
-	_, err := s.execGitCommand(path, args...)
+	_, err := s.ExecGitCommand(path, args...)
 	return err
 }
 
@@ -230,6 +230,6 @@ func (s *GitService) Stash(path string, pop bool) error {
 		args = append(args, "pop")
 	}
 
-	_, err := s.execGitCommand(path, args...)
+	_, err := s.ExecGitCommand(path, args...)
 	return err
 }

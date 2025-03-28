@@ -18,6 +18,7 @@ const (
 	ModulePriorityLuban        = 2007 // 游戏-Luban
 	ModulePrioritySVN          = 3000 // 工具-SVN
 	ModulePriorityGit          = 3001 // 工具-Git
+	ModulePriorityRepoSync     = 3002 // 工具-仓库同步
 	ModulePriorityFileManager  = 8000 // 功能-文件管理
 	ModulePriorityImageManager = 8001 // 功能-图片管理
 	ModulePriorityBugTracker   = 8002 // 功能-Bug 跟踪
