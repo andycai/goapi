@@ -16,7 +16,7 @@ import (
 	"github.com/andycai/unitool/modules/svn"
 )
 
-var reposyncService *RepoSyncService
+var srv *RepoSyncService
 
 // RepoConfig 仓库配置
 type RepoConfig struct {
@@ -55,20 +55,15 @@ type RepoSyncService struct {
 	commitList []CommitRecord
 }
 
-// InitService 初始化服务
-func InitService() {
-	reposyncService = &RepoSyncService{
+// initService 初始化服务
+func initService() {
+	srv = &RepoSyncService{
 		config:     &RepoConfig{ConfigPath: "./data/reposync_config.json"},
 		commitList: []CommitRecord{},
 	}
 
 	// 尝试加载配置
-	reposyncService.LoadConfig()
-}
-
-// GetService 获取服务实例
-func GetService() *RepoSyncService {
-	return reposyncService
+	srv.LoadConfig()
 }
 
 // isValidPath 检查路径是否安全

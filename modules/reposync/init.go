@@ -20,7 +20,7 @@ func (m *reposyncModule) Awake(a *core.App) error {
 	app = a
 
 	// 初始化服务
-	InitService()
+	initService()
 
 	return nil
 }
@@ -37,11 +37,11 @@ func (m *reposyncModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	app.RouterApi.Post("/reposync/config", app.HasPermission("reposync:config"), ConfigHandler)
-	app.RouterApi.Get("/reposync/config", app.HasPermission("reposync:config"), GetConfigHandler)
-	app.RouterApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), CheckoutHandler)
-	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:list"), ListCommitsHandler)
-	app.RouterApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), SyncHandler)
+	app.RouterApi.Post("/reposync/config", app.HasPermission("reposync:config"), saveConfig)
+	app.RouterApi.Get("/reposync/config", app.HasPermission("reposync:config"), getConfig)
+	app.RouterApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkout)
+	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:list"), getCommits)
+	app.RouterApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommits)
 
 	return nil
 }

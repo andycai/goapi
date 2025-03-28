@@ -7,6 +7,7 @@ import (
 type Module interface {
 	Awake(*App) error
 	Start() error
+	Dispose() error
 	AddPublicRouters() error
 	AddAuthRouters() error
 }
@@ -21,6 +22,10 @@ func (m *BaseModule) Awake(a *App) error {
 }
 
 func (m *BaseModule) Start() error {
+	return nil
+}
+
+func (m *BaseModule) Dispose() error {
 	return nil
 }
 
