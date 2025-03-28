@@ -169,6 +169,15 @@ func writeJSONFile(path string, v interface{}) error {
 	return nil
 }
 
+// @Summary 获取服务器列表
+// @Description 获取服务器的详细列表
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Success 200 {object} ServerList
+// @Failure 500 {object} map[string]string
+// @Router /api/server/list [get]
+
 // 获取服务器列表
 func getServerList(c *fiber.Ctx) error {
 	var serverList ServerList
@@ -177,6 +186,17 @@ func getServerList(c *fiber.Ctx) error {
 	}
 	return c.JSON(serverList)
 }
+
+// @Summary 更新服务器列表
+// @Description 更新服务器的详细列表
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Param body body ServerList true "服务器列表数据"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/server/list [put]
 
 // 更新服务器列表
 func updateServerList(c *fiber.Ctx) error {
@@ -195,6 +215,15 @@ func updateServerList(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
 
+// @Summary 获取最后登录服务器
+// @Description 获取最后登录的服务器信息
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Success 200 {object} LastServer
+// @Failure 500 {object} map[string]string
+// @Router /api/server/last [get]
+
 // 获取最后登录服务器
 func getLastServer(c *fiber.Ctx) error {
 	var lastServer LastServer
@@ -203,6 +232,17 @@ func getLastServer(c *fiber.Ctx) error {
 	}
 	return c.JSON(lastServer)
 }
+
+// @Summary 更新最后登录服务器
+// @Description 更新最后登录的服务器信息
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Param body body LastServer true "最后登录服务器数据"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/server/last [put]
 
 // 更新最后登录服务器
 func updateLastServer(c *fiber.Ctx) error {
@@ -221,6 +261,15 @@ func updateLastServer(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
 
+// @Summary 获取服务器信息
+// @Description 获取服务器的详细信息
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Success 200 {object} ServerInfoConfig
+// @Failure 500 {object} map[string]string
+// @Router /api/server/info [get]
+
 // 获取服务器信息
 func getServerInfo(c *fiber.Ctx) error {
 	var data map[string]interface{}
@@ -233,6 +282,17 @@ func getServerInfo(c *fiber.Ctx) error {
 
 	return c.JSON(config.ToMap())
 }
+
+// @Summary 更新服务器信息
+// @Description 更新服务器的详细信息
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Param body body ServerInfoConfig true "服务器信息数据"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/server/info [put]
 
 // 更新服务器信息
 func updateServerInfo(c *fiber.Ctx) error {
@@ -272,6 +332,15 @@ func updateServerInfo(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
 
+// @Summary 获取公告列表
+// @Description 获取公告的详细列表
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Success 200 {object} NoticeList
+// @Failure 500 {object} map[string]string
+// @Router /api/server/notice [get]
+
 // 获取公告列表
 func getNoticeList(c *fiber.Ctx) error {
 	var noticeList NoticeList
@@ -280,6 +349,17 @@ func getNoticeList(c *fiber.Ctx) error {
 	}
 	return c.JSON(noticeList)
 }
+
+// @Summary 更新公告列表
+// @Description 更新公告的详细列表
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Param body body NoticeList true "公告列表数据"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/server/notice [put]
 
 // 更新公告列表
 func updateNoticeList(c *fiber.Ctx) error {
@@ -298,6 +378,15 @@ func updateNoticeList(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
 
+// @Summary 获取公告数量
+// @Description 获取公告的数量
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Success 200 {object} NoticeNum
+// @Failure 500 {object} map[string]string
+// @Router /api/server/notice/num [get]
+
 // 获取公告数量
 func getNoticeNum(c *fiber.Ctx) error {
 	var noticeNum NoticeNum
@@ -306,6 +395,17 @@ func getNoticeNum(c *fiber.Ctx) error {
 	}
 	return c.JSON(noticeNum)
 }
+
+// @Summary 更新公告数量
+// @Description 更新公告的数量
+// @Tags serverconf
+// @Accept json
+// @Produce json
+// @Param body body NoticeNum true "公告数量数据"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/server/notice/num [put]
 
 // 更新公告数量
 func updateNoticeNum(c *fiber.Ctx) error {
