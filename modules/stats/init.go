@@ -3,7 +3,6 @@ package stats
 import (
 	"github.com/andycai/unitool/core"
 	"github.com/andycai/unitool/enum"
-	"github.com/andycai/unitool/models"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,9 +18,13 @@ func init() {
 
 func (m *statsModule) Awake(a *core.App) error {
 	app = a
-
 	// 数据迁移
-	return app.DB.AutoMigrate(&models.StatsRecord{}, &models.StatsInfo{})
+	if err := autoMigrate(); err != nil {
+		return err
+	}
+
+	// 初始化数据
+	return initData()
 }
 
 func (m *statsModule) AddPublicRouters() error {

@@ -5,8 +5,17 @@ import (
 	"gorm.io/gorm"
 )
 
+var srv *noteService
+
+type noteService struct {
+}
+
+func initService() {
+	srv = &noteService{}
+}
+
 // GetNoteByID 获取笔记
-func GetNoteByID(id uint) (*models.Note, error) {
+func (s *noteService) GetNoteByID(id uint) (*models.Note, error) {
 	var note models.Note
 	if err := app.DB.Preload("Category").Preload("Roles").First(&note, id).Error; err != nil {
 		return nil, err
@@ -15,7 +24,7 @@ func GetNoteByID(id uint) (*models.Note, error) {
 }
 
 // GetCategoryByID 获取分类
-func GetCategoryByID(id uint) (*models.NoteCategory, error) {
+func (s *noteService) GetCategoryByID(id uint) (*models.NoteCategory, error) {
 	var category models.NoteCategory
 	if err := app.DB.Preload("Roles").First(&category, id).Error; err != nil {
 		return nil, err
@@ -24,7 +33,7 @@ func GetCategoryByID(id uint) (*models.NoteCategory, error) {
 }
 
 // ListNotes 获取笔记列表
-func ListNotes() ([]models.Note, error) {
+func (s *noteService) ListNotes() ([]models.Note, error) {
 	var notes []models.Note
 	if err := app.DB.Preload("Category").Find(&notes).Error; err != nil {
 		return nil, err
@@ -33,7 +42,7 @@ func ListNotes() ([]models.Note, error) {
 }
 
 // ListCategories 获取分类列表
-func ListCategories() ([]models.NoteCategory, error) {
+func (s *noteService) ListCategories() ([]models.NoteCategory, error) {
 	var categories []models.NoteCategory
 	if err := app.DB.Find(&categories).Error; err != nil {
 		return nil, err
@@ -42,7 +51,7 @@ func ListCategories() ([]models.NoteCategory, error) {
 }
 
 // ListPublicNotes 获取公开笔记列表
-func ListPublicNotes() ([]models.Note, error) {
+func (s *noteService) ListPublicNotes() ([]models.Note, error) {
 	var notes []models.Note
 	if err := app.DB.Where("is_public = ?", 1).Find(&notes).Error; err != nil {
 		return nil, err
@@ -51,7 +60,7 @@ func ListPublicNotes() ([]models.Note, error) {
 }
 
 // ListPublicCategories 获取公开分类列表
-func ListPublicCategories() ([]models.NoteCategory, error) {
+func (s *noteService) ListPublicCategories() ([]models.NoteCategory, error) {
 	var categories []models.NoteCategory
 	if err := app.DB.Where("is_public = ?", 1).Find(&categories).Error; err != nil {
 		return nil, err
@@ -60,7 +69,7 @@ func ListPublicCategories() ([]models.NoteCategory, error) {
 }
 
 // HasCategoryChildren 检查分类是否有子分类
-func HasCategoryChildren(id uint) (bool, error) {
+func (s *noteService) HasCategoryChildren(id uint) (bool, error) {
 	var count int64
 	if err := app.DB.Model(&models.NoteCategory{}).Where("parent_id = ?", id).Count(&count).Error; err != nil {
 		return false, err
@@ -69,7 +78,7 @@ func HasCategoryChildren(id uint) (bool, error) {
 }
 
 // HasCategoryNotes 检查分类是否有笔记
-func HasCategoryNotes(id uint) (bool, error) {
+func (s *noteService) HasCategoryNotes(id uint) (bool, error) {
 	var count int64
 	if err := app.DB.Model(&models.Note{}).Where("category_id = ?", id).Count(&count).Error; err != nil {
 		return false, err
@@ -78,12 +87,12 @@ func HasCategoryNotes(id uint) (bool, error) {
 }
 
 // IncrementNoteViewCount 增加笔记浏览次数
-func IncrementNoteViewCount(note *models.Note) error {
+func (s *noteService) IncrementNoteViewCount(note *models.Note) error {
 	return app.DB.Model(note).UpdateColumn("view_count", note.ViewCount+1).Error
 }
 
 // CreateNote 创建笔记
-func CreateNote(note *models.Note, roleIDs []uint) error {
+func (s *noteService) CreateNote(note *models.Note, roleIDs []uint) error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(note).Error; err != nil {
 			return err
@@ -104,7 +113,7 @@ func CreateNote(note *models.Note, roleIDs []uint) error {
 }
 
 // UpdateNote 更新笔记
-func UpdateNote(note *models.Note, roleIDs []uint) error {
+func (s *noteService) UpdateNote(note *models.Note, roleIDs []uint) error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(note).Error; err != nil {
 			return err
@@ -129,12 +138,12 @@ func UpdateNote(note *models.Note, roleIDs []uint) error {
 }
 
 // DeleteNote 删除笔记
-func DeleteNote(note *models.Note) error {
+func (s *noteService) DeleteNote(note *models.Note) error {
 	return app.DB.Delete(note).Error
 }
 
 // CreateCategory 创建分类
-func CreateCategory(category *models.NoteCategory, roleIDs []uint) error {
+func (s *noteService) CreateCategory(category *models.NoteCategory, roleIDs []uint) error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(category).Error; err != nil {
 			return err
@@ -155,7 +164,7 @@ func CreateCategory(category *models.NoteCategory, roleIDs []uint) error {
 }
 
 // UpdateCategory 更新分类
-func UpdateCategory(category *models.NoteCategory, roleIDs []uint) error {
+func (s *noteService) UpdateCategory(category *models.NoteCategory, roleIDs []uint) error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(category).Error; err != nil {
 			return err
@@ -180,6 +189,6 @@ func UpdateCategory(category *models.NoteCategory, roleIDs []uint) error {
 }
 
 // DeleteCategory 删除分类
-func DeleteCategory(category *models.NoteCategory) error {
+func (s *noteService) DeleteCategory(category *models.NoteCategory) error {
 	return app.DB.Delete(category).Error
 }

@@ -3,7 +3,6 @@ package gameconf
 import (
 	"github.com/andycai/unitool/core"
 	"github.com/andycai/unitool/enum"
-	"github.com/andycai/unitool/models"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,7 +18,13 @@ func init() {
 
 func (m *gameconfModule) Awake(a *core.App) error {
 	app = a
-	return autoMigrate()
+	// 数据迁移
+	if err := autoMigrate(); err != nil {
+		return err
+	}
+
+	// 初始化数据
+	return initData()
 }
 
 func (m *gameconfModule) Start() error {
@@ -60,12 +65,4 @@ func (m *gameconfModule) AddAuthRouters() error {
 	app.RouterApi.Get("/gameconf/exports/:id/download", app.HasPermission("gameconf:list"), downloadExport) // 下载导出文件
 
 	return nil
-}
-
-func autoMigrate() error {
-	return app.DB.AutoMigrate(
-		&models.GameConfProject{},
-		&models.GameConfTable{},
-		&models.GameConfExport{},
-	)
 }

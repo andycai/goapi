@@ -6,21 +6,12 @@ import (
 	"github.com/andycai/unitool/models"
 )
 
-var bugtrackerService *BugtrackerService
+var srv *BugtrackerService
 
 type BugtrackerService struct{}
 
-func InitService() {
-	bugtrackerService = &BugtrackerService{}
-	initTables()
-}
-
-func GetService() *BugtrackerService {
-	return bugtrackerService
-}
-
-func initTables() {
-	app.DB.AutoMigrate(&models.Project{}, &models.Iteration{}, &models.Issue{}, &models.Comment{})
+func initService() {
+	srv = &BugtrackerService{}
 }
 
 // Project methods

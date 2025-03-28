@@ -7,7 +7,7 @@ import (
 // ListHandler handles the request to list images
 func ListHandler(c *fiber.Ctx) error {
 	path := c.Query("path", "./")
-	images, err := GetService().List(path)
+	images, err := srv.List(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -36,7 +36,7 @@ func UploadHandler(c *fiber.Ctx) error {
 	}
 	defer src.Close()
 
-	err = GetService().Upload(path, src, file.Filename)
+	err = srv.Upload(path, src, file.Filename)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -52,7 +52,7 @@ func UploadHandler(c *fiber.Ctx) error {
 func DeleteHandler(c *fiber.Ctx) error {
 	path := c.FormValue("path")
 
-	err := GetService().Delete(path)
+	err := srv.Delete(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -69,7 +69,7 @@ func RenameHandler(c *fiber.Ctx) error {
 	oldPath := c.FormValue("old_path")
 	newPath := c.FormValue("new_path")
 
-	err := GetService().Rename(oldPath, newPath)
+	err := srv.Rename(oldPath, newPath)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -86,7 +86,7 @@ func MoveHandler(c *fiber.Ctx) error {
 	sourcePath := c.FormValue("source_path")
 	destPath := c.FormValue("dest_path")
 
-	err := GetService().Move(sourcePath, destPath)
+	err := srv.Move(sourcePath, destPath)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -103,7 +103,7 @@ func CopyHandler(c *fiber.Ctx) error {
 	sourcePath := c.FormValue("source_path")
 	destPath := c.FormValue("dest_path")
 
-	err := GetService().Copy(sourcePath, destPath)
+	err := srv.Copy(sourcePath, destPath)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -119,7 +119,7 @@ func CopyHandler(c *fiber.Ctx) error {
 func InfoHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
 
-	info, err := GetService().GetInfo(path)
+	info, err := srv.GetInfo(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -135,7 +135,7 @@ func InfoHandler(c *fiber.Ctx) error {
 func ThumbnailHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
 
-	thumbnailPath, err := GetService().GetThumbnail(path)
+	thumbnailPath, err := srv.GetThumbnail(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -148,7 +148,7 @@ func ThumbnailHandler(c *fiber.Ctx) error {
 // ViewHandler serves the original image
 func ViewHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
-	fullPath := GetService().rootPath + "/" + path
+	fullPath := srv.rootPath + "/" + path
 
 	return c.SendFile(fullPath)
 }

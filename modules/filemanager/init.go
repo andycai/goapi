@@ -20,7 +20,7 @@ func (m *filemanagerModule) Awake(a *core.App) error {
 	app = a
 
 	// Initialize Filemanager service
-	InitService()
+	initService()
 
 	return nil
 }

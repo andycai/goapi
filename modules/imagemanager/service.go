@@ -15,7 +15,7 @@ import (
 	"github.com/nfnt/resize"
 )
 
-var imagemanagerService *ImagemanagerService
+var srv *ImagemanagerService
 
 type ImageInfo struct {
 	Name      string    `json:"name"`
@@ -33,18 +33,14 @@ type ImagemanagerService struct {
 	thumbnailDir string
 }
 
-func InitService() {
-	imagemanagerService = &ImagemanagerService{
+func initService() {
+	srv = &ImagemanagerService{
 		rootPath:     "./uploads/images",
 		thumbnailDir: "./uploads/thumbnails",
 	}
 	// Create directories if they don't exist
-	os.MkdirAll(imagemanagerService.rootPath, 0755)
-	os.MkdirAll(imagemanagerService.thumbnailDir, 0755)
-}
-
-func GetService() *ImagemanagerService {
-	return imagemanagerService
+	os.MkdirAll(srv.rootPath, 0755)
+	os.MkdirAll(srv.thumbnailDir, 0755)
 }
 
 // isValidPath checks if the path is safe for file operations

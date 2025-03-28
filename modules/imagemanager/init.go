@@ -20,7 +20,7 @@ func (m *imagemanagerModule) Awake(a *core.App) error {
 	app = a
 
 	// Initialize Imagemanager service
-	InitService()
+	initService()
 
 	return nil
 }

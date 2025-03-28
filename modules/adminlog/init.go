@@ -3,7 +3,6 @@ package adminlog
 import (
 	"github.com/andycai/unitool/core"
 	"github.com/andycai/unitool/enum"
-	"github.com/andycai/unitool/models"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,7 +18,13 @@ func init() {
 
 func (m *adminlogModule) Awake(a *core.App) error {
 	app = a
-	return app.DB.AutoMigrate(&models.AdminLog{})
+	// 数据迁移
+	if err := autoMigrate(); err != nil {
+		return err
+	}
+
+	// 初始化数据
+	return initData()
 }
 
 func (m *adminlogModule) AddAuthRouters() error {

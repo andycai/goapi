@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var filemanagerService *FilemanagerService
+var srv *FilemanagerService
 
 type FileInfo struct {
 	Name      string    `json:"name"`
@@ -26,14 +26,10 @@ type FilemanagerService struct {
 	rootPath string
 }
 
-func InitService() {
-	filemanagerService = &FilemanagerService{
+func initService() {
+	srv = &FilemanagerService{
 		rootPath: "./",
 	}
-}
-
-func GetService() *FilemanagerService {
-	return filemanagerService
 }
 
 // isValidPath checks if the path is safe for file operations
