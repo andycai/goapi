@@ -13,8 +13,8 @@ type SVNRequest struct {
 	Limit    int    `json:"limit"`
 }
 
-// CheckoutHandler handles SVN checkout requests
-func CheckoutHandler(c *fiber.Ctx) error {
+// checkout handles SVN checkout requests
+func checkout(c *fiber.Ctx) error {
 	var req SVNRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -28,7 +28,7 @@ func CheckoutHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Checkout(req.URL, req.Path, req.Username, req.Password)
+	err := srv.Checkout(req.URL, req.Path, req.Username, req.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -40,8 +40,8 @@ func CheckoutHandler(c *fiber.Ctx) error {
 	})
 }
 
-// UpdateHandler handles SVN update requests
-func UpdateHandler(c *fiber.Ctx) error {
+// update handles SVN update requests
+func update(c *fiber.Ctx) error {
 	var req SVNRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -55,7 +55,7 @@ func UpdateHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Update(req.Path)
+	err := srv.Update(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -67,8 +67,8 @@ func UpdateHandler(c *fiber.Ctx) error {
 	})
 }
 
-// CommitHandler handles SVN commit requests
-func CommitHandler(c *fiber.Ctx) error {
+// commit handles SVN commit requests
+func commit(c *fiber.Ctx) error {
 	var req SVNRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -82,7 +82,7 @@ func CommitHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Commit(req.Path, req.Message)
+	err := srv.Commit(req.Path, req.Message)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -94,8 +94,8 @@ func CommitHandler(c *fiber.Ctx) error {
 	})
 }
 
-// StatusHandler handles SVN status requests
-func StatusHandler(c *fiber.Ctx) error {
+// status handles SVN status requests
+func status(c *fiber.Ctx) error {
 	path := c.Query("path")
 	if path == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -103,7 +103,7 @@ func StatusHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	status, err := GetService().Status(path)
+	status, err := srv.Status(path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -115,8 +115,8 @@ func StatusHandler(c *fiber.Ctx) error {
 	})
 }
 
-// InfoHandler handles SVN info requests
-func InfoHandler(c *fiber.Ctx) error {
+// info handles SVN info requests
+func info(c *fiber.Ctx) error {
 	path := c.Query("path")
 	if path == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -124,7 +124,7 @@ func InfoHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	info, err := GetService().Info(path)
+	info, err := srv.Info(path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -136,8 +136,8 @@ func InfoHandler(c *fiber.Ctx) error {
 	})
 }
 
-// LogHandler handles SVN log requests
-func LogHandler(c *fiber.Ctx) error {
+// log handles SVN log requests
+func log(c *fiber.Ctx) error {
 	path := c.Query("path")
 	limit := c.QueryInt("limit", 10) // Default to 10 entries if not specified
 
@@ -147,7 +147,7 @@ func LogHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	log, err := GetService().Log(path, limit)
+	log, err := srv.Log(path, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -159,8 +159,8 @@ func LogHandler(c *fiber.Ctx) error {
 	})
 }
 
-// RevertHandler handles SVN revert requests
-func RevertHandler(c *fiber.Ctx) error {
+// revert handles SVN revert requests
+func revert(c *fiber.Ctx) error {
 	var req SVNRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -174,7 +174,7 @@ func RevertHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Revert(req.Path)
+	err := srv.Revert(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -186,8 +186,8 @@ func RevertHandler(c *fiber.Ctx) error {
 	})
 }
 
-// AddHandler handles SVN add requests
-func AddHandler(c *fiber.Ctx) error {
+// add handles SVN add requests
+func add(c *fiber.Ctx) error {
 	var req SVNRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -201,7 +201,7 @@ func AddHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Add(req.Path)
+	err := srv.Add(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -213,8 +213,8 @@ func AddHandler(c *fiber.Ctx) error {
 	})
 }
 
-// DeleteHandler handles SVN delete requests
-func DeleteHandler(c *fiber.Ctx) error {
+// delete handles SVN delete requests
+func delete(c *fiber.Ctx) error {
 	var req SVNRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -228,7 +228,7 @@ func DeleteHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Delete(req.Path)
+	err := srv.Delete(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),

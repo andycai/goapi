@@ -17,8 +17,8 @@ type GitRequest struct {
 	Limit    int    `json:"limit"`
 }
 
-// CloneHandler handles Git clone requests
-func CloneHandler(c *fiber.Ctx) error {
+// clone handles Git clone requests
+func clone(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -32,7 +32,7 @@ func CloneHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Clone(req.URL, req.Path, req.Branch, req.Username, req.Password)
+	err := srv.Clone(req.URL, req.Path, req.Branch, req.Username, req.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -44,8 +44,8 @@ func CloneHandler(c *fiber.Ctx) error {
 	})
 }
 
-// PullHandler handles Git pull requests
-func PullHandler(c *fiber.Ctx) error {
+// pull handles Git pull requests
+func pull(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -59,7 +59,7 @@ func PullHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Pull(req.Path)
+	err := srv.Pull(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -71,8 +71,8 @@ func PullHandler(c *fiber.Ctx) error {
 	})
 }
 
-// PushHandler handles Git push requests
-func PushHandler(c *fiber.Ctx) error {
+// push handles Git push requests
+func push(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -86,7 +86,7 @@ func PushHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Push(req.Path, req.Branch)
+	err := srv.Push(req.Path, req.Branch)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -98,8 +98,8 @@ func PushHandler(c *fiber.Ctx) error {
 	})
 }
 
-// StatusHandler handles Git status requests
-func StatusHandler(c *fiber.Ctx) error {
+// status handles Git status requests
+func status(c *fiber.Ctx) error {
 	path := c.Query("path")
 	if path == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -107,7 +107,7 @@ func StatusHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	status, err := GetService().Status(path)
+	status, err := srv.Status(path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -119,8 +119,8 @@ func StatusHandler(c *fiber.Ctx) error {
 	})
 }
 
-// LogHandler handles Git log requests
-func LogHandler(c *fiber.Ctx) error {
+// log handles Git log requests
+func log(c *fiber.Ctx) error {
 	path := c.Query("path")
 	limit := c.QueryInt("limit", 10) // Default to 10 entries if not specified
 
@@ -130,7 +130,7 @@ func LogHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	log, err := GetService().Log(path, limit)
+	log, err := srv.Log(path, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -142,8 +142,8 @@ func LogHandler(c *fiber.Ctx) error {
 	})
 }
 
-// CommitHandler handles Git commit requests
-func CommitHandler(c *fiber.Ctx) error {
+// commit handles Git commit requests
+func commit(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -157,7 +157,7 @@ func CommitHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Commit(req.Path, req.Message)
+	err := srv.Commit(req.Path, req.Message)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -169,8 +169,8 @@ func CommitHandler(c *fiber.Ctx) error {
 	})
 }
 
-// CheckoutHandler handles Git checkout requests
-func CheckoutHandler(c *fiber.Ctx) error {
+// checkout handles Git checkout requests
+func checkout(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -184,7 +184,7 @@ func CheckoutHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Checkout(req.Path, req.Branch, req.Create)
+	err := srv.Checkout(req.Path, req.Branch, req.Create)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -196,8 +196,8 @@ func CheckoutHandler(c *fiber.Ctx) error {
 	})
 }
 
-// BranchHandler handles Git branch requests
-func BranchHandler(c *fiber.Ctx) error {
+// branch handles Git branch requests
+func branch(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -211,7 +211,7 @@ func BranchHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	result, err := GetService().Branch(req.Path, req.Create, req.Branch)
+	result, err := srv.Branch(req.Path, req.Create, req.Branch)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -223,8 +223,8 @@ func BranchHandler(c *fiber.Ctx) error {
 	})
 }
 
-// MergeHandler handles Git merge requests
-func MergeHandler(c *fiber.Ctx) error {
+// merge handles Git merge requests
+func merge(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -238,7 +238,7 @@ func MergeHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Merge(req.Path, req.Branch)
+	err := srv.Merge(req.Path, req.Branch)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -250,8 +250,8 @@ func MergeHandler(c *fiber.Ctx) error {
 	})
 }
 
-// ResetHandler handles Git reset requests
-func ResetHandler(c *fiber.Ctx) error {
+// reset handles Git reset requests
+func reset(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -265,7 +265,7 @@ func ResetHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Reset(req.Path, req.Hard)
+	err := srv.Reset(req.Path, req.Hard)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -277,8 +277,8 @@ func ResetHandler(c *fiber.Ctx) error {
 	})
 }
 
-// StashHandler handles Git stash requests
-func StashHandler(c *fiber.Ctx) error {
+// stash handles Git stash requests
+func stash(c *fiber.Ctx) error {
 	var req GitRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -292,7 +292,7 @@ func StashHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err := GetService().Stash(req.Path, req.Pop)
+	err := srv.Stash(req.Path, req.Pop)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),

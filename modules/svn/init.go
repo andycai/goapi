@@ -7,6 +7,7 @@ import (
 )
 
 var app *core.App
+var Srv *SVNService
 
 type svnModule struct {
 	core.BaseModule
@@ -20,7 +21,7 @@ func (m *svnModule) Awake(a *core.App) error {
 	app = a
 
 	// Initialize SVN service
-	InitService()
+	Srv = InitService()
 
 	return nil
 }
@@ -37,15 +38,15 @@ func (m *svnModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Post("/svn/checkout", app.HasPermission("svn:checkout"), CheckoutHandler)
-	app.RouterApi.Post("/svn/update", app.HasPermission("svn:update"), UpdateHandler)
-	app.RouterApi.Post("/svn/commit", app.HasPermission("svn:commit"), CommitHandler)
-	app.RouterApi.Get("/svn/status", app.HasPermission("svn:status"), StatusHandler)
-	app.RouterApi.Get("/svn/info", app.HasPermission("svn:info"), InfoHandler)
-	app.RouterApi.Get("/svn/log", app.HasPermission("svn:log"), LogHandler)
-	app.RouterApi.Post("/svn/revert", app.HasPermission("svn:revert"), RevertHandler)
-	app.RouterApi.Post("/svn/add", app.HasPermission("svn:add"), AddHandler)
-	app.RouterApi.Delete("/svn/delete", app.HasPermission("svn:delete"), DeleteHandler)
+	app.RouterApi.Post("/svn/checkout", app.HasPermission("svn:checkout"), checkout)
+	app.RouterApi.Post("/svn/update", app.HasPermission("svn:update"), update)
+	app.RouterApi.Post("/svn/commit", app.HasPermission("svn:commit"), commit)
+	app.RouterApi.Get("/svn/status", app.HasPermission("svn:status"), status)
+	app.RouterApi.Get("/svn/info", app.HasPermission("svn:info"), info)
+	app.RouterApi.Get("/svn/log", app.HasPermission("svn:log"), log)
+	app.RouterApi.Post("/svn/revert", app.HasPermission("svn:revert"), revert)
+	app.RouterApi.Post("/svn/add", app.HasPermission("svn:add"), add)
+	app.RouterApi.Delete("/svn/delete", app.HasPermission("svn:delete"), delete)
 
 	return nil
 }

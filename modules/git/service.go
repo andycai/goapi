@@ -9,20 +9,18 @@ import (
 	"strings"
 )
 
-var gitService *GitService
+var srv *GitService
 
 type GitService struct {
 	gitCmd string
 }
 
-func InitService() {
-	gitService = &GitService{
+func InitService() *GitService {
+	srv = &GitService{
 		gitCmd: getGitCommand(),
 	}
-}
 
-func GetService() *GitService {
-	return gitService
+	return srv
 }
 
 // getGitCommand returns the appropriate Git command based on the OS

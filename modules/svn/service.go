@@ -9,20 +9,18 @@ import (
 	"strings"
 )
 
-var svnService *SVNService
+var srv *SVNService
 
 type SVNService struct {
 	svnCmd string
 }
 
-func InitService() {
-	svnService = &SVNService{
+func InitService() *SVNService {
+	srv = &SVNService{
 		svnCmd: getSVNCommand(),
 	}
-}
 
-func GetService() *SVNService {
-	return svnService
+	return srv
 }
 
 // getSVNCommand returns the appropriate SVN command based on the OS

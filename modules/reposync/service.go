@@ -199,9 +199,9 @@ func (s *RepoSyncService) checkoutRepo(repoType, url, path, username, password s
 	// 根据仓库类型执行检出操作
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return svn.GetService().Checkout(url, path, username, password)
+		return svn.Srv.Checkout(url, path, username, password)
 	case "git":
-		return git.GetService().Clone(url, path, "", username, password)
+		return git.Srv.Clone(url, path, "", username, password)
 	default:
 		return fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
@@ -259,9 +259,9 @@ func (s *RepoSyncService) updateRepo(repoType, path, username, password string) 
 	// 根据仓库类型执行更新操作
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return svn.GetService().Update(path)
+		return svn.Srv.Update(path)
 	case "git":
-		return git.GetService().Pull(path)
+		return git.Srv.Pull(path)
 	default:
 		return fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
@@ -287,7 +287,7 @@ func (s *RepoSyncService) getRepoCommits(repoType, path string, limit int) ([]Co
 // getSVNCommits 获取SVN提交记录
 func (s *RepoSyncService) getSVNCommits(path string, limit int) ([]CommitRecord, error) {
 	// 获取SVN日志
-	logOutput, err := svn.GetService().Log(path, limit)
+	logOutput, err := svn.Srv.Log(path, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +380,7 @@ func (s *RepoSyncService) getSVNChangedFiles(path, revision string) ([]string, e
 // getGitCommits 获取Git提交记录
 func (s *RepoSyncService) getGitCommits(path string, limit int) ([]CommitRecord, error) {
 	// 获取Git日志
-	logOutput, err := git.GetService().Log(path, limit)
+	logOutput, err := git.Srv.Log(path, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -738,7 +738,7 @@ func (s *RepoSyncService) commitToRepo(repoType, path, message string) error {
 			switch status {
 			case "?":
 				// 未版本控制的文件，需要添加
-				if err := svn.GetService().Add(filePath); err != nil {
+				if err := svn.Srv.Add(filePath); err != nil {
 					return fmt.Errorf("添加文件失败 %s: %v", filePath, err)
 				}
 			case "!", "D":
@@ -751,15 +751,15 @@ func (s *RepoSyncService) commitToRepo(repoType, path, message string) error {
 		}
 
 		// 提交所有变更
-		return svn.GetService().Commit(path, message)
+		return svn.Srv.Commit(path, message)
 	case "git":
 		// 先添加所有变更
-		_, err := git.GetService().ExecGitCommand(path, "add", "-A")
+		_, err := git.Srv.ExecGitCommand(path, "add", "-A")
 		if err != nil {
 			return err
 		}
 		// 提交变更
-		return git.GetService().Commit(path, message)
+		return git.Srv.Commit(path, message)
 	default:
 		return fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
