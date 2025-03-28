@@ -716,6 +716,46 @@ func (s *RepoSyncService) commitToRepo(repoType, path, message string) error {
 	// 根据仓库类型执行提交操作
 	switch strings.ToLower(repoType) {
 	case "svn":
+		// 获取文件状态
+		cmd := exec.Command("svn", "status", path)
+		output, err := cmd.Output()
+		if err != nil {
+			return fmt.Errorf("获取文件状态失败: %v", err)
+		}
+
+		// 处理每个文件的状态
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+
+			// 格式: ?/A/M/D/! path/to/file
+			parts := strings.SplitN(line, " ", 2)
+			if len(parts) != 2 {
+				continue
+			}
+
+			status := parts[0]
+			filePath := strings.TrimSpace(parts[1])
+
+			switch status {
+			case "?":
+				// 未版本控制的文件，需要添加
+				if err := svn.GetService().Add(filePath); err != nil {
+					return fmt.Errorf("添加文件失败 %s: %v", filePath, err)
+				}
+			case "!", "D":
+				// 丢失或删除的文件，需要从版本库中删除
+				cmd := exec.Command("svn", "delete", filePath)
+				if err := cmd.Run(); err != nil {
+					return fmt.Errorf("删除文件失败 %s: %v", filePath, err)
+				}
+			}
+		}
+
+		// 提交所有变更
 		return svn.GetService().Commit(path, message)
 	case "git":
 		// 先添加所有变更
