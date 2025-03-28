@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andycai/unitool/models"
 	"github.com/andycai/unitool/modules/git"
 	"github.com/andycai/unitool/modules/svn"
 )
@@ -232,6 +233,15 @@ func (s *RepoSyncService) GetCommits(limit, page int) ([]CommitRecord, int, erro
 	)
 	if err != nil {
 		return nil, 0, fmt.Errorf("获取提交记录失败: %v", err)
+	}
+
+	// 获取同步状态
+	for i := range commits {
+		var record models.RepoSyncRecord
+		result := app.DB.Where("revision = ?", commits[i].Revision).First(&record)
+		if result.Error == nil {
+			commits[i].Synced = record.Status == 1 // 1表示同步成功
+		}
 	}
 
 	// 获取总记录数
@@ -549,6 +559,14 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 		commit.Revision,
 	)
 	if err != nil {
+		// 记录同步失败状态
+		app.DB.Create(&models.RepoSyncRecord{
+			Revision: commit.Revision,
+			Comment:  commit.Comment,
+			Author:   commit.Author,
+			SyncTime: time.Now(),
+			Status:   2, // 同步失败
+		})
 		return fmt.Errorf("获取变更文件列表失败: %v", err)
 	}
 
@@ -608,11 +626,23 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 	}
 
 	// 提交到第二个仓库
-	return s.commitToRepo(
+	err = s.commitToRepo(
 		s.config.RepoType2,
 		s.config.LocalPath2,
 		fmt.Sprintf("Sync from %s: %s", commit.Revision, commit.Comment),
 	)
+	if err != nil {
+		return err
+	}
+
+	// 记录同步成功状态
+	return app.DB.Create(&models.RepoSyncRecord{
+		Revision: commit.Revision,
+		Comment:  commit.Comment,
+		Author:   commit.Author,
+		SyncTime: time.Now(),
+		Status:   1, // 同步成功
+	}).Error
 }
 
 // getFileChanges 获取文件变更列表
