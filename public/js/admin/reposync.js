@@ -1,4 +1,13 @@
 function reposyncManagement() {
+    window.Alpine = window.Alpine || {};
+    if (!Alpine.store('notification')) {
+        Alpine.store('notification', {
+            show: (message, type) => {
+                console.error(message);
+            },
+            after: () => {}
+        });
+    }
     return {
         config: {
             repo_type1: 'svn',
@@ -15,6 +24,10 @@ function reposyncManagement() {
         commits: [],
         selectedCommits: [],
         selectAll: false,
+        currentPage: 1,
+        pageSize: 10,
+        totalRecords: 0,
+        totalPages: 1,
 
         init() {
             this.loadConfig();
@@ -75,14 +88,23 @@ function reposyncManagement() {
 
         async loadCommits() {
             try {
-                const response = await fetch('/api/reposync/commits');
+                const response = await fetch(`/api/reposync/commits?page=${this.currentPage}&pageSize=${this.pageSize}`);
                 if (!response.ok) throw new Error('加载提交记录失败');
-                this.commits = await response.json();
+                const data = await response.json();
+                this.commits = data.commits;
+                this.totalRecords = data.total;
+                this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
                 this.selectedCommits = [];
                 this.selectAll = false;
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
             }
+        },
+
+        async changePage(page) {
+            if (page < 1 || page > this.totalPages) return;
+            this.currentPage = page;
+            await this.loadCommits();
         },
 
         toggleSelectAll() {

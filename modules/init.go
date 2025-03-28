@@ -9,6 +9,7 @@ import (
 	_ "github.com/andycai/unitool/modules/login"
 	_ "github.com/andycai/unitool/modules/menu"
 	_ "github.com/andycai/unitool/modules/permission"
+	_ "github.com/andycai/unitool/modules/reposync"
 	_ "github.com/andycai/unitool/modules/role"
 	_ "github.com/andycai/unitool/modules/serverconf"
 	_ "github.com/andycai/unitool/modules/shell"

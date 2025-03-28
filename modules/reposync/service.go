@@ -239,21 +239,20 @@ func (s *RepoSyncService) GetCommits(limit, page int) ([]CommitRecord, int, erro
 		return nil, 0, fmt.Errorf("获取提交记录失败: %v", err)
 	}
 
-	// 计算总页数
+	// 获取总记录数
 	totalCount := len(commits)
-	totalPages := (totalCount + limit - 1) / limit
 
 	// 分页
 	start := (page - 1) * limit
 	end := start + limit
 	if start >= totalCount {
-		return []CommitRecord{}, totalPages, nil
+		return []CommitRecord{}, totalCount, nil
 	}
 	if end > totalCount {
 		end = totalCount
 	}
 
-	return commits[start:end], totalPages, nil
+	return commits[start:end], totalCount, nil
 }
 
 // updateRepo 更新仓库
@@ -326,7 +325,7 @@ func (s *RepoSyncService) getSVNCommits(path string, limit int) ([]CommitRecord,
 
 		// 解析时间
 		timeStr := headerParts[2]
-		commitTime, _ := time.Parse("2006-01-02 15:04:05 -0700", timeStr)
+		commitTime, _ := time.Parse("2006-01-02 15:04:05 +0800", timeStr)
 
 		// 提取注释
 		comment := ""
@@ -376,7 +375,7 @@ func (s *RepoSyncService) getSVNChangedFiles(path, revision string) ([]string, e
 		// 格式: A path/to/file.txt
 		parts := strings.SplitN(line, " ", 2)
 		if len(parts) == 2 {
-			files = append(files, parts[1])
+			files = append(files, strings.TrimSpace(parts[1]))
 		}
 	}
 
@@ -567,20 +566,48 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 		// 根据变更类型执行操作
 		switch change.ChangeType {
 		case "A", "M": // 新增或修改
-			// 确保目标目录存在
-			targetDir := filepath.Dir(targetPath)
-			if err := os.MkdirAll(targetDir, 0755); err != nil {
-				return err
+			// 检查源文件是否是目录
+			sourceInfo, err := os.Stat(sourcePath)
+			if err != nil {
+				return fmt.Errorf("获取源文件信息失败: %v", err)
 			}
 
-			// 复制文件
-			if err := s.copyFile(sourcePath, targetPath); err != nil {
-				return err
+			if sourceInfo.IsDir() {
+				// 如果是目录，只需要创建目标目录
+				if err := os.MkdirAll(targetPath, 0755); err != nil {
+					return err
+				}
+			} else {
+				// 如果是文件，确保目标目录存在并复制文件
+				targetDir := filepath.Dir(targetPath)
+				if err := os.MkdirAll(targetDir, 0755); err != nil {
+					return err
+				}
+
+				// 复制文件
+				if err := s.copyFile(sourcePath, targetPath); err != nil {
+					return err
+				}
 			}
 		case "D": // 删除
-			// 删除文件
-			if err := os.Remove(targetPath); err != nil && !os.IsNotExist(err) {
-				return err
+			// 检查目标路径是否是目录
+			targetInfo, err := os.Stat(targetPath)
+			if err == nil && targetInfo.IsDir() {
+				// 如果是目录，使用RemoveAll删除
+				if err := os.RemoveAll(targetPath); err != nil {
+					return err
+				}
+			} else {
+				// 如果是文件或不存在，尝试删除
+				if err := os.Remove(targetPath); err != nil && !os.IsNotExist(err) {
+					return err
+				}
+
+				// 检查并删除空目录
+				targetDir := filepath.Dir(targetPath)
+				if err := s.removeEmptyDirs(targetDir, s.config.LocalPath2); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -628,7 +655,7 @@ func (s *RepoSyncService) getSVNFileChanges(path, revision string) ([]FileChange
 		parts := strings.SplitN(line, " ", 2)
 		if len(parts) == 2 {
 			changeType := parts[0]
-			filePath := parts[1]
+			filePath := strings.TrimSpace(parts[1])
 
 			// 计算相对路径
 			relPath, err := filepath.Rel(path, filePath)
@@ -722,4 +749,39 @@ func (s *RepoSyncService) copyFile(src, dst string) error {
 	// 复制内容
 	_, err = io.Copy(destination, source)
 	return err
+}
+
+// removeEmptyDirs 递归删除空目录
+func (s *RepoSyncService) removeEmptyDirs(dir, rootDir string) error {
+	// 检查路径是否安全
+	if !s.isValidPath(dir) {
+		return errors.New("无效的目录路径")
+	}
+
+	// 如果已经到达根目录，停止递归
+	if dir == rootDir {
+		return nil
+	}
+
+	// 读取目录内容
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	// 如果目录不为空，保留目录
+	if len(entries) > 0 {
+		return nil
+	}
+
+	// 删除空目录
+	if err := os.Remove(dir); err != nil {
+		return err
+	}
+
+	// 递归检查父目录
+	return s.removeEmptyDirs(filepath.Dir(dir), rootDir)
 }

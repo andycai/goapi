@@ -2,7 +2,6 @@ package reposync
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -66,7 +65,7 @@ func ListCommitsHandler(c *fiber.Ctx) error {
 		page = 1
 	}
 
-	commits, totalPages, err := GetService().GetCommits(limit, page)
+	commits, totalCount, err := GetService().GetCommits(limit, page)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取提交记录失败: " + err.Error(),
@@ -74,25 +73,31 @@ func ListCommitsHandler(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"data":         commits,
-		"total_pages":  totalPages,
-		"current_page": page,
+		"commits": commits,
+		"total":   totalCount,
 	})
 }
 
 // SyncHandler 同步提交记录
 func SyncHandler(c *fiber.Ctx) error {
-	revisions := c.FormValue("revisions")
-	if revisions == "" {
+	type SyncRequest struct {
+		Revisions []string `json:"revisions"`
+	}
+
+	var req SyncRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的请求数据",
+		})
+	}
+
+	if len(req.Revisions) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "版本号列表不能为空",
 		})
 	}
 
-	// 将逗号分隔的版本号字符串转换为切片
-	revisionList := strings.Split(revisions, ",")
-
-	if err := GetService().SyncCommits(revisionList); err != nil {
+	if err := GetService().SyncCommits(req.Revisions); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "同步提交失败: " + err.Error(),
 		})

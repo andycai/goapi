@@ -1,0 +1,13 @@
+{
+  "repo_type1": "svn",
+  "repo_url1": "https://192.168.200.200:8443/svn/dqtest/a",
+  "local_path1": "/Users/andy/Workspace/projects/devenv/repos/a",
+  "username1": "caihuayi",
+  "password1": "20waYEE12",
+  "repo_type2": "svn",
+  "repo_url2": "https://192.168.200.200:8443/svn/dqtest/b",
+  "local_path2": "/Users/andy/Workspace/projects/devenv/repos/b",
+  "username2": "caihuayi",
+  "password2": "20waYEE12",
+  "config_path": "./data/reposync_config.json"
+}
