@@ -3,7 +3,6 @@ package shell
 import (
 	"github.com/andycai/unitool/core"
 	"github.com/andycai/unitool/enum"
-	"github.com/gofiber/fiber/v2"
 )
 
 var app *core.App
@@ -23,19 +22,13 @@ func (m *shellModule) Awake(a *core.App) error {
 		return err
 	}
 
-	return nil
-}
-
-func (m *shellModule) Start() error {
 	// 初始化数据
 	return initData()
 }
 
 func (m *shellModule) AddPublicRouters() error {
 	// public
-	app.RouterPublicApi.Post("/shell", func(c *fiber.Ctx) error {
-		return execShell(c, app.Config.Server.ScriptPath)
-	})
+	app.RouterPublicApi.Post("/shell", execScriptHandler)
 
 	return nil
 }
