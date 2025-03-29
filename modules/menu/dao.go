@@ -35,7 +35,7 @@ func initData() error {
 
 func initPermissions() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("menu:permissions") {
+	if app.IsInitializedModule("menu:permission") {
 		log.Println("游戏日志模块数据库已初始化，跳过")
 		return nil
 	}
@@ -80,7 +80,7 @@ func initPermissions() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "menu:permissions",
+			Module:      "menu:permission",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

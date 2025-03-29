@@ -36,7 +36,7 @@ func initMenus() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("parameter:permission") {
-		log.Println("parameter:permission参数管理模块数据库已初始化，跳过")
+		log.Println("参数管理模块数据库已初始化，跳过")
 		return nil
 	}
 
