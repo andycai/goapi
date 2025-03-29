@@ -10,16 +10,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type LogReq struct {
-	AppID    string           `json:"app_id"`
-	Package  string           `json:"package"`
-	RoleName string           `json:"role_name"`
-	Device   string           `json:"device"`
-	Logs     []models.GameLog `json:"list"`
-}
-
 // 创建日志记录
-func createLog(c *fiber.Ctx) error {
+func createLogHandler(c *fiber.Ctx) error {
 	logReq := new(LogReq)
 	if err := c.BodyParser(logReq); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid input"})
@@ -46,7 +38,7 @@ func createLog(c *fiber.Ctx) error {
 }
 
 // 获取日志记录
-func getLogs(c *fiber.Ctx) error {
+func listLogsHandler(c *fiber.Ctx) error {
 	page := c.QueryInt("page", 1)
 	pageSize := c.QueryInt("pageSize", 20)
 	search := c.Query("search", "")
@@ -77,7 +69,7 @@ func getLogs(c *fiber.Ctx) error {
 }
 
 // 删除日志记录
-func deleteLogsBefore(c *fiber.Ctx) error {
+func deleteLogsBeforeHandler(c *fiber.Ctx) error {
 	dateStr := c.Query("date")
 	if dateStr == "" {
 		return c.Status(400).JSON(fiber.Map{"code": 1, "error": "Date parameter is required"})
@@ -107,7 +99,7 @@ func deleteLogsBefore(c *fiber.Ctx) error {
 }
 
 // 删除单条日志记录
-func deleteLog(c *fiber.Ctx) error {
+func deleteLogHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
 		return c.Status(400).JSON(fiber.Map{"code": 4, "error": "Log ID is required"})

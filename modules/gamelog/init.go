@@ -29,7 +29,7 @@ func (m *gamelogModule) Start() error {
 
 func (m *gamelogModule) AddPublicRouters() error {
 	// public
-	app.RouterPublicApi.Post("/gamelog", createLog)
+	app.RouterPublicApi.Post("/gamelog", createLogHandler)
 	return nil
 }
 
@@ -45,9 +45,9 @@ func (m *gamelogModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/gamelog", app.HasPermission("gamelog:list"), getLogs)
-	app.RouterApi.Delete("/gamelog/before", app.HasPermission("gamelog:delete"), deleteLogsBefore)
-	app.RouterApi.Delete("/gamelog/:id", app.HasPermission("gamelog:list"), deleteLog)
+	app.RouterApi.Get("/gamelog", app.HasPermission("gamelog:list"), listLogsHandler)
+	app.RouterApi.Delete("/gamelog/before", app.HasPermission("gamelog:delete"), deleteLogsBeforeHandler)
+	app.RouterApi.Delete("/gamelog/:id", app.HasPermission("gamelog:list"), deleteLogHandler)
 
 	return nil
 }
