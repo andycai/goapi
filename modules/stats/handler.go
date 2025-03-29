@@ -193,7 +193,7 @@ func deleteStatsBefore(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "delete", "stats", 0, fmt.Sprintf("批量删除%s之前的统计记录，共%d条", dateStr, result.RowsAffected))
+	adminlog.Srv.WriteLog(c, "delete", "stats", 0, fmt.Sprintf("批量删除%s之前的统计记录，共%d条", dateStr, result.RowsAffected))
 
 	return c.JSON(fiber.Map{"code": 0, "message": "records deleted successfully", "count": result.RowsAffected})
 }
@@ -281,7 +281,7 @@ func deleteStat(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "delete", "stats", statsRecord.ID, fmt.Sprintf("删除统计记录：%d", statsRecord.LoginID))
+	adminlog.Srv.WriteLog(c, "delete", "stats", statsRecord.ID, fmt.Sprintf("删除统计记录：%d", statsRecord.LoginID))
 
 	return c.JSON(fiber.Map{"code": 0, "message": "Stat record, associated info, and image files deleted successfully"})
 }

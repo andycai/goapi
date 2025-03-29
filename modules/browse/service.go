@@ -6,8 +6,18 @@ import (
 	"os"
 )
 
+var srv *BrowseService
+
+// BrowseService 浏览服务
+type BrowseService struct{}
+
+// initService 初始化服务
+func initService() {
+	srv = &BrowseService{}
+}
+
 // WriteToBinaryFile 写入二进制文件
-func WriteToBinaryFile(filename, username, password string) error {
+func (s *BrowseService) WriteToBinaryFile(filename, username, password string) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -40,7 +50,7 @@ func WriteToBinaryFile(filename, username, password string) error {
 }
 
 // ReadFromBinaryFile 从二进制文件中读取用户名和密码
-func ReadFromBinaryFile(filename string) (string, string, error) {
+func (s *BrowseService) ReadFromBinaryFile(filename string) (string, string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return "", "", err
@@ -80,23 +90,7 @@ func ReadFromBinaryFile(filename string) (string, string, error) {
 	return username, password, nil
 }
 
-// func test() {
-// 	filename := "user_data.bin"
-// 	username := "testuser"
-// 	password := "mypassword123"
-
-// 	// 写入
-// 	if err := WriteToBinaryFile(filename, username, password); err != nil {
-// 		fmt.Println("写入错误:", err)
-// 		return
-// 	}
-
-// 	// 读取
-// 	readUsername, readPassword, err := ReadFromBinaryFile(filename)
-// 	if err != nil {
-// 		fmt.Println("读取错误:", err)
-// 		return
-// 	}
-
-// 	fmt.Printf("读取到的用户名: %s, 密码: %s\n", readUsername, readPassword)
-// }
+// GetService 获取服务实例
+func GetService() *BrowseService {
+	return srv
+}

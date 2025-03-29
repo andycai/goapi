@@ -7,8 +7,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// CreateAdminLog 创建操作日志
-func CreateAdminLog(c *fiber.Ctx, action string, resource string, resourceID uint, details string) error {
+var srv *AdminLogService
+
+// AdminLogService 管理日志服务
+type AdminLogService struct{}
+
+// initService 初始化服务
+func initService() *AdminLogService {
+	srv = &AdminLogService{}
+	return srv
+}
+
+// WriteLog 创建操作日志
+func (s *AdminLogService) WriteLog(c *fiber.Ctx, action string, resource string, resourceID uint, details string) error {
 	currentUser := app.CurrentUser(c)
 
 	if currentUser.ID == 0 {

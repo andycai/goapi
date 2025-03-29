@@ -7,6 +7,7 @@ import (
 )
 
 var app *core.App
+var Srv *AdminLogService
 
 type adminlogModule struct {
 	core.BaseModule
@@ -24,7 +25,13 @@ func (m *adminlogModule) Awake(a *core.App) error {
 
 func (m *adminlogModule) Start() error {
 	// 初始化数据
-	return initData()
+	if err := initData(); err != nil {
+		return err
+	}
+
+	Srv = initService()
+
+	return nil
 }
 
 func (m *adminlogModule) AddAuthRouters() error {

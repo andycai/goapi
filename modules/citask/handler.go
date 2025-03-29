@@ -286,7 +286,7 @@ func deleteTask(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "delete", "task", task.ID, fmt.Sprintf("删除任务：%s", task.Name))
+	adminlog.Srv.WriteLog(c, "delete", "task", task.ID, fmt.Sprintf("删除任务：%s", task.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
@@ -327,7 +327,7 @@ func runTask(c *fiber.Ctx) error {
 	progressMutex.Unlock()
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "run", "task", task.ID, fmt.Sprintf("执行任务：%s", task.Name))
+	adminlog.Srv.WriteLog(c, "run", "task", task.ID, fmt.Sprintf("执行任务：%s", task.Name))
 
 	// 异步执行任务
 	go executeTask(&task, &taskLog)
@@ -978,8 +978,8 @@ func stopTask(c *fiber.Ctx) error {
 	})
 }
 
-// GetRunningTasks 获取正在执行的任务列表
-func GetRunningTasks(c *fiber.Ctx) error {
+// getRunningTasks 获取正在执行的任务列表
+func getRunningTasks(c *fiber.Ctx) error {
 	progressMutex.Lock()
 	defer progressMutex.Unlock()
 

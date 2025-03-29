@@ -47,7 +47,7 @@ func createMenu(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "create", "menu", menu.ID, fmt.Sprintf("创建菜单：%s", menu.Name))
+	adminlog.Srv.WriteLog(c, "create", "menu", menu.ID, fmt.Sprintf("创建菜单：%s", menu.Name))
 
 	return c.JSON(menu)
 }
@@ -76,7 +76,7 @@ func updateMenu(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "update", "menu", menu.ID, fmt.Sprintf("更新菜单：%s", menu.Name))
+	adminlog.Srv.WriteLog(c, "update", "menu", menu.ID, fmt.Sprintf("更新菜单：%s", menu.Name))
 
 	return c.JSON(menu)
 }
@@ -105,7 +105,7 @@ func deleteMenu(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "delete", "menu", uint(id), fmt.Sprintf("删除菜单：%s", menu.Name))
+	adminlog.Srv.WriteLog(c, "delete", "menu", uint(id), fmt.Sprintf("删除菜单：%s", menu.Name))
 
 	return c.SendStatus(fiber.StatusNoContent)
 }

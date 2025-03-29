@@ -210,7 +210,7 @@ func updateServerList(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "update", "serverconf_list", 0, "更新服务器信息配置")
+	adminlog.Srv.WriteLog(c, "update", "serverconf_list", 0, "更新服务器信息配置")
 
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
@@ -256,7 +256,7 @@ func updateLastServer(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "update", "serverconf_last", 0, "更新服务器信息配置")
+	adminlog.Srv.WriteLog(c, "update", "serverconf_last", 0, "更新服务器信息配置")
 
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
@@ -327,7 +327,7 @@ func updateServerInfo(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "update", "serverconf_info", 0, "更新服务器信息配置")
+	adminlog.Srv.WriteLog(c, "update", "serverconf_info", 0, "更新服务器信息配置")
 
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
@@ -373,7 +373,7 @@ func updateNoticeList(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "update", "serverconf_notice", 0, "更新公告列表配置")
+	adminlog.Srv.WriteLog(c, "update", "serverconf_notice", 0, "更新公告列表配置")
 
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }
@@ -424,7 +424,7 @@ func updateNoticeNum(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "update", "serverconf_notice_num", 0, "更新公告数量配置")
+	adminlog.Srv.WriteLog(c, "update", "serverconf_notice_num", 0, "更新公告数量配置")
 
 	return c.JSON(fiber.Map{"message": "更新成功"})
 }

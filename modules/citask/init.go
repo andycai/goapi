@@ -44,7 +44,7 @@ func (m *taskModule) AddAuthRouters() error {
 	// api
 	app.RouterApi.Get("/citask", app.HasPermission("citask:list"), getTasks)                        // 获取任务列表
 	app.RouterApi.Post("/citask", app.HasPermission("citask:create"), createTask)                   // 创建任务
-	app.RouterApi.Get("/citask/running", app.HasPermission("citask:list"), GetRunningTasks)         // 获取正在执行的任务
+	app.RouterApi.Get("/citask/running", app.HasPermission("citask:list"), getRunningTasks)         // 获取正在执行的任务
 	app.RouterApi.Get("/citask/next-run", app.HasPermission("citask:list"), getNextRunTime)         // 计算下次执行时间
 	app.RouterApi.Get("/citask/search", app.HasPermission("citask:list"), searchTasks)              // 添加搜索接口
 	app.RouterApi.Get("/citask/:id", app.HasPermission("citask:list"), getTask)                     // 获取任务详情

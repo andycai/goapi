@@ -101,7 +101,7 @@ func deleteLogsBefore(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "delete", "gamelog", 0, fmt.Sprintf("批量删除%s之前的游戏日志，共%d条", dateStr, result.RowsAffected))
+	adminlog.Srv.WriteLog(c, "delete", "gamelog", 0, fmt.Sprintf("批量删除%s之前的游戏日志，共%d条", dateStr, result.RowsAffected))
 
 	return c.JSON(fiber.Map{"code": 0, "message": "Logs deleted successfully", "count": result.RowsAffected})
 }
@@ -129,7 +129,7 @@ func deleteLog(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.CreateAdminLog(c, "delete", "gamelog", uint(log.ID), fmt.Sprintf("删除游戏日志，角色：%s", log.RoleName))
+	adminlog.Srv.WriteLog(c, "delete", "gamelog", uint(log.ID), fmt.Sprintf("删除游戏日志，角色：%s", log.RoleName))
 
 	return c.JSON(fiber.Map{"code": 0, "message": "Log deleted successfully"})
 }
