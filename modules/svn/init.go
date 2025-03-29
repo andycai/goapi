@@ -43,15 +43,15 @@ func (m *svnModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Post("/svn/checkout", app.HasPermission("svn:checkout"), checkout)
-	app.RouterApi.Post("/svn/update", app.HasPermission("svn:update"), update)
-	app.RouterApi.Post("/svn/commit", app.HasPermission("svn:commit"), commit)
-	app.RouterApi.Get("/svn/status", app.HasPermission("svn:status"), status)
-	app.RouterApi.Get("/svn/info", app.HasPermission("svn:info"), info)
-	app.RouterApi.Get("/svn/log", app.HasPermission("svn:log"), log)
-	app.RouterApi.Post("/svn/revert", app.HasPermission("svn:revert"), revert)
-	app.RouterApi.Post("/svn/add", app.HasPermission("svn:add"), add)
-	app.RouterApi.Delete("/svn/delete", app.HasPermission("svn:delete"), delete)
+	app.RouterApi.Post("/svn/checkout", app.HasPermission("svn:checkout"), checkoutHandler)
+	app.RouterApi.Post("/svn/update", app.HasPermission("svn:update"), updateHandler)
+	app.RouterApi.Post("/svn/commit", app.HasPermission("svn:commit"), commitHandler)
+	app.RouterApi.Get("/svn/status", app.HasPermission("svn:status"), statusHandler)
+	app.RouterApi.Get("/svn/info", app.HasPermission("svn:info"), infoHandler)
+	app.RouterApi.Get("/svn/log", app.HasPermission("svn:log"), logHandler)
+	app.RouterApi.Post("/svn/revert", app.HasPermission("svn:revert"), revertHandler)
+	app.RouterApi.Post("/svn/add", app.HasPermission("svn:add"), addHandler)
+	app.RouterApi.Delete("/svn/delete", app.HasPermission("svn:delete"), deleteHandler)
 
 	return nil
 }
