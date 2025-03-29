@@ -47,11 +47,11 @@ func (m *reposyncModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	app.RouterApi.Post("/reposync/config", app.HasPermission("reposync:config"), saveConfig)
-	app.RouterApi.Get("/reposync/config", app.HasPermission("reposync:config"), getConfig)
-	app.RouterApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkout)
-	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:list"), getCommits)
-	app.RouterApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommits)
+	app.RouterApi.Post("/reposync/config", app.HasPermission("reposync:config"), saveConfigHandler)
+	app.RouterApi.Get("/reposync/config", app.HasPermission("reposync:config"), getConfigHandler)
+	app.RouterApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkoutHandler)
+	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:list"), listCommitsHandler)
+	app.RouterApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommitsHandler)
 
 	return nil
 }

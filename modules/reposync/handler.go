@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// saveConfig 保存仓库配置
-func saveConfig(c *fiber.Ctx) error {
+// saveConfigHandler 保存仓库配置
+func saveConfigHandler(c *fiber.Ctx) error {
 	config := new(RepoConfig)
 	if err := c.BodyParser(config); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -16,13 +16,13 @@ func saveConfig(c *fiber.Ctx) error {
 	}
 
 	// 验证路径安全性
-	if !srv.isValidPath(config.LocalPath1) || !srv.isValidPath(config.LocalPath2) {
+	if !isValidPath(config.LocalPath1) || !isValidPath(config.LocalPath2) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的本地路径",
 		})
 	}
 
-	if err := srv.UpdateConfig(config); err != nil {
+	if err := UpdateConfig(config); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "保存配置失败",
 		})
@@ -33,15 +33,15 @@ func saveConfig(c *fiber.Ctx) error {
 	})
 }
 
-// getConfig 获取仓库配置
-func getConfig(c *fiber.Ctx) error {
-	config := srv.GetConfig()
+// getConfigHandler 获取仓库配置
+func getConfigHandler(c *fiber.Ctx) error {
+	config := GetConfig()
 	return c.JSON(config)
 }
 
-// checkout 检出仓库
-func checkout(c *fiber.Ctx) error {
-	if err := srv.CheckoutRepos(); err != nil {
+// checkoutHandler 检出仓库
+func checkoutHandler(c *fiber.Ctx) error {
+	if err := CheckoutRepos(); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "检出仓库失败: " + err.Error(),
 		})
@@ -52,8 +52,8 @@ func checkout(c *fiber.Ctx) error {
 	})
 }
 
-// getCommits 获取提交记录列表
-func getCommits(c *fiber.Ctx) error {
+// listCommitsHandler 获取提交记录列表
+func listCommitsHandler(c *fiber.Ctx) error {
 	// 获取分页参数
 	limit, err := strconv.Atoi(c.Query("limit", "10"))
 	if err != nil || limit <= 0 {
@@ -65,7 +65,7 @@ func getCommits(c *fiber.Ctx) error {
 		page = 1
 	}
 
-	commits, totalCount, err := srv.GetCommits(limit, page)
+	commits, totalCount, err := GetCommits(limit, page)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取提交记录失败: " + err.Error(),
@@ -78,8 +78,8 @@ func getCommits(c *fiber.Ctx) error {
 	})
 }
 
-// syncCommits 同步提交记录
-func syncCommits(c *fiber.Ctx) error {
+// syncCommitsHandler 同步提交记录
+func syncCommitsHandler(c *fiber.Ctx) error {
 	type SyncRequest struct {
 		Revisions []string `json:"revisions"`
 	}
@@ -97,7 +97,7 @@ func syncCommits(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := srv.SyncCommits(req.Revisions); err != nil {
+	if err := SyncCommits(req.Revisions); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "同步提交失败: " + err.Error(),
 		})

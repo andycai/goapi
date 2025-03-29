@@ -17,58 +17,20 @@ import (
 	"github.com/andycai/unitool/modules/svn"
 )
 
-var srv *RepoSyncService
-
-// RepoConfig 仓库配置
-type RepoConfig struct {
-	RepoType1  string `json:"repo_type1"`  // 第一个仓库类型 (svn/git)
-	RepoURL1   string `json:"repo_url1"`   // 第一个仓库URL
-	LocalPath1 string `json:"local_path1"` // 第一个仓库本地路径
-	Username1  string `json:"username1"`   // 第一个仓库用户名
-	Password1  string `json:"password1"`   // 第一个仓库密码
-	RepoType2  string `json:"repo_type2"`  // 第二个仓库类型 (svn/git)
-	RepoURL2   string `json:"repo_url2"`   // 第二个仓库URL
-	LocalPath2 string `json:"local_path2"` // 第二个仓库本地路径
-	Username2  string `json:"username2"`   // 第二个仓库用户名
-	Password2  string `json:"password2"`   // 第二个仓库密码
-	ConfigPath string `json:"config_path"` // 配置文件路径
-}
-
-// CommitRecord 提交记录
-type CommitRecord struct {
-	Revision     string    `json:"revision"`      // 版本号
-	Comment      string    `json:"comment"`       // 提交内容
-	Author       string    `json:"author"`        // 提交人
-	Time         time.Time `json:"time"`          // 提交时间
-	Synced       bool      `json:"synced"`        // 是否已同步
-	ChangedFiles []string  `json:"changed_files"` // 变更的文件列表
-}
-
-// FileChange 文件变更
-type FileChange struct {
-	Path       string `json:"path"`        // 文件路径
-	ChangeType string `json:"change_type"` // 变更类型 (A:新增, M:修改, D:删除)
-}
-
-// RepoSyncService 仓库同步服务
-type RepoSyncService struct {
-	config     *RepoConfig
-	commitList []CommitRecord
-}
+var config *RepoConfig
+var commitList []CommitRecord
 
 // initService 初始化服务
 func initService() {
-	srv = &RepoSyncService{
-		config:     &RepoConfig{ConfigPath: "./data/reposync_config.json"},
-		commitList: []CommitRecord{},
-	}
+	config = &RepoConfig{ConfigPath: "./data/reposync_config.json"}
+	commitList = []CommitRecord{}
 
 	// 尝试加载配置
-	srv.LoadConfig()
+	LoadConfig()
 }
 
 // isValidPath 检查路径是否安全
-func (s *RepoSyncService) isValidPath(path string) bool {
+func isValidPath(path string) bool {
 	// 清理和规范化路径
 	cleanPath := filepath.Clean(path)
 
@@ -94,90 +56,90 @@ func (s *RepoSyncService) isValidPath(path string) bool {
 }
 
 // SaveConfig 保存配置
-func (s *RepoSyncService) SaveConfig() error {
-	if s.config == nil {
+func SaveConfig() error {
+	if config == nil {
 		return errors.New("配置为空")
 	}
 
 	// 确保目录存在
-	dir := filepath.Dir(s.config.ConfigPath)
+	dir := filepath.Dir(config.ConfigPath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
 
 	// 序列化配置
-	data, err := json.MarshalIndent(s.config, "", "  ")
+	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return err
 	}
 
 	// 写入文件
-	return os.WriteFile(s.config.ConfigPath, data, 0644)
+	return os.WriteFile(config.ConfigPath, data, 0644)
 }
 
 // LoadConfig 加载配置
-func (s *RepoSyncService) LoadConfig() error {
+func LoadConfig() error {
 	// 检查文件是否存在
-	if _, err := os.Stat(s.config.ConfigPath); os.IsNotExist(err) {
+	if _, err := os.Stat(config.ConfigPath); os.IsNotExist(err) {
 		// 配置文件不存在，使用默认配置
 		return nil
 	}
 
 	// 读取文件
-	data, err := os.ReadFile(s.config.ConfigPath)
+	data, err := os.ReadFile(config.ConfigPath)
 	if err != nil {
 		return err
 	}
 
 	// 反序列化配置
-	return json.Unmarshal(data, s.config)
+	return json.Unmarshal(data, config)
 }
 
 // UpdateConfig 更新配置
-func (s *RepoSyncService) UpdateConfig(config *RepoConfig) error {
+func UpdateConfig(config *RepoConfig) error {
 	// 验证路径
-	if !s.isValidPath(config.LocalPath1) || !s.isValidPath(config.LocalPath2) {
+	if !isValidPath(config.LocalPath1) || !isValidPath(config.LocalPath2) {
 		return errors.New("无效的本地路径")
 	}
 
 	// 更新配置
-	config.ConfigPath = s.config.ConfigPath
-	s.config = config
+	config.ConfigPath = config.ConfigPath
+	config = config
 
 	// 保存配置
-	return s.SaveConfig()
+	return SaveConfig()
 }
 
 // GetConfig 获取配置
-func (s *RepoSyncService) GetConfig() *RepoConfig {
-	return s.config
+func GetConfig() *RepoConfig {
+	return config
 }
 
 // CheckoutRepos 初始化检出仓库
-func (s *RepoSyncService) CheckoutRepos() error {
-	if s.config == nil {
+func CheckoutRepos() error {
+	if config == nil {
 		return errors.New("配置为空")
 	}
 
 	// 检出第一个仓库
-	err := s.checkoutRepo(
-		s.config.RepoType1,
-		s.config.RepoURL1,
-		s.config.LocalPath1,
-		s.config.Username1,
-		s.config.Password1,
+	err := checkoutRepo(
+		config.RepoType1,
+		config.RepoURL1,
+		config.LocalPath1,
+		config.Username1,
+		config.Password1,
 	)
 	if err != nil {
 		return fmt.Errorf("检出第一个仓库失败: %v", err)
 	}
 
 	// 检出第二个仓库
-	err = s.checkoutRepo(
-		s.config.RepoType2,
-		s.config.RepoURL2,
-		s.config.LocalPath2,
-		s.config.Username2,
-		s.config.Password2,
+	err = checkoutRepo(
+		config.RepoType2,
+		config.RepoURL2,
+		config.LocalPath2,
+		config.Username2,
+		config.Password2,
 	)
 	if err != nil {
 		return fmt.Errorf("检出第二个仓库失败: %v", err)
@@ -187,8 +149,8 @@ func (s *RepoSyncService) CheckoutRepos() error {
 }
 
 // checkoutRepo 检出单个仓库
-func (s *RepoSyncService) checkoutRepo(repoType, url, path, username, password string) error {
-	if !s.isValidPath(path) {
+func checkoutRepo(repoType, url, path, username, password string) error {
+	if !isValidPath(path) {
 		return errors.New("无效的本地路径")
 	}
 
@@ -209,26 +171,26 @@ func (s *RepoSyncService) checkoutRepo(repoType, url, path, username, password s
 }
 
 // GetCommits 获取第一个仓库的提交记录
-func (s *RepoSyncService) GetCommits(limit, page int) ([]CommitRecord, int, error) {
-	if s.config == nil {
+func GetCommits(limit, page int) ([]CommitRecord, int, error) {
+	if config == nil {
 		return nil, 0, errors.New("配置为空")
 	}
 
 	// 更新第一个仓库
-	err := s.updateRepo(
-		s.config.RepoType1,
-		s.config.LocalPath1,
-		s.config.Username1,
-		s.config.Password1,
+	err := updateRepo(
+		config.RepoType1,
+		config.LocalPath1,
+		config.Username1,
+		config.Password1,
 	)
 	if err != nil {
 		return nil, 0, fmt.Errorf("更新第一个仓库失败: %v", err)
 	}
 
 	// 获取提交记录
-	commits, err := s.getRepoCommits(
-		s.config.RepoType1,
-		s.config.LocalPath1,
+	commits, err := getRepoCommits(
+		config.RepoType1,
+		config.LocalPath1,
 		limit*5, // 获取更多记录以便分页
 	)
 	if err != nil {
@@ -261,8 +223,8 @@ func (s *RepoSyncService) GetCommits(limit, page int) ([]CommitRecord, int, erro
 }
 
 // updateRepo 更新仓库
-func (s *RepoSyncService) updateRepo(repoType, path, username, password string) error {
-	if !s.isValidPath(path) {
+func updateRepo(repoType, path, username, password string) error {
+	if !isValidPath(path) {
 		return errors.New("无效的本地路径")
 	}
 
@@ -278,24 +240,24 @@ func (s *RepoSyncService) updateRepo(repoType, path, username, password string) 
 }
 
 // getRepoCommits 获取仓库提交记录
-func (s *RepoSyncService) getRepoCommits(repoType, path string, limit int) ([]CommitRecord, error) {
-	if !s.isValidPath(path) {
+func getRepoCommits(repoType, path string, limit int) ([]CommitRecord, error) {
+	if !isValidPath(path) {
 		return nil, errors.New("无效的本地路径")
 	}
 
 	// 根据仓库类型获取提交记录
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return s.getSvnCommits(path, limit)
+		return getSvnCommits(path, limit)
 	case "git":
-		return s.getGitCommits(path, limit)
+		return getGitCommits(path, limit)
 	default:
 		return nil, fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
 }
 
 // getSvnCommits 获取Svn提交记录
-func (s *RepoSyncService) getSvnCommits(path string, limit int) ([]CommitRecord, error) {
+func getSvnCommits(path string, limit int) ([]CommitRecord, error) {
 	// 获取Svn日志
 	logOutput, err := svn.Log(path, limit)
 	if err != nil {
@@ -339,7 +301,7 @@ func (s *RepoSyncService) getSvnCommits(path string, limit int) ([]CommitRecord,
 		}
 
 		// 获取变更文件列表
-		changedFiles, _ := s.getSvnChangedFiles(path, revision)
+		changedFiles, _ := getSvnChangedFiles(path, revision)
 
 		// 创建提交记录
 		commits = append(commits, CommitRecord{
@@ -356,7 +318,7 @@ func (s *RepoSyncService) getSvnCommits(path string, limit int) ([]CommitRecord,
 }
 
 // getSvnChangedFiles 获取Svn变更文件列表
-func (s *RepoSyncService) getSvnChangedFiles(path, revision string) ([]string, error) {
+func getSvnChangedFiles(path, revision string) ([]string, error) {
 	// 执行svn diff命令获取变更文件
 	revInt, err := strconv.Atoi(revision)
 	if err != nil {
@@ -388,7 +350,7 @@ func (s *RepoSyncService) getSvnChangedFiles(path, revision string) ([]string, e
 }
 
 // getGitCommits 获取Git提交记录
-func (s *RepoSyncService) getGitCommits(path string, limit int) ([]CommitRecord, error) {
+func getGitCommits(path string, limit int) ([]CommitRecord, error) {
 	// 获取Git日志
 	logOutput, err := git.Log(path, limit)
 	if err != nil {
@@ -414,13 +376,13 @@ func (s *RepoSyncService) getGitCommits(path string, limit int) ([]CommitRecord,
 		comment := parts[1]
 
 		// 获取提交详情
-		details, err := s.getGitCommitDetails(path, revision)
+		details, err := getGitCommitDetails(path, revision)
 		if err != nil {
 			continue
 		}
 
 		// 获取变更文件列表
-		changedFiles, _ := s.getGitChangedFiles(path, revision)
+		changedFiles, _ := getGitChangedFiles(path, revision)
 
 		// 创建提交记录
 		commits = append(commits, CommitRecord{
@@ -443,7 +405,7 @@ type GitCommitDetails struct {
 }
 
 // getGitCommitDetails 获取Git提交详情
-func (s *RepoSyncService) getGitCommitDetails(path, revision string) (*GitCommitDetails, error) {
+func getGitCommitDetails(path, revision string) (*GitCommitDetails, error) {
 	// 执行git show命令获取提交详情
 	cmd := exec.Command("git", "-C", path, "show", "--pretty=format:%an|%at", "-s", revision)
 	output, err := cmd.Output()
@@ -474,7 +436,7 @@ func (s *RepoSyncService) getGitCommitDetails(path, revision string) (*GitCommit
 }
 
 // getGitChangedFiles 获取Git变更文件列表
-func (s *RepoSyncService) getGitChangedFiles(path, revision string) ([]string, error) {
+func getGitChangedFiles(path, revision string) ([]string, error) {
 	// 执行git show命令获取变更文件
 	cmd := exec.Command("git", "-C", path, "show", "--name-status", "--pretty=format:", revision)
 	output, err := cmd.Output()
@@ -502,26 +464,26 @@ func (s *RepoSyncService) getGitChangedFiles(path, revision string) ([]string, e
 }
 
 // SyncCommits 同步提交记录
-func (s *RepoSyncService) SyncCommits(revisions []string) error {
-	if s.config == nil {
+func SyncCommits(revisions []string) error {
+	if config == nil {
 		return errors.New("配置为空")
 	}
 
 	// 更新第一个仓库
-	err := s.updateRepo(
-		s.config.RepoType1,
-		s.config.LocalPath1,
-		s.config.Username1,
-		s.config.Password1,
+	err := updateRepo(
+		config.RepoType1,
+		config.LocalPath1,
+		config.Username1,
+		config.Password1,
 	)
 	if err != nil {
 		return fmt.Errorf("更新第一个仓库失败: %v", err)
 	}
 
 	// 获取所有提交记录
-	commits, err := s.getRepoCommits(
-		s.config.RepoType1,
-		s.config.LocalPath1,
+	commits, err := getRepoCommits(
+		config.RepoType1,
+		config.LocalPath1,
 		100, // 获取足够多的记录
 	)
 	if err != nil {
@@ -541,7 +503,7 @@ func (s *RepoSyncService) SyncCommits(revisions []string) error {
 
 	// 同步每个提交记录
 	for _, commit := range selectedCommits {
-		err := s.syncCommit(commit)
+		err := syncCommit(commit)
 		if err != nil {
 			return fmt.Errorf("同步提交记录 %s 失败: %v", commit.Revision, err)
 		}
@@ -551,11 +513,11 @@ func (s *RepoSyncService) SyncCommits(revisions []string) error {
 }
 
 // syncCommit 同步单个提交记录
-func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
+func syncCommit(commit CommitRecord) error {
 	// 获取变更文件列表
-	changes, err := s.getFileChanges(
-		s.config.RepoType1,
-		s.config.LocalPath1,
+	changes, err := getFileChanges(
+		config.RepoType1,
+		config.LocalPath1,
 		commit.Revision,
 	)
 	if err != nil {
@@ -573,8 +535,8 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 	// 处理每个变更文件
 	for _, change := range changes {
 		// 计算源路径和目标路径
-		sourcePath := filepath.Join(s.config.LocalPath1, change.Path)
-		targetPath := filepath.Join(s.config.LocalPath2, change.Path)
+		sourcePath := filepath.Join(config.LocalPath1, change.Path)
+		targetPath := filepath.Join(config.LocalPath2, change.Path)
 
 		// 根据变更类型执行操作
 		switch change.ChangeType {
@@ -598,7 +560,7 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 				}
 
 				// 复制文件
-				if err := s.copyFile(sourcePath, targetPath); err != nil {
+				if err := copyFile(sourcePath, targetPath); err != nil {
 					return err
 				}
 			}
@@ -618,7 +580,7 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 
 				// 检查并删除空目录
 				targetDir := filepath.Dir(targetPath)
-				if err := s.removeEmptyDirs(targetDir, s.config.LocalPath2); err != nil {
+				if err := removeEmptyDirs(targetDir, config.LocalPath2); err != nil {
 					return err
 				}
 			}
@@ -626,9 +588,9 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 	}
 
 	// 提交到第二个仓库
-	err = s.commitToRepo(
-		s.config.RepoType2,
-		s.config.LocalPath2,
+	err = commitToRepo(
+		config.RepoType2,
+		config.LocalPath2,
 		fmt.Sprintf("Sync from %s: %s", commit.Revision, commit.Comment),
 	)
 	if err != nil {
@@ -646,20 +608,20 @@ func (s *RepoSyncService) syncCommit(commit CommitRecord) error {
 }
 
 // getFileChanges 获取文件变更列表
-func (s *RepoSyncService) getFileChanges(repoType, path, revision string) ([]FileChange, error) {
+func getFileChanges(repoType, path, revision string) ([]FileChange, error) {
 	// 根据仓库类型获取文件变更列表
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return s.getSvnFileChanges(path, revision)
+		return getSvnFileChanges(path, revision)
 	case "git":
-		return s.getGitFileChanges(path, revision)
+		return getGitFileChanges(path, revision)
 	default:
 		return nil, fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
 }
 
 // getSvnFileChanges 获取Svn文件变更列表
-func (s *RepoSyncService) getSvnFileChanges(path, revision string) ([]FileChange, error) {
+func getSvnFileChanges(path, revision string) ([]FileChange, error) {
 	// 执行svn diff命令获取变更文件
 	cmd := exec.Command("svn", "diff", "--summarize", "-c", revision, path)
 	output, err := cmd.Output()
@@ -699,7 +661,7 @@ func (s *RepoSyncService) getSvnFileChanges(path, revision string) ([]FileChange
 }
 
 // getGitFileChanges 获取Git文件变更列表
-func (s *RepoSyncService) getGitFileChanges(path, revision string) ([]FileChange, error) {
+func getGitFileChanges(path, revision string) ([]FileChange, error) {
 	// 执行git show命令获取变更文件
 	cmd := exec.Command("git", "-C", path, "show", "--name-status", "--pretty=format:", revision)
 	output, err := cmd.Output()
@@ -733,8 +695,8 @@ func (s *RepoSyncService) getGitFileChanges(path, revision string) ([]FileChange
 }
 
 // commitToRepo 提交到仓库
-func (s *RepoSyncService) commitToRepo(repoType, path, message string) error {
-	if !s.isValidPath(path) {
+func commitToRepo(repoType, path, message string) error {
+	if !isValidPath(path) {
 		return errors.New("无效的本地路径")
 	}
 
@@ -796,7 +758,7 @@ func (s *RepoSyncService) commitToRepo(repoType, path, message string) error {
 }
 
 // copyFile 复制文件
-func (s *RepoSyncService) copyFile(src, dst string) error {
+func copyFile(src, dst string) error {
 	// 打开源文件
 	source, err := os.Open(src)
 	if err != nil {
@@ -817,9 +779,9 @@ func (s *RepoSyncService) copyFile(src, dst string) error {
 }
 
 // removeEmptyDirs 递归删除空目录
-func (s *RepoSyncService) removeEmptyDirs(dir, rootDir string) error {
+func removeEmptyDirs(dir, rootDir string) error {
 	// 检查路径是否安全
-	if !s.isValidPath(dir) {
+	if !isValidPath(dir) {
 		return errors.New("无效的目录路径")
 	}
 
@@ -848,5 +810,5 @@ func (s *RepoSyncService) removeEmptyDirs(dir, rootDir string) error {
 	}
 
 	// 递归检查父目录
-	return s.removeEmptyDirs(filepath.Dir(dir), rootDir)
+	return removeEmptyDirs(filepath.Dir(dir), rootDir)
 }
