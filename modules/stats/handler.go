@@ -99,7 +99,7 @@ func CreateStats(c *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{} "包含统计列表和分页信息"
 // @Failure 500 {object} map[string]string
 // @Router /api/stats [get]
-func getStats(c *fiber.Ctx) error {
+func listStatsHandler(c *fiber.Ctx) error {
 	page := c.QueryInt("page", 1)
 	pageSize := c.QueryInt("pageSize", 20)
 	searchQuery := c.Query("search", "")
@@ -146,7 +146,7 @@ func getStats(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /api/stats/before [delete]
-func deleteStatsBefore(c *fiber.Ctx) error {
+func deleteStatsBeforeHandler(c *fiber.Ctx) error {
 	dateStr := c.Query("date")
 	if dateStr == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"code": 1, "error": "date query parameter is required"})
@@ -209,7 +209,7 @@ func deleteStatsBefore(c *fiber.Ctx) error {
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /api/stats/details [get]
-func getStatDetails(c *fiber.Ctx) error {
+func getStatDetailsHandler(c *fiber.Ctx) error {
 	loginID := c.Query("login_id")
 	if loginID == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "login_id is required"})
@@ -242,7 +242,7 @@ func getStatDetails(c *fiber.Ctx) error {
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /api/stats/{id} [delete]
-func deleteStat(c *fiber.Ctx) error {
+func deleteStatHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
 		return c.Status(400).JSON(fiber.Map{"code": 7, "error": "Stat ID is required"})
