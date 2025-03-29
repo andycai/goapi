@@ -25,10 +25,10 @@ func init() {
 func (m *browseModule) Awake(a *core.App) error {
 	app = a
 	// 数据迁移
-	if err := autoMigrate(); err != nil {
-		return err
-	}
+	return autoMigrate()
+}
 
+func (m *browseModule) Start() error {
 	// 初始化数据
 	return initData()
 }

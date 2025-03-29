@@ -23,7 +23,11 @@ func (m *gitModule) Awake(a *core.App) error {
 	// Initialize Git service
 	Srv = initService()
 
-	return nil
+	return autoMigrate()
+}
+
+func (m *gitModule) Start() error {
+	return initData()
 }
 
 func (m *gitModule) AddAuthRouters() error {

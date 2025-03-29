@@ -23,6 +23,10 @@ func (m *shellModule) Awake(a *core.App) error {
 		return err
 	}
 
+	return nil
+}
+
+func (m *shellModule) Start() error {
 	// 初始化数据
 	return initData()
 }

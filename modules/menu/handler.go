@@ -10,7 +10,7 @@ import (
 
 // listMenus 获取菜单列表
 func listMenus(c *fiber.Ctx) error {
-	menus, err := menuDao.GetMenus()
+	menus, err := dao.GetMenus()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取菜单列表失败",
@@ -21,13 +21,13 @@ func listMenus(c *fiber.Ctx) error {
 
 // getMenuTree 获取菜单树
 func getMenuTree(c *fiber.Ctx) error {
-	menus, err := menuDao.GetMenus()
+	menus, err := dao.GetMenus()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取菜单列表失败",
 		})
 	}
-	tree := menuDao.BuildMenuTree(menus, 0)
+	tree := dao.BuildMenuTree(menus, 0)
 	return c.JSON(tree)
 }
 
@@ -40,7 +40,7 @@ func createMenu(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := menuDao.CreateMenu(menu); err != nil {
+	if err := dao.CreateMenu(menu); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "创建菜单失败",
 		})
@@ -69,7 +69,7 @@ func updateMenu(c *fiber.Ctx) error {
 	}
 
 	menu.ID = uint(id)
-	if err := menuDao.UpdateMenu(menu); err != nil {
+	if err := dao.UpdateMenu(menu); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "更新菜单失败",
 		})
@@ -91,14 +91,14 @@ func deleteMenu(c *fiber.Ctx) error {
 	}
 
 	// 获取菜单信息用于日志记录
-	menu, err := menuDao.GetMenuByID(uint(id))
+	menu, err := dao.GetMenuByID(uint(id))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "菜单不存在",
 		})
 	}
 
-	if err := menuDao.DeleteMenu(uint(id)); err != nil {
+	if err := dao.DeleteMenu(uint(id)); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "删除菜单失败",
 		})

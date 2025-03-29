@@ -22,6 +22,10 @@ func (m *noteModule) Awake(a *core.App) error {
 		return err
 	}
 
+	return nil
+}
+
+func (m *noteModule) Start() error {
 	// 初始化数据
 	return initData()
 }

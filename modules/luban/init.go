@@ -19,16 +19,12 @@ func init() {
 func (m *lubanModule) Awake(a *core.App) error {
 	app = a
 	// 数据迁移
-	if err := autoMigrate(); err != nil {
-		return err
-	}
-
-	// 初始化数据
-	return initData()
+	return autoMigrate()
 }
 
 func (m *lubanModule) Start() error {
-	return nil
+	// 初始化数据
+	return initData()
 }
 
 func (m *lubanModule) AddAuthRouters() error {

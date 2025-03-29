@@ -27,6 +27,10 @@ func (m *reposyncModule) Awake(a *core.App) error {
 	// 初始化服务
 	initService()
 
+	return nil
+}
+
+func (m *reposyncModule) Start() error {
 	// 初始化数据
 	return initData()
 }

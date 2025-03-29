@@ -19,10 +19,10 @@ func init() {
 func (m *serverconfModule) Awake(a *core.App) error {
 	app = a
 	// 数据迁移
-	if err := autoMigrate(); err != nil {
-		return err
-	}
+	return autoMigrate()
+}
 
+func (m *serverconfModule) Start() error {
 	// 初始化数据
 	return initData()
 }

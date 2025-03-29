@@ -25,7 +25,10 @@ func (m *imagemanagerModule) Awake(a *core.App) error {
 
 	// Initialize Imagemanager service
 	initService()
+	return nil
+}
 
+func (m *imagemanagerModule) Start() error {
 	// 初始化数据
 	return initData()
 }

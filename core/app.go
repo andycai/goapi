@@ -39,7 +39,7 @@ func (a *App) Start(dbs []*gorm.DB, fiberApp *fiber.App) {
 		fiberApp.Static(staticPath.Route, staticPath.Path)
 	}
 
-	AwakeModules(a)
+	InitModules(a)
 
 	// 初始化公共路由
 	a.RouterPublic = fiberApp.Group("/")

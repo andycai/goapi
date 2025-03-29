@@ -22,6 +22,10 @@ func (m *uniBuildModule) Awake(a *core.App) error {
 		return err
 	}
 
+	return nil
+}
+
+func (m *uniBuildModule) Start() error {
 	// 初始化数据
 	return initData()
 }

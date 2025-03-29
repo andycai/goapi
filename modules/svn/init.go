@@ -23,7 +23,11 @@ func (m *svnModule) Awake(a *core.App) error {
 	// Initialize SVN service
 	Srv = initService()
 
-	return nil
+	return autoMigrate()
+}
+
+func (m *svnModule) Start() error {
+	return initData()
 }
 
 func (m *svnModule) AddAuthRouters() error {

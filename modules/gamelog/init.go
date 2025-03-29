@@ -19,10 +19,10 @@ func init() {
 func (m *gamelogModule) Awake(a *core.App) error {
 	app = a
 	// 数据迁移
-	if err := autoMigrate(); err != nil {
-		return err
-	}
+	return autoMigrate()
+}
 
+func (m *gamelogModule) Start() error {
 	// 初始化数据
 	return initData()
 }

@@ -26,6 +26,10 @@ func (m *bugtrackerModule) Awake(a *core.App) error {
 	// Initialize Bugtracker service
 	initService()
 
+	return nil
+}
+
+func (m *bugtrackerModule) Start() error {
 	// 初始化数据
 	return initData()
 }

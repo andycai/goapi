@@ -23,12 +23,12 @@ func (m *gameconfModule) Awake(a *core.App) error {
 		return err
 	}
 
-	// 初始化数据
-	return initData()
+	return nil
 }
 
 func (m *gameconfModule) Start() error {
-	return nil
+	// 初始化数据
+	return initData()
 }
 
 func (m *gameconfModule) AddAuthRouters() error {

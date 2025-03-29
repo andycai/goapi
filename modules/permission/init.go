@@ -23,6 +23,10 @@ func (m *permissionModule) Awake(a *core.App) error {
 		return err
 	}
 
+	return nil
+}
+
+func (m *permissionModule) Start() error {
 	// 初始化数据
 	return initData()
 }

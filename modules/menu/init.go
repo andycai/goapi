@@ -7,7 +7,7 @@ import (
 )
 
 var app *core.App
-var menuDao *MenuDao
+var dao *MenuDao
 
 type menuModule struct {
 	core.BaseModule
@@ -22,8 +22,13 @@ func (m *menuModule) Awake(a *core.App) error {
 	if err := autoMigrate(); err != nil {
 		return err
 	}
-	menuDao = NewMenuDao()
+	dao = NewMenuDao()
 
+	return nil
+}
+
+func (m *menuModule) Start() error {
+	// 初始化数据
 	return initData()
 }
 

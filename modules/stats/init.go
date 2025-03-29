@@ -23,6 +23,10 @@ func (m *statsModule) Awake(a *core.App) error {
 		return err
 	}
 
+	return nil
+}
+
+func (m *statsModule) Start() error {
 	// 初始化数据
 	return initData()
 }

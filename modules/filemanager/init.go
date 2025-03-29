@@ -25,7 +25,10 @@ func (m *filemanagerModule) Awake(a *core.App) error {
 
 	// Initialize Filemanager service
 	initService()
+	return nil
+}
 
+func (m *filemanagerModule) Start() error {
 	// 初始化数据
 	return initData()
 }

@@ -23,6 +23,10 @@ func (m *userModule) Awake(a *core.App) error {
 		return err
 	}
 
+	return nil
+}
+
+func (m *userModule) Start() error {
 	return initData()
 }
 

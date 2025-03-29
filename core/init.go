@@ -60,15 +60,15 @@ func InitAuthRouters() {
 	})
 }
 
-// AwakeModules 模块初始化
-func AwakeModules(app *App) {
-	// 模块初始化
+// InitModules 模块初始化
+func InitModules(app *App) {
+	// Awake
 	modules.ForEach(func(module Module, priority int) bool {
 		module.Awake(app)
 		return true
 	})
 
-	// 模块启动
+	// Start
 	modules.ForEach(func(module Module, priority int) bool {
 		module.Start()
 		return true
