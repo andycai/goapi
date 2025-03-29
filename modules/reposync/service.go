@@ -18,15 +18,13 @@ import (
 )
 
 var config *RepoConfig
-var commitList []CommitRecord
 
 // initService 初始化服务
 func initService() {
 	config = &RepoConfig{ConfigPath: "./data/reposync_config.json"}
-	commitList = []CommitRecord{}
 
 	// 尝试加载配置
-	LoadConfig()
+	loadConfig()
 }
 
 // isValidPath 检查路径是否安全
@@ -55,8 +53,8 @@ func isValidPath(path string) bool {
 	return true
 }
 
-// SaveConfig 保存配置
-func SaveConfig() error {
+// saveConfig 保存配置
+func saveConfig() error {
 	if config == nil {
 		return errors.New("配置为空")
 	}
@@ -73,12 +71,15 @@ func SaveConfig() error {
 		return err
 	}
 
+	// 记录操作日志
+	// adminlog.WriteLog(c, "write", "config", permission.ID, fmt.Sprintf("创建权限：%s", permission.Name))
+
 	// 写入文件
 	return os.WriteFile(config.ConfigPath, data, 0644)
 }
 
-// LoadConfig 加载配置
-func LoadConfig() error {
+// loadConfig 加载配置
+func loadConfig() error {
 	// 检查文件是否存在
 	if _, err := os.Stat(config.ConfigPath); os.IsNotExist(err) {
 		// 配置文件不存在，使用默认配置
@@ -95,28 +96,28 @@ func LoadConfig() error {
 	return json.Unmarshal(data, config)
 }
 
-// UpdateConfig 更新配置
-func UpdateConfig(config *RepoConfig) error {
+// updateConfig 更新配置
+func updateConfig(conf *RepoConfig) error {
 	// 验证路径
 	if !isValidPath(config.LocalPath1) || !isValidPath(config.LocalPath2) {
 		return errors.New("无效的本地路径")
 	}
 
 	// 更新配置
-	config.ConfigPath = config.ConfigPath
-	config = config
+	config.ConfigPath = conf.ConfigPath
+	config = conf
 
 	// 保存配置
-	return SaveConfig()
+	return saveConfig()
 }
 
-// GetConfig 获取配置
-func GetConfig() *RepoConfig {
+// getConfig 获取配置
+func getConfig() *RepoConfig {
 	return config
 }
 
-// CheckoutRepos 初始化检出仓库
-func CheckoutRepos() error {
+// checkoutRepos 初始化检出仓库
+func checkoutRepos() error {
 	if config == nil {
 		return errors.New("配置为空")
 	}
@@ -170,8 +171,8 @@ func checkoutRepo(repoType, url, path, username, password string) error {
 	}
 }
 
-// GetCommits 获取第一个仓库的提交记录
-func GetCommits(limit, page int) ([]CommitRecord, int, error) {
+// getCommits 获取第一个仓库的提交记录
+func getCommits(limit, page int) ([]CommitRecord, int, error) {
 	if config == nil {
 		return nil, 0, errors.New("配置为空")
 	}

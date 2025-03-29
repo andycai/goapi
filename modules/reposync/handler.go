@@ -22,7 +22,7 @@ func saveConfigHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := UpdateConfig(config); err != nil {
+	if err := updateConfig(config); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "保存配置失败",
 		})
@@ -35,13 +35,13 @@ func saveConfigHandler(c *fiber.Ctx) error {
 
 // getConfigHandler 获取仓库配置
 func getConfigHandler(c *fiber.Ctx) error {
-	config := GetConfig()
+	config := getConfig()
 	return c.JSON(config)
 }
 
 // checkoutHandler 检出仓库
 func checkoutHandler(c *fiber.Ctx) error {
-	if err := CheckoutRepos(); err != nil {
+	if err := checkoutRepos(); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "检出仓库失败: " + err.Error(),
 		})
@@ -65,7 +65,7 @@ func listCommitsHandler(c *fiber.Ctx) error {
 		page = 1
 	}
 
-	commits, totalCount, err := GetCommits(limit, page)
+	commits, totalCount, err := getCommits(limit, page)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取提交记录失败: " + err.Error(),
