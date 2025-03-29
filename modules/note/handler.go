@@ -9,8 +9,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// getNoteList 处理笔记列表页面
-func getNoteList(c *fiber.Ctx) error {
+// listNotesHandler 处理笔记列表页面
+func listNotesHandler(c *fiber.Ctx) error {
 	return c.Render("admin/notes", fiber.Map{
 		"Title": "笔记管理",
 		"Scripts": []string{
@@ -19,8 +19,8 @@ func getNoteList(c *fiber.Ctx) error {
 	}, "admin/layout")
 }
 
-// getCategoryList 处理分类列表
-func getCategoryList(c *fiber.Ctx) error {
+// listCategoriesHandler 处理分类列表
+func listCategoriesHandler(c *fiber.Ctx) error {
 	categories, err := srv.ListCategories()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "获取分类列表失败"})
@@ -28,8 +28,8 @@ func getCategoryList(c *fiber.Ctx) error {
 	return c.JSON(categories)
 }
 
-// getNoteTree 处理笔记树结构
-func getNoteTree(c *fiber.Ctx) error {
+// getNoteTreeHandler 处理笔记树结构
+func getNoteTreeHandler(c *fiber.Ctx) error {
 	notes, err := srv.ListNotes()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "获取笔记列表失败"})
@@ -37,8 +37,8 @@ func getNoteTree(c *fiber.Ctx) error {
 	return c.JSON(notes)
 }
 
-// getNoteDetail 处理笔记详情
-func getNoteDetail(c *fiber.Ctx) error {
+// getNoteDetailHandler 处理笔记详情
+func getNoteDetailHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的ID"})
@@ -64,8 +64,8 @@ type NoteRequest struct {
 	RoleIDs    []uint `json:"role_ids"`
 }
 
-// createNote 处理创建笔记
-func createNote(c *fiber.Ctx) error {
+// createNoteHandler 处理创建笔记
+func createNoteHandler(c *fiber.Ctx) error {
 	var req NoteRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -92,8 +92,8 @@ func createNote(c *fiber.Ctx) error {
 	return c.JSON(note)
 }
 
-// updateNote 处理更新笔记
-func updateNote(c *fiber.Ctx) error {
+// updateNoteHandler 处理更新笔记
+func updateNoteHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的ID"})
@@ -131,8 +131,8 @@ func updateNote(c *fiber.Ctx) error {
 	return c.JSON(note)
 }
 
-// deleteNote 处理删除笔记
-func deleteNote(c *fiber.Ctx) error {
+// deleteNoteHandler 处理删除笔记
+func deleteNoteHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的ID"})
@@ -163,8 +163,8 @@ type CategoryRequest struct {
 	RoleIDs     []uint `json:"role_ids"`
 }
 
-// createCategory 处理创建分类
-func createCategory(c *fiber.Ctx) error {
+// createCategoryHandler 处理创建分类
+func createCategoryHandler(c *fiber.Ctx) error {
 	var req CategoryRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -190,8 +190,8 @@ func createCategory(c *fiber.Ctx) error {
 	return c.JSON(category)
 }
 
-// updateCategory 处理更新分类
-func updateCategory(c *fiber.Ctx) error {
+// updateCategoryHandler 处理更新分类
+func updateCategoryHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的ID"})
@@ -228,8 +228,8 @@ func updateCategory(c *fiber.Ctx) error {
 	return c.JSON(category)
 }
 
-// deleteCategory 处理删除分类
-func deleteCategory(c *fiber.Ctx) error {
+// deleteCategoryHandler 处理删除分类
+func deleteCategoryHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的ID"})
@@ -270,8 +270,8 @@ func deleteCategory(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-// getPublicNotes 处理公开笔记列表
-func getPublicNotes(c *fiber.Ctx) error {
+// getPublicNotesHandler 处理公开笔记列表
+func getPublicNotesHandler(c *fiber.Ctx) error {
 	notes, err := srv.ListPublicNotes()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "获取公开笔记列表失败"})
@@ -279,8 +279,8 @@ func getPublicNotes(c *fiber.Ctx) error {
 	return c.JSON(notes)
 }
 
-// getPublicNoteDetail 处理公开笔记详情
-func getPublicNoteDetail(c *fiber.Ctx) error {
+// getPublicNoteDetailHandler 处理公开笔记详情
+func getPublicNoteDetailHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的ID"})
@@ -306,8 +306,8 @@ func getPublicNoteDetail(c *fiber.Ctx) error {
 	return c.JSON(note)
 }
 
-// getPublicCategories 处理公开分类列表
-func getPublicCategories(c *fiber.Ctx) error {
+// getPublicCategoriesHandler 处理公开分类列表
+func getPublicCategoriesHandler(c *fiber.Ctx) error {
 	categories, err := srv.ListPublicCategories()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "获取公开分类列表失败"})
