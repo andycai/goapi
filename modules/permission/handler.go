@@ -21,8 +21,8 @@ type UpdatePermissionRequest struct {
 	Description string `json:"description,omitempty"`
 }
 
-// getPermissions 获取权限列表
-func getPermissions(c *fiber.Ctx) error {
+// listPermissionsHandler 获取权限列表
+func listPermissionsHandler(c *fiber.Ctx) error {
 	var permissions []models.Permission
 	if err := app.DB.Find(&permissions).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "获取权限列表失败"})
@@ -30,8 +30,8 @@ func getPermissions(c *fiber.Ctx) error {
 	return c.JSON(permissions)
 }
 
-// createPermission 创建权限
-func createPermission(c *fiber.Ctx) error {
+// createPermissionHandler 创建权限
+func createPermissionHandler(c *fiber.Ctx) error {
 	var req CreatePermissionRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -62,8 +62,8 @@ func createPermission(c *fiber.Ctx) error {
 	return c.JSON(permission)
 }
 
-// updatePermission 更新权限
-func updatePermission(c *fiber.Ctx) error {
+// updatePermissionHandler 更新权限
+func updatePermissionHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var req UpdatePermissionRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -105,8 +105,8 @@ func updatePermission(c *fiber.Ctx) error {
 	return c.JSON(permission)
 }
 
-// deletePermission 删除权限
-func deletePermission(c *fiber.Ctx) error {
+// deletePermissionHandler 删除权限
+func deletePermissionHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	// 检查权限是否被角色使用
