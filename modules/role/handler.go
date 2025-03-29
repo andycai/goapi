@@ -21,8 +21,8 @@ type UpdateRoleRequest struct {
 	Permissions []uint `json:"permissions,omitempty"`
 }
 
-// getRoles 获取角色列表
-func getRoles(c *fiber.Ctx) error {
+// listRolesHandler 获取角色列表
+func listRolesHandler(c *fiber.Ctx) error {
 	var roles []models.Role
 	if err := app.DB.Preload("Permissions").Find(&roles).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "获取角色列表失败"})
@@ -30,8 +30,8 @@ func getRoles(c *fiber.Ctx) error {
 	return c.JSON(roles)
 }
 
-// createRole 创建角色
-func createRole(c *fiber.Ctx) error {
+// createRoleHandler 创建角色
+func createRoleHandler(c *fiber.Ctx) error {
 	var req CreateRoleRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -81,8 +81,8 @@ func createRole(c *fiber.Ctx) error {
 	return c.JSON(role)
 }
 
-// updateRole 更新角色
-func updateRole(c *fiber.Ctx) error {
+// updateRoleHandler 更新角色
+func updateRoleHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var req UpdateRoleRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -135,8 +135,8 @@ func updateRole(c *fiber.Ctx) error {
 	return c.JSON(role)
 }
 
-// deleteRole 删除角色
-func deleteRole(c *fiber.Ctx) error {
+// deleteRoleHandler 删除角色
+func deleteRoleHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	// 检查是否有用户使用此角色
