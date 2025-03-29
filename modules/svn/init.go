@@ -19,15 +19,17 @@ func init() {
 
 func (m *svnModule) Awake(a *core.App) error {
 	app = a
-
-	// Initialize SVN service
-	Srv = initService()
-
 	return autoMigrate()
 }
 
 func (m *svnModule) Start() error {
-	return initData()
+	if err := initData(); err != nil {
+		return err
+	}
+
+	// Initialize SVN service
+	Srv = initService()
+	return nil
 }
 
 func (m *svnModule) AddAuthRouters() error {

@@ -22,8 +22,11 @@ func (m *taskModule) Awake(a *core.App) error {
 }
 
 func (m *taskModule) Start() error {
-	initCron()
+	if err := initData(); err != nil {
+		return err
+	}
 
+	initCron()
 	return nil
 }
 

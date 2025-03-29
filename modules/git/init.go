@@ -19,15 +19,17 @@ func init() {
 
 func (m *gitModule) Awake(a *core.App) error {
 	app = a
-
-	// Initialize Git service
-	Srv = initService()
-
 	return autoMigrate()
 }
 
 func (m *gitModule) Start() error {
-	return initData()
+	if err := initData(); err != nil {
+		return err
+	}
+
+	// Initialize Git service
+	Srv = initService()
+	return nil
 }
 
 func (m *gitModule) AddAuthRouters() error {

@@ -19,7 +19,12 @@ func init() {
 func (m *bugtrackerModule) Awake(a *core.App) error {
 	app = a
 	// 数据迁移
-	if err := autoMigrate(); err != nil {
+	return autoMigrate()
+}
+
+func (m *bugtrackerModule) Start() error {
+	// 初始化数据
+	if err := initData(); err != nil {
 		return err
 	}
 
@@ -27,11 +32,6 @@ func (m *bugtrackerModule) Awake(a *core.App) error {
 	initService()
 
 	return nil
-}
-
-func (m *bugtrackerModule) Start() error {
-	// 初始化数据
-	return initData()
 }
 
 func (m *bugtrackerModule) AddAuthRouters() error {

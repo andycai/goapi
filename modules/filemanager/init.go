@@ -19,18 +19,18 @@ func init() {
 func (m *filemanagerModule) Awake(a *core.App) error {
 	app = a
 	// 数据迁移
-	if err := autoMigrate(); err != nil {
+	return autoMigrate()
+}
+
+func (m *filemanagerModule) Start() error {
+	// 初始化数据
+	if err := initData(); err != nil {
 		return err
 	}
 
 	// Initialize Filemanager service
 	initService()
 	return nil
-}
-
-func (m *filemanagerModule) Start() error {
-	// 初始化数据
-	return initData()
 }
 
 func (m *filemanagerModule) AddAuthRouters() error {
