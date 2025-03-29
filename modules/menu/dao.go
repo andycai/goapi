@@ -175,6 +175,17 @@ func initMenus() error {
 			CreatedAt:  now,
 			UpdatedAt:  now,
 		},
+		{
+			ParentID:   systemManage.ID,
+			Name:       "参数配置",
+			Path:       "/admin/parameter",
+			Icon:       "parameter",
+			Sort:       5,
+			Permission: "parameter:view",
+			IsShow:     true,
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
 	}
 
 	if err := app.DB.Create(&systemMenus).Error; err != nil {
