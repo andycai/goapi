@@ -5,9 +5,10 @@ const (
 	ModulePriorityUser         = 1000 // 系统-用户管理
 	ModulePriorityRole         = 1001 // 系统-角色管理
 	ModulePriorityPermission   = 1002 // 系统-权限管理
-	ModulePriorityLogin        = 1003 // 系统-登录管理
-	ModulePriorityMenu         = 1004 // 系统-菜单管理
-	ModulePriorityAdminLog     = 1005 // 系统-管理员活动日志
+	ModulePriorityParameter    = 1003 // 系统-参数管理
+	ModulePriorityLogin        = 1004 // 系统-登录管理
+	ModulePriorityMenu         = 1005 // 系统-菜单管理
+	ModulePriorityAdminLog     = 1006 // 系统-管理员活动日志
 	ModulePriorityStats        = 2000 // 游戏-性能统计
 	ModulePriorityGameLog      = 2001 // 游戏-日志
 	ModulePriorityServerConf   = 2002 // 游戏-服务器配置

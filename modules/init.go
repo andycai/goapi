@@ -8,6 +8,7 @@ import (
 	_ "github.com/andycai/unitool/modules/gamelog"
 	_ "github.com/andycai/unitool/modules/login"
 	_ "github.com/andycai/unitool/modules/menu"
+	_ "github.com/andycai/unitool/modules/parameter"
 	_ "github.com/andycai/unitool/modules/permission"
 	_ "github.com/andycai/unitool/modules/reposync"
 	_ "github.com/andycai/unitool/modules/role"
