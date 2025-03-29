@@ -28,22 +28,13 @@ func (m *loginModule) AddPublicRouters() error {
 	})
 
 	// 登录 API 路由（不需要认证）
-	app.RouterPublic.Post("/login", func(c *fiber.Ctx) error {
-		return loginAction(c)
-	})
-
+	app.RouterPublic.Post("/login", loginHandler)
 	// 退出登录 API 路由（不需要认证）
-	app.RouterPublic.Get("/logout", func(c *fiber.Ctx) error {
-		return logoutAction(c)
-	})
-	app.RouterPublic.Post("/logout", func(c *fiber.Ctx) error {
-		return logoutAction(c)
-	})
+	app.RouterPublic.Get("/logout", logoutHandler)
+	app.RouterPublic.Post("/logout", logoutHandler)
 
 	// 修改密码路由（不需要认证）
-	app.RouterPublic.Post("/change-password", func(c *fiber.Ctx) error {
-		return changePasswordAction(c)
-	})
+	app.RouterPublic.Post("/change-password", changePasswordHandler)
 
 	return nil
 }

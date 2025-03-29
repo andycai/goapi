@@ -27,8 +27,8 @@ type ChangePasswordRequest struct {
 	NewPassword string `json:"new_password"`
 }
 
-// loginAction 处理登录请求
-func loginAction(c *fiber.Ctx) error {
+// loginHandler 处理登录请求
+func loginHandler(c *fiber.Ctx) error {
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -103,8 +103,8 @@ func loginAction(c *fiber.Ctx) error {
 	return c.JSON(responseData)
 }
 
-// logoutAction 处理退出登录请求
-func logoutAction(c *fiber.Ctx) error {
+// logoutHandler 处理退出登录请求
+func logoutHandler(c *fiber.Ctx) error {
 	isAuthenticated, _ := core.GetSession(c)
 	if !isAuthenticated {
 		return c.Redirect("/login")
@@ -115,8 +115,8 @@ func logoutAction(c *fiber.Ctx) error {
 	return c.Redirect("/login")
 }
 
-// changePasswordAction 修改密码
-func changePasswordAction(c *fiber.Ctx) error {
+// changePasswordHandler 修改密码
+func changePasswordHandler(c *fiber.Ctx) error {
 	var req ChangePasswordRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
