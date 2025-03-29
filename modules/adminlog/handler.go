@@ -5,8 +5,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// getAdminLogs 获取操作日志列表
-func getAdminLogs(c *fiber.Ctx) error {
+// listLogsHandler 获取操作日志列表
+func listLogsHandler(c *fiber.Ctx) error {
 	var total int64
 
 	// 获取查询参数
@@ -57,8 +57,8 @@ func getAdminLogs(c *fiber.Ctx) error {
 	})
 }
 
-// deleteAdminLogs 删除指定日期之前的操作日志
-func deleteAdminLogs(c *fiber.Ctx) error {
+// deleteLogsHandler 删除指定日期之前的操作日志
+func deleteLogsHandler(c *fiber.Ctx) error {
 	beforeDate := c.Query("beforeDate")
 	if beforeDate == "" {
 		return c.Status(400).JSON(fiber.Map{
