@@ -32,7 +32,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "游戏配置列表",
-				Code:        "gameconf:list",
+				Code:        "gameconf:view",
 				Description: "查看游戏配置列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

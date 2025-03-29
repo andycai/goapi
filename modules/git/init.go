@@ -33,7 +33,7 @@ func (m *gitModule) Start() error {
 
 func (m *gitModule) AddAuthRouters() error {
 	// admin page
-	app.RouterAdmin.Get("/git", app.HasPermission("git:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/git", app.HasPermission("git:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/git", fiber.Map{
 			"Title": "Git管理",
 			"Scripts": []string{

@@ -23,7 +23,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "SVN列表",
-				Code:        "svn:list",
+				Code:        "svn:view",
 				Description: "查看SVN列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

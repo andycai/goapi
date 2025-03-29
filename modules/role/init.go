@@ -33,7 +33,7 @@ func (m *roleModule) Start() error {
 
 func (m *roleModule) AddAuthRouters() error {
 	// admin
-	app.RouterAdmin.Get("/roles", app.HasPermission("role:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/roles", app.HasPermission("role:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/roles", fiber.Map{
 			"Title": "角色管理",
 			"Scripts": []string{
@@ -43,7 +43,7 @@ func (m *roleModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/roles", app.HasPermission("role:list"), listRolesHandler)
+	app.RouterApi.Get("/roles", app.HasPermission("role:view"), listRolesHandler)
 	app.RouterApi.Post("/roles", app.HasPermission("role:create"), createRoleHandler)
 	app.RouterApi.Put("/roles/:id", app.HasPermission("role:update"), updateRoleHandler)
 	app.RouterApi.Delete("/roles/:id", app.HasPermission("role:delete"), deleteRoleHandler)

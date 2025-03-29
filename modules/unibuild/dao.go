@@ -27,7 +27,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "构建任务列表",
-				Code:        "unibuild:list",
+				Code:        "unibuild:view",
 				Description: "查看构建任务列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

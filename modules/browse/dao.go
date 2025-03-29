@@ -27,7 +27,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "文件浏览列表",
-				Code:        "browse:list",
+				Code:        "browse:view",
 				Description: "查看文件列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

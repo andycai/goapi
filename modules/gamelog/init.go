@@ -35,7 +35,7 @@ func (m *gamelogModule) AddPublicRouters() error {
 
 func (m *gamelogModule) AddAuthRouters() error {
 	// admin
-	app.RouterAdmin.Get("/gamelog", app.HasPermission("gamelog:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/gamelog", app.HasPermission("gamelog:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/gamelog", fiber.Map{
 			"Title": "游戏日志",
 			"Scripts": []string{
@@ -45,9 +45,9 @@ func (m *gamelogModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/gamelog", app.HasPermission("gamelog:list"), listLogsHandler)
+	app.RouterApi.Get("/gamelog", app.HasPermission("gamelog:view"), listLogsHandler)
 	app.RouterApi.Delete("/gamelog/before", app.HasPermission("gamelog:delete"), deleteLogsBeforeHandler)
-	app.RouterApi.Delete("/gamelog/:id", app.HasPermission("gamelog:list"), deleteLogHandler)
+	app.RouterApi.Delete("/gamelog/:id", app.HasPermission("gamelog:view"), deleteLogHandler)
 
 	return nil
 }

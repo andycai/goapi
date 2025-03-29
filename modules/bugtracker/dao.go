@@ -33,7 +33,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "Bug跟踪列表",
-				Code:        "bugtracker:list",
+				Code:        "bugtracker:view",
 				Description: "查看Bug跟踪列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

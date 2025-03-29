@@ -30,7 +30,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "管理员日志列表",
-				Code:        "adminlog:list",
+				Code:        "adminlog:view",
 				Description: "查看管理员日志列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

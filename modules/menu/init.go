@@ -40,7 +40,7 @@ func (m *menuModule) AddPublicRouters() error {
 
 func (m *menuModule) AddAuthRouters() error {
 	// admin
-	app.RouterAdmin.Get("/menus", app.HasPermission("menu:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/menus", app.HasPermission("menu:view"), func(c *fiber.Ctx) error {
 		user := app.CurrentUser(c)
 
 		return c.Render("admin/menus", fiber.Map{
@@ -53,8 +53,8 @@ func (m *menuModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/menus", app.HasPermission("menu:list"), listMenus)
-	app.RouterApi.Get("/menus/tree", app.HasPermission("menu:list"), getMenuTree)
+	app.RouterApi.Get("/menus", app.HasPermission("menu:view"), listMenus)
+	app.RouterApi.Get("/menus/tree", app.HasPermission("menu:view"), getMenuTree)
 	app.RouterApi.Post("/menus", app.HasPermission("menu:create"), createMenu)
 	app.RouterApi.Put("/menus/:id", app.HasPermission("menu:update"), updateMenu)
 	app.RouterApi.Delete("/menus/:id", app.HasPermission("menu:delete"), deleteMenu)

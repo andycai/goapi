@@ -23,7 +23,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "Git列表",
-				Code:        "git:list",
+				Code:        "git:view",
 				Description: "查看Git列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

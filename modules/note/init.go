@@ -41,17 +41,17 @@ func (m *noteModule) AddPublicRouters() error {
 
 func (m *noteModule) AddAuthRouters() error {
 	// 管理后台路由
-	app.RouterAdmin.Get("/notes", app.HasPermission("note:list"), listNotesHandler)
+	app.RouterAdmin.Get("/notes", app.HasPermission("note:view"), listNotesHandler)
 
 	// API路由
-	app.RouterApi.Get("/notes/tree", app.HasPermission("note:list"), getNoteTreeHandler)
-	app.RouterApi.Get("/notes/:id", app.HasPermission("note:list"), getNoteDetailHandler)
+	app.RouterApi.Get("/notes/tree", app.HasPermission("note:view"), getNoteTreeHandler)
+	app.RouterApi.Get("/notes/:id", app.HasPermission("note:view"), getNoteDetailHandler)
 	app.RouterApi.Post("/notes", app.HasPermission("note:create"), createNoteHandler)
 	app.RouterApi.Put("/notes/:id", app.HasPermission("note:update"), updateNoteHandler)
 	app.RouterApi.Delete("/notes/:id", app.HasPermission("note:delete"), deleteNoteHandler)
 
 	// 分类操作
-	app.RouterApi.Get("/notes/categories", app.HasPermission("note:category:list"), listCategoriesHandler)
+	app.RouterApi.Get("/notes/categories", app.HasPermission("note:category:view"), listCategoriesHandler)
 	app.RouterApi.Post("/notes/categories", app.HasPermission("note:category:create"), createCategoryHandler)
 	app.RouterApi.Put("/notes/categories/:id", app.HasPermission("note:category:update"), updateCategoryHandler)
 	app.RouterApi.Delete("/notes/categories/:id", app.HasPermission("note:category:delete"), deleteCategoryHandler)

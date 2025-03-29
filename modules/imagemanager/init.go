@@ -35,7 +35,7 @@ func (m *imagemanagerModule) Start() error {
 
 func (m *imagemanagerModule) AddAuthRouters() error {
 	// admin page
-	app.RouterAdmin.Get("/imagemanager", app.HasPermission("imagemanager:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/imagemanager", app.HasPermission("imagemanager:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/imagemanager", fiber.Map{
 			"Title": "图片管理",
 			"Scripts": []string{
@@ -45,15 +45,15 @@ func (m *imagemanagerModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Get("/imagemanager/list", app.HasPermission("imagemanager:list"), listFilesHandler)
+	app.RouterApi.Get("/imagemanager/list", app.HasPermission("imagemanager:view"), listFilesHandler)
 	app.RouterApi.Post("/imagemanager/upload", app.HasPermission("imagemanager:upload"), uploadHandler)
 	app.RouterApi.Post("/imagemanager/delete", app.HasPermission("imagemanager:delete"), deleteHandler)
 	app.RouterApi.Post("/imagemanager/rename", app.HasPermission("imagemanager:rename"), renameHandler)
 	app.RouterApi.Post("/imagemanager/move", app.HasPermission("imagemanager:move"), moveHandler)
 	app.RouterApi.Post("/imagemanager/copy", app.HasPermission("imagemanager:copy"), copyHandler)
 	app.RouterApi.Get("/imagemanager/info", app.HasPermission("imagemanager:info"), infoHandler)
-	app.RouterApi.Get("/imagemanager/thumbnail", app.HasPermission("imagemanager:list"), thumbnailHandler)
-	app.RouterApi.Get("/imagemanager/view", app.HasPermission("imagemanager:list"), viewHandler)
+	app.RouterApi.Get("/imagemanager/thumbnail", app.HasPermission("imagemanager:view"), thumbnailHandler)
+	app.RouterApi.Get("/imagemanager/view", app.HasPermission("imagemanager:view"), viewHandler)
 
 	return nil
 }

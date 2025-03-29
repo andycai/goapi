@@ -27,7 +27,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "游戏日志列表",
-				Code:        "gamelog:list",
+				Code:        "gamelog:view",
 				Description: "查看游戏日志列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

@@ -39,13 +39,13 @@ func (m *statsModule) AddPublicRouters() error {
 
 func (m *statsModule) AddAuthRouters() error {
 
-	app.RouterApi.Get("/stats", app.HasPermission("stats:list"), listStatsHandler)
+	app.RouterApi.Get("/stats", app.HasPermission("stats:view"), listStatsHandler)
 	app.RouterApi.Delete("/stats/before", app.HasPermission("stats:delete"), deleteStatsBeforeHandler)
-	app.RouterApi.Get("/stats/details", app.HasPermission("stats:list"), getStatDetailsHandler)
+	app.RouterApi.Get("/stats/details", app.HasPermission("stats:view"), getStatDetailsHandler)
 	app.RouterApi.Delete("/stats/:id", app.HasPermission("stats:delete"), deleteStatHandler)
 
 	// admin
-	app.RouterAdmin.Get("/stats", app.HasPermission("stats:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/stats", app.HasPermission("stats:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/stats", fiber.Map{
 			"Title": "游戏统计",
 			"Scripts": []string{

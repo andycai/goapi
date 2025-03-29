@@ -29,7 +29,7 @@ func (m *browseModule) Start() error {
 func (m *browseModule) AddAuthRouters() error {
 	// admin
 	// 浏览目录和文件的路由
-	app.RouterAdmin.Get("/browse/*", app.HasPermission("browse:list"), listFilesHandler)
+	app.RouterAdmin.Get("/browse/*", app.HasPermission("browse:view"), listFilesHandler)
 
 	// 文件删除路由
 	app.RouterAdmin.Delete("/browse/*", app.HasPermission("browse:delete"), deleteFileHandler)

@@ -37,7 +37,7 @@ func (m *reposyncModule) Start() error {
 
 func (m *reposyncModule) AddAuthRouters() error {
 	// 管理页面
-	app.RouterAdmin.Get("/reposync", app.HasPermission("reposync:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/reposync", app.HasPermission("reposync:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/reposync", fiber.Map{
 			"Title": "仓库同步",
 			"Scripts": []string{
@@ -50,7 +50,7 @@ func (m *reposyncModule) AddAuthRouters() error {
 	app.RouterApi.Post("/reposync/config", app.HasPermission("reposync:config"), saveConfigHandler)
 	app.RouterApi.Get("/reposync/config", app.HasPermission("reposync:config"), getConfigHandler)
 	app.RouterApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkoutHandler)
-	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:list"), listCommitsHandler)
+	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:view"), listCommitsHandler)
 	app.RouterApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommitsHandler)
 
 	return nil

@@ -30,7 +30,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "仓库同步查看",
-				Code:        "reposync:list",
+				Code:        "reposync:view",
 				Description: "查看仓库同步",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

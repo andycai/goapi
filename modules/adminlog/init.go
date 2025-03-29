@@ -33,7 +33,7 @@ func (m *adminlogModule) Start() error {
 
 func (m *adminlogModule) AddAuthRouters() error {
 	// admin
-	app.RouterAdmin.Get("/adminlog", app.HasPermission("adminlog:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/adminlog", app.HasPermission("adminlog:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/adminlog", fiber.Map{
 			"Title": "操作日志",
 			"Scripts": []string{
@@ -43,7 +43,7 @@ func (m *adminlogModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/adminlog", app.HasPermission("adminlog:list"), listLogsHandler)
+	app.RouterApi.Get("/adminlog", app.HasPermission("adminlog:view"), listLogsHandler)
 	app.RouterApi.Delete("/adminlog", app.HasPermission("adminlog:delete"), deleteLogsHandler)
 
 	return nil

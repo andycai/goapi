@@ -27,7 +27,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "Luban配置列表",
-				Code:        "luban:list",
+				Code:        "luban:view",
 				Description: "查看Luban配置列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

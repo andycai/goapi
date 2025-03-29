@@ -33,7 +33,7 @@ func (m *svnModule) Start() error {
 
 func (m *svnModule) AddAuthRouters() error {
 	// admin page
-	app.RouterAdmin.Get("/svn", app.HasPermission("svn:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/svn", app.HasPermission("svn:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/svn", fiber.Map{
 			"Title": "SVN管理",
 			"Scripts": []string{

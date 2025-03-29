@@ -26,7 +26,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "任务列表",
-				Code:        "citask:list",
+				Code:        "citask:view",
 				Description: "查看任务列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

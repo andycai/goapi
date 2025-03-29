@@ -35,7 +35,7 @@ func (m *filemanagerModule) Start() error {
 
 func (m *filemanagerModule) AddAuthRouters() error {
 	// admin page
-	app.RouterAdmin.Get("/filemanager", app.HasPermission("filemanager:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/filemanager", app.HasPermission("filemanager:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/filemanager", fiber.Map{
 			"Title": "文件管理",
 			"Scripts": []string{
@@ -45,7 +45,7 @@ func (m *filemanagerModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Get("/filemanager/list", app.HasPermission("filemanager:list"), listFilesHandler)
+	app.RouterApi.Get("/filemanager/list", app.HasPermission("filemanager:view"), listFilesHandler)
 	app.RouterApi.Post("/filemanager/upload", app.HasPermission("filemanager:upload"), uploadFileHandler)
 	app.RouterApi.Post("/filemanager/create", app.HasPermission("filemanager:create"), createHandler)
 	app.RouterApi.Post("/filemanager/delete", app.HasPermission("filemanager:delete"), deleteHandler)

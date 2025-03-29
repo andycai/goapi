@@ -31,7 +31,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "角色列表",
-				Code:        "role:list",
+				Code:        "role:view",
 				Description: "查看角色列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

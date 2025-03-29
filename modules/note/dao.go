@@ -33,7 +33,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "笔记列表",
-				Code:        "note:list",
+				Code:        "note:view",
 				Description: "查看笔记列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -61,7 +61,7 @@ func initData() error {
 			},
 			{
 				Name:        "分类列表",
-				Code:        "note:category:list",
+				Code:        "note:category:view",
 				Description: "查看笔记分类列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

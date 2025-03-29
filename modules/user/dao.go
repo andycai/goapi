@@ -36,7 +36,7 @@ func initData() error {
 			// 用户
 			{
 				Name:        "用户列表",
-				Code:        "user:list",
+				Code:        "user:view",
 				Description: "查看用户列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -65,7 +65,7 @@ func initData() error {
 			// 角色
 			{
 				Name:        "角色列表",
-				Code:        "role:list",
+				Code:        "role:view",
 				Description: "查看角色列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -94,7 +94,7 @@ func initData() error {
 			// 权限
 			{
 				Name:        "权限列表",
-				Code:        "permission:list",
+				Code:        "permission:view",
 				Description: "查看权限列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -123,7 +123,7 @@ func initData() error {
 			// 菜单
 			{
 				Name:        "菜单列表",
-				Code:        "menu:list",
+				Code:        "menu:view",
 				Description: "查看菜单列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -152,7 +152,7 @@ func initData() error {
 			// 系统日志
 			{
 				Name:        "日志列表",
-				Code:        "adminlog:list",
+				Code:        "adminlog:view",
 				Description: "查看操作日志",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -167,7 +167,7 @@ func initData() error {
 			// 游戏日志
 			{
 				Name:        "游戏日志",
-				Code:        "gamelog:list",
+				Code:        "gamelog:view",
 				Description: "查看游戏日志",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -182,7 +182,7 @@ func initData() error {
 			// 游戏统计
 			{
 				Name:        "游戏统计",
-				Code:        "stats:list",
+				Code:        "stats:view",
 				Description: "查看游戏统计",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -197,7 +197,7 @@ func initData() error {
 			// 文件浏览
 			{
 				Name:        "文件浏览",
-				Code:        "browse:list",
+				Code:        "browse:view",
 				Description: "查看文件浏览",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -219,7 +219,7 @@ func initData() error {
 			// 服务器配置
 			{
 				Name:        "服务器配置",
-				Code:        "serverconf:list",
+				Code:        "serverconf:view",
 				Description: "查看服务器配置",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -241,7 +241,7 @@ func initData() error {
 			// 任务管理
 			{
 				Name:        "构建任务查看",
-				Code:        "citask:list",
+				Code:        "citask:view",
 				Description: "查看构建任务",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),

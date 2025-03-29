@@ -33,7 +33,7 @@ func (m *permissionModule) Start() error {
 
 func (m *permissionModule) AddAuthRouters() error {
 	// admin
-	app.RouterAdmin.Get("/permissions", app.HasPermission("permission:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/permissions", app.HasPermission("permission:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/permissions", fiber.Map{
 			"Title": "权限管理",
 			"Scripts": []string{
@@ -43,7 +43,7 @@ func (m *permissionModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/permissions", app.HasPermission("permission:list"), listPermissionsHandler)
+	app.RouterApi.Get("/permissions", app.HasPermission("permission:view"), listPermissionsHandler)
 	app.RouterApi.Post("/permissions", app.HasPermission("permission:create"), createPermissionHandler)
 	app.RouterApi.Put("/permissions/:id", app.HasPermission("permission:update"), updatePermissionHandler)
 	app.RouterApi.Delete("/permissions/:id", app.HasPermission("permission:delete"), deletePermissionHandler)

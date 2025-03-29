@@ -45,7 +45,7 @@ func (m *serverconfModule) AddPublicRouters() error {
 
 func (m *serverconfModule) AddAuthRouters() error {
 	// admin
-	app.RouterAdmin.Get("/serverconf", app.HasPermission("serverconf:list"), func(c *fiber.Ctx) error {
+	app.RouterAdmin.Get("/serverconf", app.HasPermission("serverconf:view"), func(c *fiber.Ctx) error {
 		return c.Render("admin/serverconf", fiber.Map{
 			"Title": "服务器配置",
 			"Scripts": []string{

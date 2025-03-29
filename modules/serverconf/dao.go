@@ -27,7 +27,7 @@ func initData() error {
 		permissions := []models.Permission{
 			{
 				Name:        "服务器配置列表",
-				Code:        "serverconf:list",
+				Code:        "serverconf:view",
 				Description: "查看服务器配置列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
