@@ -45,15 +45,15 @@ func (m *imagemanagerModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Get("/imagemanager/list", app.HasPermission("imagemanager:list"), ListHandler)
-	app.RouterApi.Post("/imagemanager/upload", app.HasPermission("imagemanager:upload"), UploadHandler)
-	app.RouterApi.Post("/imagemanager/delete", app.HasPermission("imagemanager:delete"), DeleteHandler)
-	app.RouterApi.Post("/imagemanager/rename", app.HasPermission("imagemanager:rename"), RenameHandler)
-	app.RouterApi.Post("/imagemanager/move", app.HasPermission("imagemanager:move"), MoveHandler)
-	app.RouterApi.Post("/imagemanager/copy", app.HasPermission("imagemanager:copy"), CopyHandler)
-	app.RouterApi.Get("/imagemanager/info", app.HasPermission("imagemanager:info"), InfoHandler)
-	app.RouterApi.Get("/imagemanager/thumbnail", app.HasPermission("imagemanager:list"), ThumbnailHandler)
-	app.RouterApi.Get("/imagemanager/view", app.HasPermission("imagemanager:list"), ViewHandler)
+	app.RouterApi.Get("/imagemanager/list", app.HasPermission("imagemanager:list"), listFilesHandler)
+	app.RouterApi.Post("/imagemanager/upload", app.HasPermission("imagemanager:upload"), uploadHandler)
+	app.RouterApi.Post("/imagemanager/delete", app.HasPermission("imagemanager:delete"), deleteHandler)
+	app.RouterApi.Post("/imagemanager/rename", app.HasPermission("imagemanager:rename"), renameHandler)
+	app.RouterApi.Post("/imagemanager/move", app.HasPermission("imagemanager:move"), moveHandler)
+	app.RouterApi.Post("/imagemanager/copy", app.HasPermission("imagemanager:copy"), copyHandler)
+	app.RouterApi.Get("/imagemanager/info", app.HasPermission("imagemanager:info"), infoHandler)
+	app.RouterApi.Get("/imagemanager/thumbnail", app.HasPermission("imagemanager:list"), thumbnailHandler)
+	app.RouterApi.Get("/imagemanager/view", app.HasPermission("imagemanager:list"), viewHandler)
 
 	return nil
 }

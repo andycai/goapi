@@ -4,8 +4,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// ListHandler handles the request to list images
-func ListHandler(c *fiber.Ctx) error {
+// listFilesHandler handles the request to list images
+func listFilesHandler(c *fiber.Ctx) error {
 	path := c.Query("path", "./")
 	images, err := srv.List(path)
 	if err != nil {
@@ -18,8 +18,8 @@ func ListHandler(c *fiber.Ctx) error {
 	})
 }
 
-// UploadHandler handles image upload requests
-func UploadHandler(c *fiber.Ctx) error {
+// uploadHandler handles image upload requests
+func uploadHandler(c *fiber.Ctx) error {
 	path := c.FormValue("path", "./")
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -48,8 +48,8 @@ func UploadHandler(c *fiber.Ctx) error {
 	})
 }
 
-// DeleteHandler handles image deletion
-func DeleteHandler(c *fiber.Ctx) error {
+// deleteHandler handles image deletion
+func deleteHandler(c *fiber.Ctx) error {
 	path := c.FormValue("path")
 
 	err := srv.Delete(path)
@@ -64,8 +64,8 @@ func DeleteHandler(c *fiber.Ctx) error {
 	})
 }
 
-// RenameHandler handles image renaming
-func RenameHandler(c *fiber.Ctx) error {
+// renameHandler handles image renaming
+func renameHandler(c *fiber.Ctx) error {
 	oldPath := c.FormValue("old_path")
 	newPath := c.FormValue("new_path")
 
@@ -81,8 +81,8 @@ func RenameHandler(c *fiber.Ctx) error {
 	})
 }
 
-// MoveHandler handles moving images
-func MoveHandler(c *fiber.Ctx) error {
+// moveHandler handles moving images
+func moveHandler(c *fiber.Ctx) error {
 	sourcePath := c.FormValue("source_path")
 	destPath := c.FormValue("dest_path")
 
@@ -98,8 +98,8 @@ func MoveHandler(c *fiber.Ctx) error {
 	})
 }
 
-// CopyHandler handles copying images
-func CopyHandler(c *fiber.Ctx) error {
+// copyHandler handles copying images
+func copyHandler(c *fiber.Ctx) error {
 	sourcePath := c.FormValue("source_path")
 	destPath := c.FormValue("dest_path")
 
@@ -115,8 +115,8 @@ func CopyHandler(c *fiber.Ctx) error {
 	})
 }
 
-// InfoHandler returns detailed information about an image
-func InfoHandler(c *fiber.Ctx) error {
+// infoHandler returns detailed information about an image
+func infoHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
 
 	info, err := srv.GetInfo(path)
@@ -131,8 +131,8 @@ func InfoHandler(c *fiber.Ctx) error {
 	})
 }
 
-// ThumbnailHandler serves image thumbnails
-func ThumbnailHandler(c *fiber.Ctx) error {
+// thumbnailHandler serves image thumbnails
+func thumbnailHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
 
 	thumbnailPath, err := srv.GetThumbnail(path)
@@ -145,8 +145,8 @@ func ThumbnailHandler(c *fiber.Ctx) error {
 	return c.SendFile(thumbnailPath)
 }
 
-// ViewHandler serves the original image
-func ViewHandler(c *fiber.Ctx) error {
+// viewHandler serves the original image
+func viewHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
 	fullPath := srv.rootPath + "/" + path
 
