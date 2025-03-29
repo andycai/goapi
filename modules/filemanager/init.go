@@ -45,15 +45,15 @@ func (m *filemanagerModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Get("/filemanager/list", app.HasPermission("filemanager:list"), ListHandler)
-	app.RouterApi.Post("/filemanager/upload", app.HasPermission("filemanager:upload"), UploadHandler)
-	app.RouterApi.Post("/filemanager/create", app.HasPermission("filemanager:create"), CreateHandler)
-	app.RouterApi.Post("/filemanager/delete", app.HasPermission("filemanager:delete"), DeleteHandler)
-	app.RouterApi.Post("/filemanager/rename", app.HasPermission("filemanager:rename"), RenameHandler)
-	app.RouterApi.Post("/filemanager/move", app.HasPermission("filemanager:move"), MoveHandler)
-	app.RouterApi.Post("/filemanager/copy", app.HasPermission("filemanager:copy"), CopyHandler)
-	app.RouterApi.Get("/filemanager/download", app.HasPermission("filemanager:download"), DownloadHandler)
-	app.RouterApi.Get("/filemanager/info", app.HasPermission("filemanager:info"), InfoHandler)
+	app.RouterApi.Get("/filemanager/list", app.HasPermission("filemanager:list"), listFilesHandler)
+	app.RouterApi.Post("/filemanager/upload", app.HasPermission("filemanager:upload"), uploadFileHandler)
+	app.RouterApi.Post("/filemanager/create", app.HasPermission("filemanager:create"), createHandler)
+	app.RouterApi.Post("/filemanager/delete", app.HasPermission("filemanager:delete"), deleteHandler)
+	app.RouterApi.Post("/filemanager/rename", app.HasPermission("filemanager:rename"), renameHandler)
+	app.RouterApi.Post("/filemanager/move", app.HasPermission("filemanager:move"), moveHandler)
+	app.RouterApi.Post("/filemanager/copy", app.HasPermission("filemanager:copy"), copyHandler)
+	app.RouterApi.Get("/filemanager/download", app.HasPermission("filemanager:download"), downloadHandler)
+	app.RouterApi.Get("/filemanager/info", app.HasPermission("filemanager:info"), infoHandler)
 
 	return nil
 }

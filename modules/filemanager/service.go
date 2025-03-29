@@ -7,33 +7,16 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 )
 
-var srv *FilemanagerService
-
-type FileInfo struct {
-	Name      string    `json:"name"`
-	Path      string    `json:"path"`
-	Size      int64     `json:"size"`
-	IsDir     bool      `json:"is_dir"`
-	Mode      string    `json:"mode"`
-	ModTime   time.Time `json:"mod_time"`
-	Extension string    `json:"extension"`
-}
-
-type FilemanagerService struct {
-	rootPath string
-}
+var rootPath string
 
 func initService() {
-	srv = &FilemanagerService{
-		rootPath: "./",
-	}
+	rootPath = "./"
 }
 
 // isValidPath checks if the path is safe for file operations
-func (s *FilemanagerService) isValidPath(path string) bool {
+func isValidPath(path string) bool {
 	// Clean and normalize the path
 	cleanPath := filepath.Clean(path)
 
@@ -61,7 +44,7 @@ func (s *FilemanagerService) isValidPath(path string) bool {
 		return false
 	}
 
-	rootAbs, err := filepath.Abs(s.rootPath)
+	rootAbs, err := filepath.Abs(rootPath)
 	if err != nil {
 		return false
 	}
@@ -69,9 +52,9 @@ func (s *FilemanagerService) isValidPath(path string) bool {
 	return strings.HasPrefix(absPath, rootAbs)
 }
 
-// List returns a list of files and directories in the specified path
-func (s *FilemanagerService) List(path string) ([]FileInfo, error) {
-	if !s.isValidPath(path) {
+// listFiles returns a list of files and directories in the specified path
+func listFiles(path string) ([]FileInfo, error) {
+	if !isValidPath(path) {
 		return nil, errors.New("invalid path")
 	}
 
@@ -109,9 +92,9 @@ func (s *FilemanagerService) List(path string) ([]FileInfo, error) {
 	return files, nil
 }
 
-// Upload handles file upload to the specified path
-func (s *FilemanagerService) Upload(path string, file io.Reader, filename string) error {
-	if !s.isValidPath(path) {
+// uploadFile handles file upload to the specified path
+func uploadFile(path string, file io.Reader, filename string) error {
+	if !isValidPath(path) {
 		return errors.New("invalid path")
 	}
 
@@ -126,9 +109,9 @@ func (s *FilemanagerService) Upload(path string, file io.Reader, filename string
 	return err
 }
 
-// Create creates a new directory or file
-func (s *FilemanagerService) Create(path string, isDir bool) error {
-	if !s.isValidPath(path) {
+// create creates a new directory or file
+func create(path string, isDir bool) error {
+	if !isValidPath(path) {
 		return errors.New("invalid path")
 	}
 
@@ -142,33 +125,33 @@ func (s *FilemanagerService) Create(path string, isDir bool) error {
 	return f.Close()
 }
 
-// Delete removes a file or directory
-func (s *FilemanagerService) Delete(path string) error {
-	if !s.isValidPath(path) {
+// delete removes a file or directory
+func delete(path string) error {
+	if !isValidPath(path) {
 		return errors.New("invalid path")
 	}
 	return os.RemoveAll(path)
 }
 
-// Rename renames a file or directory
-func (s *FilemanagerService) Rename(oldPath, newPath string) error {
-	if !s.isValidPath(oldPath) || !s.isValidPath(newPath) {
+// rename renames a file or directory
+func rename(oldPath, newPath string) error {
+	if !isValidPath(oldPath) || !isValidPath(newPath) {
 		return errors.New("invalid path")
 	}
 	return os.Rename(oldPath, newPath)
 }
 
-// Move moves a file or directory to a new location
-func (s *FilemanagerService) Move(sourcePath, destPath string) error {
-	if !s.isValidPath(sourcePath) || !s.isValidPath(destPath) {
+// move moves a file or directory to a new location
+func move(sourcePath, destPath string) error {
+	if !isValidPath(sourcePath) || !isValidPath(destPath) {
 		return errors.New("invalid path")
 	}
 	return os.Rename(sourcePath, destPath)
 }
 
-// Copy copies a file or directory to a new location
-func (s *FilemanagerService) Copy(sourcePath, destPath string) error {
-	if !s.isValidPath(sourcePath) || !s.isValidPath(destPath) {
+// copy copies a file or directory to a new location
+func copy(sourcePath, destPath string) error {
+	if !isValidPath(sourcePath) || !isValidPath(destPath) {
 		return errors.New("invalid path")
 	}
 
@@ -178,13 +161,13 @@ func (s *FilemanagerService) Copy(sourcePath, destPath string) error {
 	}
 
 	if sourceInfo.IsDir() {
-		return s.copyDir(sourcePath, destPath)
+		return copyDir(sourcePath, destPath)
 	}
-	return s.copyFile(sourcePath, destPath)
+	return copyFile(sourcePath, destPath)
 }
 
 // copyFile copies a single file
-func (s *FilemanagerService) copyFile(sourcePath, destPath string) error {
+func copyFile(sourcePath, destPath string) error {
 	source, err := os.Open(sourcePath)
 	if err != nil {
 		return err
@@ -202,7 +185,7 @@ func (s *FilemanagerService) copyFile(sourcePath, destPath string) error {
 }
 
 // copyDir copies a directory recursively
-func (s *FilemanagerService) copyDir(sourcePath, destPath string) error {
+func copyDir(sourcePath, destPath string) error {
 	sourceInfo, err := os.Stat(sourcePath)
 	if err != nil {
 		return err
@@ -223,9 +206,9 @@ func (s *FilemanagerService) copyDir(sourcePath, destPath string) error {
 		destName := filepath.Join(destPath, entry.Name())
 
 		if entry.IsDir() {
-			err = s.copyDir(sourceName, destName)
+			err = copyDir(sourceName, destName)
 		} else {
-			err = s.copyFile(sourceName, destName)
+			err = copyFile(sourceName, destName)
 		}
 
 		if err != nil {
@@ -236,9 +219,9 @@ func (s *FilemanagerService) copyDir(sourcePath, destPath string) error {
 	return nil
 }
 
-// GetInfo returns detailed information about a file or directory
-func (s *FilemanagerService) GetInfo(path string) (*FileInfo, error) {
-	if !s.isValidPath(path) {
+// getInfo returns detailed information about a file or directory
+func getInfo(path string) (*FileInfo, error) {
+	if !isValidPath(path) {
 		return nil, errors.New("invalid path")
 	}
 

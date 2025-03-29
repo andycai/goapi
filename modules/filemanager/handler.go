@@ -4,10 +4,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// ListHandler handles the request to list files and directories
-func ListHandler(c *fiber.Ctx) error {
+// listFilesHandler handles the request to list files and directories
+func listFilesHandler(c *fiber.Ctx) error {
 	path := c.Query("path", "./")
-	files, err := srv.List(path)
+	files, err := listFiles(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -18,8 +18,8 @@ func ListHandler(c *fiber.Ctx) error {
 	})
 }
 
-// UploadHandler handles file upload requests
-func UploadHandler(c *fiber.Ctx) error {
+// uploadFileHandler handles file upload requests
+func uploadFileHandler(c *fiber.Ctx) error {
 	path := c.FormValue("path", "./")
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -36,7 +36,7 @@ func UploadHandler(c *fiber.Ctx) error {
 	}
 	defer src.Close()
 
-	err = srv.Upload(path, src, file.Filename)
+	err = uploadFile(path, src, file.Filename)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -48,12 +48,12 @@ func UploadHandler(c *fiber.Ctx) error {
 	})
 }
 
-// CreateHandler handles the creation of new files and directories
-func CreateHandler(c *fiber.Ctx) error {
+// createHandler handles the creation of new files and directories
+func createHandler(c *fiber.Ctx) error {
 	path := c.FormValue("path")
 	isDir := c.FormValue("is_dir", "false") == "true"
 
-	err := srv.Create(path, isDir)
+	err := create(path, isDir)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -65,11 +65,11 @@ func CreateHandler(c *fiber.Ctx) error {
 	})
 }
 
-// DeleteHandler handles file and directory deletion
-func DeleteHandler(c *fiber.Ctx) error {
+// deleteHandler handles file and directory deletion
+func deleteHandler(c *fiber.Ctx) error {
 	path := c.FormValue("path")
 
-	err := srv.Delete(path)
+	err := delete(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -81,12 +81,12 @@ func DeleteHandler(c *fiber.Ctx) error {
 	})
 }
 
-// RenameHandler handles file and directory renaming
-func RenameHandler(c *fiber.Ctx) error {
+// renameHandler handles file and directory renaming
+func renameHandler(c *fiber.Ctx) error {
 	oldPath := c.FormValue("old_path")
 	newPath := c.FormValue("new_path")
 
-	err := srv.Rename(oldPath, newPath)
+	err := rename(oldPath, newPath)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -98,12 +98,12 @@ func RenameHandler(c *fiber.Ctx) error {
 	})
 }
 
-// MoveHandler handles moving files and directories
-func MoveHandler(c *fiber.Ctx) error {
+// moveHandler handles moving files and directories
+func moveHandler(c *fiber.Ctx) error {
 	sourcePath := c.FormValue("source_path")
 	destPath := c.FormValue("dest_path")
 
-	err := srv.Move(sourcePath, destPath)
+	err := move(sourcePath, destPath)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -115,12 +115,12 @@ func MoveHandler(c *fiber.Ctx) error {
 	})
 }
 
-// CopyHandler handles copying files and directories
-func CopyHandler(c *fiber.Ctx) error {
+// copyHandler handles copying files and directories
+func copyHandler(c *fiber.Ctx) error {
 	sourcePath := c.FormValue("source_path")
 	destPath := c.FormValue("dest_path")
 
-	err := srv.Copy(sourcePath, destPath)
+	err := copy(sourcePath, destPath)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -132,11 +132,11 @@ func CopyHandler(c *fiber.Ctx) error {
 	})
 }
 
-// DownloadHandler handles file downloads
-func DownloadHandler(c *fiber.Ctx) error {
+// downloadHandler handles file downloads
+func downloadHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
 
-	info, err := srv.GetInfo(path)
+	info, err := getInfo(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -152,11 +152,11 @@ func DownloadHandler(c *fiber.Ctx) error {
 	return c.Download(path)
 }
 
-// InfoHandler returns detailed information about a file or directory
-func InfoHandler(c *fiber.Ctx) error {
+// infoHandler returns detailed information about a file or directory
+func infoHandler(c *fiber.Ctx) error {
 	path := c.Query("path")
 
-	info, err := srv.GetInfo(path)
+	info, err := getInfo(path)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
