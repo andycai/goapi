@@ -49,20 +49,40 @@ function uploadToFTP(path, type, event) {
 
 // 处理文件点击事件
 function handleFileClick(filePath) {
-    fetch(`/api/browse/file?path=${encodeURIComponent(filePath)}`)
+    // 显示加载提示
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+    
+    // 首先获取文件大小
+    fetch(`/api/browse/file?path=${encodeURIComponent(filePath)}&metadata=true`)
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                if (data.data.isText) {
-                    // 显示文本内容
-                    showTextContent(data.data.content, filePath);
-                } else {
-                    // 下载文件
-                    window.location.href = data.data.downloadUrl;
+        .then(metadata => {
+            if (metadata.success && metadata.data.size > 20 * 1024 * 1024) {
+                // 文件超过5MB，提示下载
+                if (confirm('文件较大(超过20MB)，建议直接下载而不是预览。\n\n是否要下载文件？')) {
+                    window.location.href = `/api/browse/file?path=${encodeURIComponent(filePath)}&download=true`;
                 }
-            } else {
-                showError('获取文件内容失败');
+                if (loadingIndicator) loadingIndicator.classList.add('hidden');
+                return;
             }
+            
+            // 获取文件内容
+            return fetch(`/api/browse/file?path=${encodeURIComponent(filePath)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (loadingIndicator) loadingIndicator.classList.add('hidden');
+                    if (data.success) {
+                        if (data.data.isText) {
+                            // 显示文本内容
+                            showTextContent(data.data.content, filePath);
+                        } else {
+                            // 下载文件
+                            window.location.href = data.data.downloadUrl;
+                        }
+                    } else {
+                        showError('获取文件内容失败');
+                    }
+                });
         })
         .catch(error => {
             console.error('Error:', error);

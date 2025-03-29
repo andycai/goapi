@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -239,17 +240,41 @@ func handleBrowseFile(c *fiber.Ctx, path string) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "获取文件路径失败")
 	}
 
-	// 检查文件是否存在
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	// 检查文件是否存在并获取文件信息
+	fileInfo, err := os.Stat(path)
+	if os.IsNotExist(err) {
 		return fiber.NewError(fiber.StatusInternalServerError, "文件不存在")
 	}
 
 	// 检查是否为文本文件
 	if isTextFile(path) {
-		// 读取文件内容
-		content, err := os.ReadFile(path)
+		// 设置文件大小限制（20MB）
+		const maxFileSize = 20 * 1024 * 1024
+		if fileInfo.Size() > maxFileSize {
+			return fiber.NewError(fiber.StatusBadRequest, "文件太大，不支持在线预览")
+		}
+
+		// 分块读取文件
+		file, err := os.Open(path)
 		if err != nil {
-			return fiber.NewError(fiber.StatusInternalServerError, "读取文件失败")
+			return fiber.NewError(fiber.StatusInternalServerError, "打开文件失败")
+		}
+		defer file.Close()
+
+		// 使用缓冲读取
+		const bufferSize = 1024 * 1024 // 1MB 缓冲区
+		buffer := make([]byte, bufferSize)
+		content := make([]byte, 0, fileInfo.Size())
+
+		for {
+			n, err := file.Read(buffer)
+			if err != nil && err != io.EOF {
+				return fiber.NewError(fiber.StatusInternalServerError, "读取文件失败")
+			}
+			if n == 0 {
+				break
+			}
+			content = append(content, buffer[:n]...)
 		}
 
 		relPath, err := filepath.Rel(absRootDir, absPath)
