@@ -30,8 +30,8 @@ var (
 	exportProgressMap = make(map[uint]*ExportProgress)
 )
 
-// getProjects 获取项目列表
-func getProjects(c *fiber.Ctx) error {
+// listProjectsHandler 获取项目列表
+func listProjectsHandler(c *fiber.Ctx) error {
 	projects, err := getProjectList()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -41,8 +41,8 @@ func getProjects(c *fiber.Ctx) error {
 	return c.JSON(projects)
 }
 
-// createProject 创建项目
-func createProject(c *fiber.Ctx) error {
+// createProjectHandler 创建项目
+func createProjectHandler(c *fiber.Ctx) error {
 	var project models.ConfigProject
 	if err := c.BodyParser(&project); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -74,8 +74,8 @@ func createProject(c *fiber.Ctx) error {
 	return c.JSON(project)
 }
 
-// getProject 获取项目详情
-func getProject(c *fiber.Ctx) error {
+// getProjectHandler 获取项目详情
+func getProjectHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -93,8 +93,8 @@ func getProject(c *fiber.Ctx) error {
 	return c.JSON(project)
 }
 
-// updateProject 更新项目
-func updateProject(c *fiber.Ctx) error {
+// updateProjectHandler 更新项目
+func updateProjectHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -144,8 +144,8 @@ func updateProject(c *fiber.Ctx) error {
 	return c.JSON(project)
 }
 
-// deleteProject 删除项目
-func deleteProject(c *fiber.Ctx) error {
+// deleteProjectHandler 删除项目
+func deleteProjectHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -172,8 +172,8 @@ func deleteProject(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-// getTables 获取配置表列表
-func getTables(c *fiber.Ctx) error {
+// listTablesHandler 获取配置表列表
+func listTablesHandler(c *fiber.Ctx) error {
 	projectID, _ := strconv.ParseUint(c.Query("project_id"), 10, 32)
 	tables, err := getTableList(uint(projectID))
 	if err != nil {
@@ -184,8 +184,8 @@ func getTables(c *fiber.Ctx) error {
 	return c.JSON(tables)
 }
 
-// createTable 创建配置表
-func createTable(c *fiber.Ctx) error {
+// createTableHandler 创建配置表
+func createTableHandler(c *fiber.Ctx) error {
 	var table models.ConfigTable
 	if err := c.BodyParser(&table); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -221,8 +221,8 @@ func createTable(c *fiber.Ctx) error {
 	return c.JSON(table)
 }
 
-// getTable 获取配置表详情
-func getTable(c *fiber.Ctx) error {
+// getTableHandler 获取配置表详情
+func getTableHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -240,8 +240,8 @@ func getTable(c *fiber.Ctx) error {
 	return c.JSON(table)
 }
 
-// updateTable 更新配置表
-func updateTable(c *fiber.Ctx) error {
+// updateTableHandler 更新配置表
+func updateTableHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -293,8 +293,8 @@ func updateTable(c *fiber.Ctx) error {
 	return c.JSON(table)
 }
 
-// deleteTable 删除配置表
-func deleteTable(c *fiber.Ctx) error {
+// deleteTableHandler 删除配置表
+func deleteTableHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -321,8 +321,8 @@ func deleteTable(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-// exportConfig 导出配置
-func exportConfig(c *fiber.Ctx) error {
+// exportConfigHandler 导出配置
+func exportConfigHandler(c *fiber.Ctx) error {
 	var export models.ConfigExport
 	if err := c.BodyParser(&export); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -375,8 +375,8 @@ func exportConfig(c *fiber.Ctx) error {
 	return c.JSON(export)
 }
 
-// getExports 获取导出记录列表
-func getExports(c *fiber.Ctx) error {
+// getExportsHandler 获取导出记录列表
+func getExportsHandler(c *fiber.Ctx) error {
 	projectID, _ := strconv.ParseUint(c.Query("project_id"), 10, 32)
 	tableID, _ := strconv.ParseUint(c.Query("table_id"), 10, 32)
 	exports, err := getExportList(uint(projectID), uint(tableID))
@@ -388,8 +388,8 @@ func getExports(c *fiber.Ctx) error {
 	return c.JSON(exports)
 }
 
-// getExport 获取导出记录详情
-func getExport(c *fiber.Ctx) error {
+// getExportHandler 获取导出记录详情
+func getExportHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -407,8 +407,8 @@ func getExport(c *fiber.Ctx) error {
 	return c.JSON(export)
 }
 
-// getExportProgress 获取导出进度
-func getExportProgress(c *fiber.Ctx) error {
+// getExportProgressHandler 获取导出进度
+func getExportProgressHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

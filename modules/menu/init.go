@@ -22,12 +22,13 @@ func (m *menuModule) Awake(a *core.App) error {
 	if err := autoMigrate(); err != nil {
 		return err
 	}
-	dao = NewMenuDao()
 
 	return nil
 }
 
 func (m *menuModule) Start() error {
+	dao = NewMenuDao()
+
 	// 初始化数据
 	return initData()
 }
