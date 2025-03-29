@@ -7,7 +7,6 @@ import (
 )
 
 var app *core.App
-var Srv *AdminLogService
 
 type adminlogModule struct {
 	core.BaseModule
@@ -28,8 +27,6 @@ func (m *adminlogModule) Start() error {
 	if err := initData(); err != nil {
 		return err
 	}
-
-	Srv = initService()
 
 	return nil
 }

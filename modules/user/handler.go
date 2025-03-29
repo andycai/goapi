@@ -68,7 +68,7 @@ func createUserAction(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "user", user.ID, fmt.Sprintf("创建用户：%s", user.Username))
+	adminlog.WriteLog(c, "create", "user", user.ID, fmt.Sprintf("创建用户：%s", user.Username))
 
 	return c.JSON(user)
 }
@@ -112,7 +112,7 @@ func updateUserAction(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "update", "user", user.ID, fmt.Sprintf("更新用户：%s", user.Username))
+	adminlog.WriteLog(c, "update", "user", user.ID, fmt.Sprintf("更新用户：%s", user.Username))
 
 	return c.JSON(user)
 }
@@ -135,7 +135,7 @@ func deleteUserAction(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "user", user.ID, fmt.Sprintf("删除用户：%s", user.Username))
+	adminlog.WriteLog(c, "delete", "user", user.ID, fmt.Sprintf("删除用户：%s", user.Username))
 
 	return c.JSON(fiber.Map{
 		"message": "删除成功",

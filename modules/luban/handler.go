@@ -69,7 +69,7 @@ func createProject(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "luban_project", project.ID, fmt.Sprintf("创建项目：%s", project.Name))
+	adminlog.WriteLog(c, "create", "luban_project", project.ID, fmt.Sprintf("创建项目：%s", project.Name))
 
 	return c.JSON(project)
 }
@@ -139,7 +139,7 @@ func updateProject(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "update", "luban_project", project.ID, fmt.Sprintf("更新项目：%s", project.Name))
+	adminlog.WriteLog(c, "update", "luban_project", project.ID, fmt.Sprintf("更新项目：%s", project.Name))
 
 	return c.JSON(project)
 }
@@ -167,7 +167,7 @@ func deleteProject(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "luban_project", project.ID, fmt.Sprintf("删除项目：%s", project.Name))
+	adminlog.WriteLog(c, "delete", "luban_project", project.ID, fmt.Sprintf("删除项目：%s", project.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
@@ -216,7 +216,7 @@ func createTable(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "luban_table", table.ID, fmt.Sprintf("创建配置表：%s", table.Name))
+	adminlog.WriteLog(c, "create", "luban_table", table.ID, fmt.Sprintf("创建配置表：%s", table.Name))
 
 	return c.JSON(table)
 }
@@ -288,7 +288,7 @@ func updateTable(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "update", "luban_table", table.ID, fmt.Sprintf("更新配置表：%s", table.Name))
+	adminlog.WriteLog(c, "update", "luban_table", table.ID, fmt.Sprintf("更新配置表：%s", table.Name))
 
 	return c.JSON(table)
 }
@@ -316,7 +316,7 @@ func deleteTable(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "luban_table", table.ID, fmt.Sprintf("删除配置表：%s", table.Name))
+	adminlog.WriteLog(c, "delete", "luban_table", table.ID, fmt.Sprintf("删除配置表：%s", table.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
@@ -370,7 +370,7 @@ func exportConfig(c *fiber.Ctx) error {
 	go executeExport(&export, project, table)
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "export", "luban_export", export.ID, fmt.Sprintf("导出配置：%s", table.Name))
+	adminlog.WriteLog(c, "export", "luban_export", export.ID, fmt.Sprintf("导出配置：%s", table.Name))
 
 	return c.JSON(export)
 }

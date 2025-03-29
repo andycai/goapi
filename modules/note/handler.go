@@ -87,7 +87,7 @@ func createNote(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "创建笔记失败"})
 	}
 
-	adminlog.Srv.WriteLog(c, "create", "note", note.ID, fmt.Sprintf("创建笔记：%s", note.Title))
+	adminlog.WriteLog(c, "create", "note", note.ID, fmt.Sprintf("创建笔记：%s", note.Title))
 
 	return c.JSON(note)
 }
@@ -126,7 +126,7 @@ func updateNote(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "更新笔记失败"})
 	}
 
-	adminlog.Srv.WriteLog(c, "update", "note", note.ID, fmt.Sprintf("更新笔记：%s", note.Title))
+	adminlog.WriteLog(c, "update", "note", note.ID, fmt.Sprintf("更新笔记：%s", note.Title))
 
 	return c.JSON(note)
 }
@@ -150,7 +150,7 @@ func deleteNote(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "删除笔记失败"})
 	}
 
-	adminlog.Srv.WriteLog(c, "delete", "note", note.ID, fmt.Sprintf("删除笔记：%s", note.Title))
+	adminlog.WriteLog(c, "delete", "note", note.ID, fmt.Sprintf("删除笔记：%s", note.Title))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
@@ -185,7 +185,7 @@ func createCategory(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "创建分类失败"})
 	}
 
-	adminlog.Srv.WriteLog(c, "create", "note_category", category.ID, fmt.Sprintf("创建笔记分类：%s", category.Name))
+	adminlog.WriteLog(c, "create", "note_category", category.ID, fmt.Sprintf("创建笔记分类：%s", category.Name))
 
 	return c.JSON(category)
 }
@@ -223,7 +223,7 @@ func updateCategory(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "更新分类失败"})
 	}
 
-	adminlog.Srv.WriteLog(c, "update", "note_category", category.ID, fmt.Sprintf("更新笔记分类：%s", category.Name))
+	adminlog.WriteLog(c, "update", "note_category", category.ID, fmt.Sprintf("更新笔记分类：%s", category.Name))
 
 	return c.JSON(category)
 }
@@ -265,7 +265,7 @@ func deleteCategory(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "删除分类失败"})
 	}
 
-	adminlog.Srv.WriteLog(c, "delete", "note_category", category.ID, fmt.Sprintf("删除笔记分类：%s", category.Name))
+	adminlog.WriteLog(c, "delete", "note_category", category.ID, fmt.Sprintf("删除笔记分类：%s", category.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }

@@ -45,7 +45,7 @@ func createProject(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "gameconf_project", project.ID, fmt.Sprintf("创建游戏配置项目：%s", project.Name))
+	adminlog.WriteLog(c, "create", "gameconf_project", project.ID, fmt.Sprintf("创建游戏配置项目：%s", project.Name))
 
 	return c.JSON(project)
 }
@@ -85,7 +85,7 @@ func updateProject(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "update", "gameconf_project", project.ID, fmt.Sprintf("更新游戏配置项目：%s", project.Name))
+	adminlog.WriteLog(c, "update", "gameconf_project", project.ID, fmt.Sprintf("更新游戏配置项目：%s", project.Name))
 
 	return c.JSON(project)
 }
@@ -121,7 +121,7 @@ func deleteProject(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "gameconf_project", project.ID, fmt.Sprintf("删除游戏配置项目：%s", project.Name))
+	adminlog.WriteLog(c, "delete", "gameconf_project", project.ID, fmt.Sprintf("删除游戏配置项目：%s", project.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
@@ -166,7 +166,7 @@ func createTable(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "gameconf_table", table.ID, fmt.Sprintf("创建游戏配置表：%s", table.Name))
+	adminlog.WriteLog(c, "create", "gameconf_table", table.ID, fmt.Sprintf("创建游戏配置表：%s", table.Name))
 
 	return c.JSON(table)
 }
@@ -206,7 +206,7 @@ func updateTable(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "update", "gameconf_table", table.ID, fmt.Sprintf("更新游戏配置表：%s", table.Name))
+	adminlog.WriteLog(c, "update", "gameconf_table", table.ID, fmt.Sprintf("更新游戏配置表：%s", table.Name))
 
 	return c.JSON(table)
 }
@@ -235,7 +235,7 @@ func deleteTable(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "gameconf_table", table.ID, fmt.Sprintf("删除游戏配置表：%s", table.Name))
+	adminlog.WriteLog(c, "delete", "gameconf_table", table.ID, fmt.Sprintf("删除游戏配置表：%s", table.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
@@ -320,7 +320,7 @@ func createExport(c *fiber.Ctx) error {
 	go srv.executeExport(&export)
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "gameconf_export", export.ID, fmt.Sprintf("创建游戏配置导出：%s - %s", table.Name, export.Format))
+	adminlog.WriteLog(c, "create", "gameconf_export", export.ID, fmt.Sprintf("创建游戏配置导出：%s - %s", table.Name, export.Format))
 
 	return c.JSON(export)
 }
@@ -354,7 +354,7 @@ func deleteExport(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "gameconf_export", export.ID, fmt.Sprintf("删除游戏配置导出记录：%d", export.ID))
+	adminlog.WriteLog(c, "delete", "gameconf_export", export.ID, fmt.Sprintf("删除游戏配置导出记录：%d", export.ID))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }

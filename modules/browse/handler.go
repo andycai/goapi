@@ -217,7 +217,7 @@ func handleBrowseFile(c *fiber.Ctx, path string) error {
 		}
 
 		// 记录操作日志
-		adminlog.Srv.WriteLog(c, "view", "browse", 0, fmt.Sprintf("查看文件：%s", path))
+		adminlog.WriteLog(c, "view", "browse", 0, fmt.Sprintf("查看文件：%s", path))
 
 		rootPath := "/admin/browse"
 
@@ -231,7 +231,7 @@ func handleBrowseFile(c *fiber.Ctx, path string) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "download", "browse", 0, fmt.Sprintf("下载文件：%s", path))
+	adminlog.WriteLog(c, "download", "browse", 0, fmt.Sprintf("下载文件：%s", path))
 
 	// 非文本文件，直接下载
 	return c.SendFile(path)
@@ -247,7 +247,7 @@ func handleBrowseDelete(c *fiber.Ctx, path string) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "browse", 0, fmt.Sprintf("删除文件：%s", path))
+	adminlog.WriteLog(c, "delete", "browse", 0, fmt.Sprintf("删除文件：%s", path))
 
 	return c.JSON(fiber.Map{
 		"message": "文件删除成功",
@@ -283,7 +283,7 @@ func uploadByFTP(c *fiber.Ctx, rootPath string) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "upload", "browse", 0, fmt.Sprintf("上传文件：%s", fullPath))
+	adminlog.WriteLog(c, "upload", "browse", 0, fmt.Sprintf("上传文件：%s", fullPath))
 
 	return c.JSON(fiber.Map{
 		"success": true,

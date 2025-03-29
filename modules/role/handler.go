@@ -76,7 +76,7 @@ func createRole(c *fiber.Ctx) error {
 	tx.Commit()
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "role", role.ID, fmt.Sprintf("创建角色：%s", role.Name))
+	adminlog.WriteLog(c, "create", "role", role.ID, fmt.Sprintf("创建角色：%s", role.Name))
 
 	return c.JSON(role)
 }
@@ -130,7 +130,7 @@ func updateRole(c *fiber.Ctx) error {
 	tx.Commit()
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "update", "role", role.ID, fmt.Sprintf("更新角色：%s", role.Name))
+	adminlog.WriteLog(c, "update", "role", role.ID, fmt.Sprintf("更新角色：%s", role.Name))
 
 	return c.JSON(role)
 }
@@ -172,7 +172,7 @@ func deleteRole(c *fiber.Ctx) error {
 	tx.Commit()
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "role", role.ID, fmt.Sprintf("删除角色：%s", role.Name))
+	adminlog.WriteLog(c, "delete", "role", role.ID, fmt.Sprintf("删除角色：%s", role.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }

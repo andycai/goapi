@@ -57,7 +57,7 @@ func createPermission(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "create", "permission", permission.ID, fmt.Sprintf("创建权限：%s", permission.Name))
+	adminlog.WriteLog(c, "create", "permission", permission.ID, fmt.Sprintf("创建权限：%s", permission.Name))
 
 	return c.JSON(permission)
 }
@@ -100,7 +100,7 @@ func updatePermission(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "update", "permission", permission.ID, fmt.Sprintf("更新权限：%s", permission.Name))
+	adminlog.WriteLog(c, "update", "permission", permission.ID, fmt.Sprintf("更新权限：%s", permission.Name))
 
 	return c.JSON(permission)
 }
@@ -129,7 +129,7 @@ func deletePermission(c *fiber.Ctx) error {
 	}
 
 	// 记录操作日志
-	adminlog.Srv.WriteLog(c, "delete", "permission", permission.ID, fmt.Sprintf("删除权限：%s", permission.Name))
+	adminlog.WriteLog(c, "delete", "permission", permission.ID, fmt.Sprintf("删除权限：%s", permission.Name))
 
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
