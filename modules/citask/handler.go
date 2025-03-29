@@ -13,7 +13,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -24,111 +23,13 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
-// TaskProgress 任务进度
-type TaskProgress struct {
-	ID        uint      `json:"id"`
-	TaskID    uint      `json:"task_id"`
-	TaskName  string    `json:"task_name"`
-	Status    string    `json:"status"`
-	Output    string    `json:"output"`
-	Error     string    `json:"error"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
-	Duration  int       `json:"duration"`
-	Progress  int       `json:"progress"` // 0-100
-}
-
 var (
 	taskProgressMap = make(map[uint]*TaskProgress)
 	taskCmdMap      = make(map[uint]*exec.Cmd)
-	cronEntries     = make(map[uint]cron.EntryID)
-	progressMutex   sync.RWMutex
-	cronScheduler   *cron.Cron
 )
 
-// 初始化定时任务调度器
-func initCron() {
-	cronScheduler = cron.New()
-	cronScheduler.Start()
-
-	// 从数据库加载定时任务
-	var tasks []models.Task
-	if err := app.DB.Where("enable_cron = ? AND status = ?", true, "active").Find(&tasks).Error; err != nil {
-		fmt.Printf("加载定时任务失败: %v\n", err)
-		return
-	}
-
-	for _, task := range tasks {
-		if err := scheduleCronTask(&task); err != nil {
-			fmt.Printf("调度任务失败 [%d]: %v\n", task.ID, err)
-		} else {
-			fmt.Printf("成功加载定时任务 [%d]: %s\n", task.ID, task.Name)
-		}
-	}
-}
-
-// 调度定时任务
-func scheduleCronTask(task *models.Task) error {
-	if task.EnableCron == 0 || task.CronExpr == "" {
-		return nil
-	}
-
-	entryID, err := cronScheduler.AddFunc(task.CronExpr, func() {
-		// 创建任务日志
-		taskLog := &models.TaskLog{
-			TaskID:    task.ID,
-			StartTime: time.Now(),
-			Status:    "running",
-		}
-
-		if err := app.DB.Create(taskLog).Error; err != nil {
-			fmt.Printf("创建任务日志失败: %v\n", err)
-			return
-		}
-
-		// 创建进度信息
-		progress := &TaskProgress{
-			Status:    "running",
-			StartTime: time.Now(),
-		}
-
-		progressMutex.Lock()
-		taskProgressMap[taskLog.ID] = progress
-		progressMutex.Unlock()
-
-		// 执行任务
-		go func() {
-			if task.Type == "script" {
-				executeScriptTask(task, taskLog, progress)
-			} else {
-				executeHTTPTask(task, taskLog, progress)
-			}
-
-			// 更新任务日志
-			taskLog.EndTime = time.Now()
-			taskLog.Status = progress.Status
-			taskLog.Output = progress.Output
-			taskLog.Error = progress.Error
-			if err := app.DB.Save(taskLog).Error; err != nil {
-				fmt.Printf("更新任务日志失败: %v\n", err)
-			}
-		}()
-	})
-
-	if err != nil {
-		return err
-	}
-
-	// 保存定时任务ID
-	progressMutex.Lock()
-	cronEntries[task.ID] = entryID
-	progressMutex.Unlock()
-
-	return nil
-}
-
 // getTasks 获取任务列表
-func getTasks(c *fiber.Ctx) error {
+func listTasksHandler(c *fiber.Ctx) error {
 	var tasks []models.Task
 	if err := app.DB.Order("created_at desc").Find(&tasks).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -138,8 +39,8 @@ func getTasks(c *fiber.Ctx) error {
 	return c.JSON(tasks)
 }
 
-// createTask 创建任务
-func createTask(c *fiber.Ctx) error {
+// createTaskHandler 创建任务
+func createTaskHandler(c *fiber.Ctx) error {
 	var task models.Task
 	if err := c.BodyParser(&task); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -179,8 +80,8 @@ func createTask(c *fiber.Ctx) error {
 	return c.JSON(task)
 }
 
-// getTask 获取任务详情
-func getTask(c *fiber.Ctx) error {
+// getTaskHandler 获取任务详情
+func getTaskHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var task models.Task
 	if err := app.DB.First(&task, id).Error; err != nil {
@@ -191,8 +92,8 @@ func getTask(c *fiber.Ctx) error {
 	return c.JSON(task)
 }
 
-// updateTask 更新任务
-func updateTask(c *fiber.Ctx) error {
+// updateTaskHandler 更新任务
+func updateTaskHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -269,8 +170,8 @@ func updateTask(c *fiber.Ctx) error {
 	})
 }
 
-// deleteTask 删除任务
-func deleteTask(c *fiber.Ctx) error {
+// deleteTaskHandler 删除任务
+func deleteTaskHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var task models.Task
 	if err := app.DB.First(&task, id).Error; err != nil {
@@ -291,8 +192,8 @@ func deleteTask(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-// runTask 执行任务
-func runTask(c *fiber.Ctx) error {
+// runTaskHandler 执行任务
+func runTaskHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var task models.Task
 	if err := app.DB.First(&task, id).Error; err != nil {
@@ -335,8 +236,8 @@ func runTask(c *fiber.Ctx) error {
 	return c.JSON(taskLog)
 }
 
-// getTaskLogs 获取任务日志
-func getTaskLogs(c *fiber.Ctx) error {
+// getTaskLogsHandler 获取任务日志
+func getTaskLogsHandler(c *fiber.Ctx) error {
 	taskID := c.Params("id")
 	var logs []models.TaskLog
 	if err := app.DB.Where("task_id = ?", taskID).Order("created_at desc").Find(&logs).Error; err != nil {
@@ -359,8 +260,8 @@ func getTaskStatus(c *fiber.Ctx) error {
 	return c.JSON(log)
 }
 
-// getTaskProgress 获取任务进度
-func getTaskProgress(c *fiber.Ctx) error {
+// getTaskProgressHandler 获取任务进度
+func getTaskProgressHandler(c *fiber.Ctx) error {
 	logId := c.Params("logId")
 	if logId == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -894,8 +795,8 @@ func executeHTTPTask(task *models.Task, log *models.TaskLog, progress *TaskProgr
 	fmt.Printf("HTTP任务执行成功完成: %s (ID: %d)\n", task.Name, task.ID)
 }
 
-// stopTask 停止正在执行的任务
-func stopTask(c *fiber.Ctx) error {
+// stopTaskHandler 停止正在执行的任务
+func stopTaskHandler(c *fiber.Ctx) error {
 	logId := c.Params("logId")
 	if logId == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -978,8 +879,8 @@ func stopTask(c *fiber.Ctx) error {
 	})
 }
 
-// getRunningTasks 获取正在执行的任务列表
-func getRunningTasks(c *fiber.Ctx) error {
+// listRunningTasksHandler 获取正在执行的任务列表
+func listRunningTasksHandler(c *fiber.Ctx) error {
 	progressMutex.Lock()
 	defer progressMutex.Unlock()
 
@@ -1018,8 +919,8 @@ func getRunningTasks(c *fiber.Ctx) error {
 	})
 }
 
-// getNextRunTime 计算下次执行时间
-func getNextRunTime(c *fiber.Ctx) error {
+// getNextRunTimeHandler 计算下次执行时间
+func getNextRunTimeHandler(c *fiber.Ctx) error {
 	expr := c.Query("expr")
 	if expr == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -1048,8 +949,8 @@ func getNextRunTime(c *fiber.Ctx) error {
 	})
 }
 
-// searchTasks 搜索任务列表
-func searchTasks(c *fiber.Ctx) error {
+// searchTasksHandler 搜索任务列表
+func searchTasksHandler(c *fiber.Ctx) error {
 	keyword := c.Query("keyword")
 	if keyword == "" {
 		return c.JSON([]models.Task{})
