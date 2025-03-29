@@ -8,8 +8,8 @@ import (
 )
 
 // Project handlers
-func listProjects(c *fiber.Ctx) error {
-	projects, err := srv.ListProjects()
+func listProjectsHandler(c *fiber.Ctx) error {
+	projects, err := getProjects()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -20,7 +20,7 @@ func listProjects(c *fiber.Ctx) error {
 	})
 }
 
-func createProject(c *fiber.Ctx) error {
+func createProjectHandler(c *fiber.Ctx) error {
 	var project models.Project
 	if err := c.BodyParser(&project); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -28,7 +28,7 @@ func createProject(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := srv.CreateProject(&project); err != nil {
+	if err := createProject(&project); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -38,7 +38,7 @@ func createProject(c *fiber.Ctx) error {
 	})
 }
 
-func updateProject(c *fiber.Ctx) error {
+func updateProjectHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -54,7 +54,7 @@ func updateProject(c *fiber.Ctx) error {
 	}
 	project.ID = id
 
-	if err := srv.UpdateProject(&project); err != nil {
+	if err := updateProject(&project); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -65,7 +65,7 @@ func updateProject(c *fiber.Ctx) error {
 }
 
 // getProject get project by ID
-func getProject(c *fiber.Ctx) error {
+func getProjectHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -73,7 +73,7 @@ func getProject(c *fiber.Ctx) error {
 		})
 	}
 
-	project, err := srv.GetProject(id)
+	project, err := getProject(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -85,7 +85,7 @@ func getProject(c *fiber.Ctx) error {
 }
 
 // listIterations list iterations by project ID
-func listIterations(c *fiber.Ctx) error {
+func listIterationsHandler(c *fiber.Ctx) error {
 	projectID, err := strconv.ParseInt(c.Query("project_id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -93,7 +93,7 @@ func listIterations(c *fiber.Ctx) error {
 		})
 	}
 
-	iterations, err := srv.ListProjectIterations(projectID)
+	iterations, err := getProjectIterations(projectID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -104,8 +104,8 @@ func listIterations(c *fiber.Ctx) error {
 	})
 }
 
-// createIteration create iteration
-func createIteration(c *fiber.Ctx) error {
+// createIterationHandler create iteration
+func createIterationHandler(c *fiber.Ctx) error {
 	var iteration models.Iteration
 	if err := c.BodyParser(&iteration); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -113,7 +113,7 @@ func createIteration(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := srv.CreateIteration(&iteration); err != nil {
+	if err := createIteration(&iteration); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -123,8 +123,8 @@ func createIteration(c *fiber.Ctx) error {
 	})
 }
 
-// updateIteration update iteration
-func updateIteration(c *fiber.Ctx) error {
+// updateIterationHandler update iteration
+func updateIterationHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -140,7 +140,7 @@ func updateIteration(c *fiber.Ctx) error {
 	}
 	iteration.ID = id
 
-	if err := srv.UpdateIteration(&iteration); err != nil {
+	if err := updateIteration(&iteration); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -150,8 +150,8 @@ func updateIteration(c *fiber.Ctx) error {
 	})
 }
 
-// getIteration get iteration by ID
-func getIteration(c *fiber.Ctx) error {
+// getIterationHandler get iteration by ID
+func getIterationHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -159,7 +159,7 @@ func getIteration(c *fiber.Ctx) error {
 		})
 	}
 
-	iteration, err := srv.GetIteration(id)
+	iteration, err := getIteration(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -170,11 +170,11 @@ func getIteration(c *fiber.Ctx) error {
 	})
 }
 
-// listIssues list issues by project_id or iteration_id
+// listIssuesHandler list issues by project_id or iteration_id
 // if both are provided, iteration_id will take precedence
 // if neither are provided, return 400 Bad Request
 // if project_id is provided, return all issues in the project
-func listIssues(c *fiber.Ctx) error {
+func listIssuesHandler(c *fiber.Ctx) error {
 	projectID, _ := strconv.ParseInt(c.Query("project_id"), 10, 64)
 	iterationID, _ := strconv.ParseInt(c.Query("iteration_id"), 10, 64)
 
@@ -182,9 +182,9 @@ func listIssues(c *fiber.Ctx) error {
 	var err error
 
 	if iterationID > 0 {
-		issues, err = srv.ListIterationIssues(iterationID)
+		issues, err = getIterationIssues(iterationID)
 	} else if projectID > 0 {
-		issues, err = srv.ListProjectIssues(projectID)
+		issues, err = getProjectIssues(projectID)
 	} else {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "project_id or iteration_id is required",
@@ -201,8 +201,8 @@ func listIssues(c *fiber.Ctx) error {
 	})
 }
 
-// createIssue create issue
-func createIssue(c *fiber.Ctx) error {
+// createIssueHandler create issue
+func createIssueHandler(c *fiber.Ctx) error {
 	var issue models.Issue
 	if err := c.BodyParser(&issue); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -210,7 +210,7 @@ func createIssue(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := srv.CreateIssue(&issue); err != nil {
+	if err := createIssue(&issue); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -220,8 +220,8 @@ func createIssue(c *fiber.Ctx) error {
 	})
 }
 
-// updateIssue update issue
-func updateIssue(c *fiber.Ctx) error {
+// updateIssueHandler update issue
+func updateIssueHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -237,7 +237,7 @@ func updateIssue(c *fiber.Ctx) error {
 	}
 	issue.ID = id
 
-	if err := srv.UpdateIssue(&issue); err != nil {
+	if err := updateIssue(&issue); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -247,8 +247,8 @@ func updateIssue(c *fiber.Ctx) error {
 	})
 }
 
-// getIssue get issue by ID
-func getIssue(c *fiber.Ctx) error {
+// getIssueHandler get issue by ID
+func getIssueHandler(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -256,7 +256,7 @@ func getIssue(c *fiber.Ctx) error {
 		})
 	}
 
-	issue, err := srv.GetIssue(id)
+	issue, err := getIssue(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -267,8 +267,8 @@ func getIssue(c *fiber.Ctx) error {
 	})
 }
 
-// listComments list comments by issue ID
-func listComments(c *fiber.Ctx) error {
+// listCommentsHandler list comments by issue ID
+func listCommentsHandler(c *fiber.Ctx) error {
 	issueID, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -276,7 +276,7 @@ func listComments(c *fiber.Ctx) error {
 		})
 	}
 
-	comments, err := srv.ListIssueComments(issueID)
+	comments, err := getIssueComments(issueID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -287,8 +287,8 @@ func listComments(c *fiber.Ctx) error {
 	})
 }
 
-// createComment create comment
-func createComment(c *fiber.Ctx) error {
+// createCommentHandler create comment
+func createCommentHandler(c *fiber.Ctx) error {
 	issueID, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -304,7 +304,7 @@ func createComment(c *fiber.Ctx) error {
 	}
 	comment.IssueID = issueID
 
-	if err := srv.CreateComment(&comment); err != nil {
+	if err := createComment(&comment); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})

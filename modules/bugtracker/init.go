@@ -28,9 +28,6 @@ func (m *bugtrackerModule) Start() error {
 		return err
 	}
 
-	// Initialize Bugtracker service
-	initService()
-
 	return nil
 }
 
@@ -46,26 +43,26 @@ func (m *bugtrackerModule) AddAuthRouters() error {
 	})
 
 	// Project routes
-	app.RouterApi.Get("/bugtracker/projects", app.HasPermission("bugtracker:project:list"), listProjects)
-	app.RouterApi.Post("/bugtracker/projects", app.HasPermission("bugtracker:project:create"), createProject)
-	app.RouterApi.Put("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:update"), updateProject)
-	app.RouterApi.Get("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:list"), getProject)
+	app.RouterApi.Get("/bugtracker/projects", app.HasPermission("bugtracker:project:list"), listProjectsHandler)
+	app.RouterApi.Post("/bugtracker/projects", app.HasPermission("bugtracker:project:create"), createProjectHandler)
+	app.RouterApi.Put("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:update"), updateProjectHandler)
+	app.RouterApi.Get("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:list"), getProjectHandler)
 
 	// Iteration routes
-	app.RouterApi.Get("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:list"), listIterations)
-	app.RouterApi.Post("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:create"), createIteration)
-	app.RouterApi.Put("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:update"), updateIteration)
-	app.RouterApi.Get("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:list"), getIteration)
+	app.RouterApi.Get("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:list"), listIterationsHandler)
+	app.RouterApi.Post("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:create"), createIterationHandler)
+	app.RouterApi.Put("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:update"), updateIterationHandler)
+	app.RouterApi.Get("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:list"), getIterationHandler)
 
 	// Issue routes
-	app.RouterApi.Get("/bugtracker/issues", app.HasPermission("bugtracker:issue:list"), listIssues)
-	app.RouterApi.Post("/bugtracker/issues", app.HasPermission("bugtracker:issue:create"), createIssue)
-	app.RouterApi.Put("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:update"), updateIssue)
-	app.RouterApi.Get("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:list"), getIssue)
+	app.RouterApi.Get("/bugtracker/issues", app.HasPermission("bugtracker:issue:list"), listIssuesHandler)
+	app.RouterApi.Post("/bugtracker/issues", app.HasPermission("bugtracker:issue:create"), createIssueHandler)
+	app.RouterApi.Put("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:update"), updateIssueHandler)
+	app.RouterApi.Get("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:list"), getIssueHandler)
 
 	// Comment routes
-	app.RouterApi.Get("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:list"), listComments)
-	app.RouterApi.Post("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:create"), createComment)
+	app.RouterApi.Get("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:list"), listCommentsHandler)
+	app.RouterApi.Post("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:create"), createCommentHandler)
 
 	return nil
 }

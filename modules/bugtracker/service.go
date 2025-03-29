@@ -6,24 +6,16 @@ import (
 	"github.com/andycai/unitool/models"
 )
 
-var srv *BugtrackerService
-
-type BugtrackerService struct{}
-
-func initService() {
-	srv = &BugtrackerService{}
-}
-
-// Project methods
-func (s *BugtrackerService) CreateProject(project *models.Project) error {
+// createProject Create project methods
+func createProject(project *models.Project) error {
 	return app.DB.Create(project).Error
 }
 
-func (s *BugtrackerService) UpdateProject(project *models.Project) error {
+func updateProject(project *models.Project) error {
 	return app.DB.Save(project).Error
 }
 
-func (s *BugtrackerService) GetProject(id int64) (*models.Project, error) {
+func getProject(id int64) (*models.Project, error) {
 	var project models.Project
 	if err := app.DB.First(&project, id).Error; err != nil {
 		return nil, err
@@ -31,7 +23,7 @@ func (s *BugtrackerService) GetProject(id int64) (*models.Project, error) {
 	return &project, nil
 }
 
-func (s *BugtrackerService) ListProjects() ([]models.Project, error) {
+func getProjects() ([]models.Project, error) {
 	var projects []models.Project
 	if err := app.DB.Find(&projects).Error; err != nil {
 		return nil, err
@@ -39,16 +31,16 @@ func (s *BugtrackerService) ListProjects() ([]models.Project, error) {
 	return projects, nil
 }
 
-// Iteration methods
-func (s *BugtrackerService) CreateIteration(iteration *models.Iteration) error {
+// createIteration Create iteration methods
+func createIteration(iteration *models.Iteration) error {
 	return app.DB.Create(iteration).Error
 }
 
-func (s *BugtrackerService) UpdateIteration(iteration *models.Iteration) error {
+func updateIteration(iteration *models.Iteration) error {
 	return app.DB.Save(iteration).Error
 }
 
-func (s *BugtrackerService) GetIteration(id int64) (*models.Iteration, error) {
+func getIteration(id int64) (*models.Iteration, error) {
 	var iteration models.Iteration
 	if err := app.DB.First(&iteration, id).Error; err != nil {
 		return nil, err
@@ -56,7 +48,7 @@ func (s *BugtrackerService) GetIteration(id int64) (*models.Iteration, error) {
 	return &iteration, nil
 }
 
-func (s *BugtrackerService) ListProjectIterations(projectID int64) ([]models.Iteration, error) {
+func getProjectIterations(projectID int64) ([]models.Iteration, error) {
 	var iterations []models.Iteration
 	if err := app.DB.Where("project_id = ?", projectID).Find(&iterations).Error; err != nil {
 		return nil, err
@@ -65,18 +57,18 @@ func (s *BugtrackerService) ListProjectIterations(projectID int64) ([]models.Ite
 }
 
 // Issue methods
-func (s *BugtrackerService) CreateIssue(issue *models.Issue) error {
+func createIssue(issue *models.Issue) error {
 	if issue.ProjectID == 0 {
 		return errors.New("project ID is required")
 	}
 	return app.DB.Create(issue).Error
 }
 
-func (s *BugtrackerService) UpdateIssue(issue *models.Issue) error {
+func updateIssue(issue *models.Issue) error {
 	return app.DB.Save(issue).Error
 }
 
-func (s *BugtrackerService) GetIssue(id int64) (*models.Issue, error) {
+func getIssue(id int64) (*models.Issue, error) {
 	var issue models.Issue
 	if err := app.DB.First(&issue, id).Error; err != nil {
 		return nil, err
@@ -84,7 +76,7 @@ func (s *BugtrackerService) GetIssue(id int64) (*models.Issue, error) {
 	return &issue, nil
 }
 
-func (s *BugtrackerService) ListProjectIssues(projectID int64) ([]models.Issue, error) {
+func getProjectIssues(projectID int64) ([]models.Issue, error) {
 	var issues []models.Issue
 	if err := app.DB.Where("project_id = ?", projectID).Find(&issues).Error; err != nil {
 		return nil, err
@@ -92,7 +84,7 @@ func (s *BugtrackerService) ListProjectIssues(projectID int64) ([]models.Issue, 
 	return issues, nil
 }
 
-func (s *BugtrackerService) ListIterationIssues(iterationID int64) ([]models.Issue, error) {
+func getIterationIssues(iterationID int64) ([]models.Issue, error) {
 	var issues []models.Issue
 	if err := app.DB.Where("iteration_id = ?", iterationID).Find(&issues).Error; err != nil {
 		return nil, err
@@ -100,15 +92,15 @@ func (s *BugtrackerService) ListIterationIssues(iterationID int64) ([]models.Iss
 	return issues, nil
 }
 
-// Comment methods
-func (s *BugtrackerService) CreateComment(comment *models.Comment) error {
+// createComment Create comment methods
+func createComment(comment *models.Comment) error {
 	if comment.IssueID == 0 {
 		return errors.New("issue ID is required")
 	}
 	return app.DB.Create(comment).Error
 }
 
-func (s *BugtrackerService) ListIssueComments(issueID int64) ([]models.Comment, error) {
+func getIssueComments(issueID int64) ([]models.Comment, error) {
 	var comments []models.Comment
 	if err := app.DB.Where("issue_id = ?", issueID).Find(&comments).Error; err != nil {
 		return nil, err
