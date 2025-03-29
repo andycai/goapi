@@ -11,8 +11,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// getProjects 获取项目列表
-func getProjects(c *fiber.Ctx) error {
+// listProjectsHandler 获取项目列表
+func listProjectsHandler(c *fiber.Ctx) error {
 	var projects []models.GameConfProject
 	if err := app.DB.Order("created_at desc").Find(&projects).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -22,8 +22,8 @@ func getProjects(c *fiber.Ctx) error {
 	return c.JSON(projects)
 }
 
-// createProject 创建项目
-func createProject(c *fiber.Ctx) error {
+// createProjectHandler 创建项目
+func createProjectHandler(c *fiber.Ctx) error {
 	var project models.GameConfProject
 	if err := c.BodyParser(&project); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -50,8 +50,8 @@ func createProject(c *fiber.Ctx) error {
 	return c.JSON(project)
 }
 
-// getProject 获取项目详情
-func getProject(c *fiber.Ctx) error {
+// getProjectHandler 获取项目详情
+func getProjectHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var project models.GameConfProject
 	if err := app.DB.First(&project, id).Error; err != nil {
@@ -62,8 +62,8 @@ func getProject(c *fiber.Ctx) error {
 	return c.JSON(project)
 }
 
-// updateProject 更新项目
-func updateProject(c *fiber.Ctx) error {
+// updateProjectHandler 更新项目
+func updateProjectHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var project models.GameConfProject
 	if err := app.DB.First(&project, id).Error; err != nil {
@@ -90,8 +90,8 @@ func updateProject(c *fiber.Ctx) error {
 	return c.JSON(project)
 }
 
-// deleteProject 删除项目
-func deleteProject(c *fiber.Ctx) error {
+// deleteProjectHandler 删除项目
+func deleteProjectHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var project models.GameConfProject
 	if err := app.DB.First(&project, id).Error; err != nil {
@@ -126,8 +126,8 @@ func deleteProject(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-// getTables 获取配置表列表
-func getTables(c *fiber.Ctx) error {
+// listTablesHandler 获取配置表列表
+func listTablesHandler(c *fiber.Ctx) error {
 	projectID := c.Query("project_id")
 	var tables []models.GameConfTable
 	query := app.DB.Order("created_at desc")
@@ -142,8 +142,8 @@ func getTables(c *fiber.Ctx) error {
 	return c.JSON(tables)
 }
 
-// createTable 创建配置表
-func createTable(c *fiber.Ctx) error {
+// createTableHandler 创建配置表
+func createTableHandler(c *fiber.Ctx) error {
 	var table models.GameConfTable
 	if err := c.BodyParser(&table); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -171,8 +171,8 @@ func createTable(c *fiber.Ctx) error {
 	return c.JSON(table)
 }
 
-// getTable 获取配置表详情
-func getTable(c *fiber.Ctx) error {
+// getTableHandler 获取配置表详情
+func getTableHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var table models.GameConfTable
 	if err := app.DB.Preload("Project").First(&table, id).Error; err != nil {
@@ -183,8 +183,8 @@ func getTable(c *fiber.Ctx) error {
 	return c.JSON(table)
 }
 
-// updateTable 更新配置表
-func updateTable(c *fiber.Ctx) error {
+// updateTableHandler 更新配置表
+func updateTableHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var table models.GameConfTable
 	if err := app.DB.First(&table, id).Error; err != nil {
@@ -211,8 +211,8 @@ func updateTable(c *fiber.Ctx) error {
 	return c.JSON(table)
 }
 
-// deleteTable 删除配置表
-func deleteTable(c *fiber.Ctx) error {
+// deleteTableHandler 删除配置表
+func deleteTableHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var table models.GameConfTable
 	if err := app.DB.First(&table, id).Error; err != nil {
@@ -240,8 +240,8 @@ func deleteTable(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-// validateTable 验证配置表
-func validateTable(c *fiber.Ctx) error {
+// validateTableHandler 验证配置表
+func validateTableHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var table models.GameConfTable
 	if err := app.DB.Preload("Project").First(&table, id).Error; err != nil {
@@ -261,8 +261,8 @@ func validateTable(c *fiber.Ctx) error {
 	})
 }
 
-// getExports 获取导出记录列表
-func getExports(c *fiber.Ctx) error {
+// listExportsHandler 获取导出记录列表
+func listExportsHandler(c *fiber.Ctx) error {
 	projectID := c.Query("project_id")
 	tableID := c.Query("table_id")
 	var exports []models.GameConfExport
@@ -281,8 +281,8 @@ func getExports(c *fiber.Ctx) error {
 	return c.JSON(exports)
 }
 
-// createExport 创建导出记录
-func createExport(c *fiber.Ctx) error {
+// createExportHandler 创建导出记录
+func createExportHandler(c *fiber.Ctx) error {
 	var export models.GameConfExport
 	if err := c.BodyParser(&export); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -317,7 +317,7 @@ func createExport(c *fiber.Ctx) error {
 	}
 
 	// 异步执行导出任务
-	go srv.executeExport(&export)
+	go executeExport(&export)
 
 	// 记录操作日志
 	adminlog.WriteLog(c, "create", "gameconf_export", export.ID, fmt.Sprintf("创建游戏配置导出：%s - %s", table.Name, export.Format))
@@ -325,8 +325,8 @@ func createExport(c *fiber.Ctx) error {
 	return c.JSON(export)
 }
 
-// getExport 获取导出记录详情
-func getExport(c *fiber.Ctx) error {
+// getExportHandler 获取导出记录详情
+func getExportHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var export models.GameConfExport
 	if err := app.DB.Preload("Project").Preload("Table").First(&export, id).Error; err != nil {
@@ -337,8 +337,8 @@ func getExport(c *fiber.Ctx) error {
 	return c.JSON(export)
 }
 
-// deleteExport 删除导出记录
-func deleteExport(c *fiber.Ctx) error {
+// deleteExportHandler 删除导出记录
+func deleteExportHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var export models.GameConfExport
 	if err := app.DB.First(&export, id).Error; err != nil {
@@ -359,8 +359,8 @@ func deleteExport(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-// downloadExport 下载导出文件
-func downloadExport(c *fiber.Ctx) error {
+// downloadExportHandler 下载导出文件
+func downloadExportHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var export models.GameConfExport
 	if err := app.DB.Preload("Project").Preload("Table").First(&export, id).Error; err != nil {

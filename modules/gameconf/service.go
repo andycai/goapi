@@ -13,23 +13,10 @@ import (
 	"github.com/andycai/unitool/models"
 	"github.com/xuri/excelize/v2"
 	"gopkg.in/yaml.v3"
-	"gorm.io/gorm"
 )
 
-// GameConfService 游戏配置服务
-type GameConfService struct {
-	db *gorm.DB
-}
-
-var srv *GameConfService
-
-// initService 初始化服务
-func initService() {
-	srv = &GameConfService{}
-}
-
 // executeExport 执行导出任务
-func (s *GameConfService) executeExport(export *models.GameConfExport) {
+func executeExport(export *models.GameConfExport) {
 	// 更新开始时间
 	export.StartTime = time.Now()
 	export.Status = "running"
@@ -39,30 +26,30 @@ func (s *GameConfService) executeExport(export *models.GameConfExport) {
 	var project models.GameConfProject
 	var table models.GameConfTable
 	if err := app.DB.First(&project, export.ProjectID).Error; err != nil {
-		s.updateExportStatus(export, "failed", fmt.Sprintf("获取项目信息失败: %v", err))
+		updateExportStatus(export, "failed", fmt.Sprintf("获取项目信息失败: %v", err))
 		return
 	}
 	if err := app.DB.First(&table, export.TableID).Error; err != nil {
-		s.updateExportStatus(export, "failed", fmt.Sprintf("获取配置表信息失败: %v", err))
+		updateExportStatus(export, "failed", fmt.Sprintf("获取配置表信息失败: %v", err))
 		return
 	}
 
 	// 读取源文件
-	data, err := s.readSourceFile(&table)
+	data, err := readSourceFile(&table)
 	if err != nil {
-		s.updateExportStatus(export, "failed", fmt.Sprintf("读取源文件失败: %v", err))
+		updateExportStatus(export, "failed", fmt.Sprintf("读取源文件失败: %v", err))
 		return
 	}
 
 	// 导出数据
-	if err := s.exportData(data, export, &project, &table); err != nil {
-		s.updateExportStatus(export, "failed", fmt.Sprintf("导出数据失败: %v", err))
+	if err := exportData(data, export, &project, &table); err != nil {
+		updateExportStatus(export, "failed", fmt.Sprintf("导出数据失败: %v", err))
 		return
 	}
 
 	// 生成代码
-	if err := s.generateCode(data, export, &project, &table); err != nil {
-		s.updateExportStatus(export, "failed", fmt.Sprintf("生成代码失败: %v", err))
+	if err := generateCode(data, export, &project, &table); err != nil {
+		updateExportStatus(export, "failed", fmt.Sprintf("生成代码失败: %v", err))
 		return
 	}
 
@@ -74,7 +61,7 @@ func (s *GameConfService) executeExport(export *models.GameConfExport) {
 }
 
 // updateExportStatus 更新导出状态
-func (s *GameConfService) updateExportStatus(export *models.GameConfExport, status string, errMsg string) {
+func updateExportStatus(export *models.GameConfExport, status string, errMsg string) {
 	export.Status = status
 	export.Error = errMsg
 	export.EndTime = time.Now()
@@ -83,19 +70,19 @@ func (s *GameConfService) updateExportStatus(export *models.GameConfExport, stat
 }
 
 // readSourceFile 读取源文件
-func (s *GameConfService) readSourceFile(table *models.GameConfTable) ([]map[string]interface{}, error) {
+func readSourceFile(table *models.GameConfTable) ([]map[string]interface{}, error) {
 	switch strings.ToLower(table.FileType) {
 	case "excel", "xlsx", "xls", "xlsm":
-		return s.readExcelFile(table)
+		return readExcelFile(table)
 	case "csv":
-		return s.readCSVFile(table)
+		return readCSVFile(table)
 	default:
 		return nil, fmt.Errorf("不支持的文件类型: %s", table.FileType)
 	}
 }
 
 // readExcelFile 读取Excel文件
-func (s *GameConfService) readExcelFile(table *models.GameConfTable) ([]map[string]interface{}, error) {
+func readExcelFile(table *models.GameConfTable) ([]map[string]interface{}, error) {
 	f, err := excelize.OpenFile(table.FilePath)
 	if err != nil {
 		return nil, err
@@ -136,7 +123,7 @@ func (s *GameConfService) readExcelFile(table *models.GameConfTable) ([]map[stri
 }
 
 // readCSVFile 读取CSV文件
-func (s *GameConfService) readCSVFile(table *models.GameConfTable) ([]map[string]interface{}, error) {
+func readCSVFile(table *models.GameConfTable) ([]map[string]interface{}, error) {
 	content, err := os.ReadFile(table.FilePath)
 	if err != nil {
 		return nil, err
@@ -168,28 +155,28 @@ func (s *GameConfService) readCSVFile(table *models.GameConfTable) ([]map[string
 }
 
 // exportData 导出数据
-func (s *GameConfService) exportData(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
+func exportData(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
 	fileName := fmt.Sprintf("%s.%s", table.Name, export.Format)
 	filePath := filepath.Join(project.DataPath, fileName)
 
 	switch strings.ToLower(export.Format) {
 	case "json":
-		return s.exportJSON(data, filePath)
+		return exportJSON(data, filePath)
 	case "xml":
-		return s.exportXML(data, filePath)
+		return exportXML(data, filePath)
 	case "yaml":
-		return s.exportYAML(data, filePath)
+		return exportYAML(data, filePath)
 	case "lua":
-		return s.exportLua(data, filePath)
+		return exportLua(data, filePath)
 	case "binary":
-		return s.exportBinary(data, filePath)
+		return exportBinary(data, filePath)
 	default:
 		return fmt.Errorf("不支持的导出格式: %s", export.Format)
 	}
 }
 
 // exportJSON 导出JSON格式
-func (s *GameConfService) exportJSON(data []map[string]interface{}, filePath string) error {
+func exportJSON(data []map[string]interface{}, filePath string) error {
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
@@ -198,7 +185,7 @@ func (s *GameConfService) exportJSON(data []map[string]interface{}, filePath str
 }
 
 // exportXML 导出XML格式
-func (s *GameConfService) exportXML(data []map[string]interface{}, filePath string) error {
+func exportXML(data []map[string]interface{}, filePath string) error {
 	type Item struct {
 		XMLName xml.Name
 		Fields  []struct {
@@ -232,7 +219,7 @@ func (s *GameConfService) exportXML(data []map[string]interface{}, filePath stri
 }
 
 // exportYAML 导出YAML格式
-func (s *GameConfService) exportYAML(data []map[string]interface{}, filePath string) error {
+func exportYAML(data []map[string]interface{}, filePath string) error {
 	yamlData, err := yaml.Marshal(data)
 	if err != nil {
 		return err
@@ -241,7 +228,7 @@ func (s *GameConfService) exportYAML(data []map[string]interface{}, filePath str
 }
 
 // exportLua 导出Lua格式
-func (s *GameConfService) exportLua(data []map[string]interface{}, filePath string) error {
+func exportLua(data []map[string]interface{}, filePath string) error {
 	var sb strings.Builder
 	sb.WriteString("return {\n")
 
@@ -274,7 +261,7 @@ func formatLuaValue(value interface{}) string {
 }
 
 // exportBinary 导出二进制格式
-func (s *GameConfService) exportBinary(data []map[string]interface{}, filePath string) error {
+func exportBinary(data []map[string]interface{}, filePath string) error {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -283,21 +270,21 @@ func (s *GameConfService) exportBinary(data []map[string]interface{}, filePath s
 }
 
 // generateCode 生成代码
-func (s *GameConfService) generateCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
+func generateCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
 	switch strings.ToLower(export.Language) {
 	case "cs":
-		return s.generateCSharpCode(data, export, project, table)
+		return generateCSharpCode(data, export, project, table)
 	case "java":
-		return s.generateJavaCode(data, export, project, table)
+		return generateJavaCode(data, export, project, table)
 	case "go":
-		return s.generateGoCode(data, export, project, table)
+		return generateGoCode(data, export, project, table)
 	default:
 		return fmt.Errorf("不支持的目标语言: %s", export.Language)
 	}
 }
 
 // generateCSharpCode 生成C#代码
-func (s *GameConfService) generateCSharpCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
+func generateCSharpCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
 	className := ToPascalCase(table.Name)
 	fileName := fmt.Sprintf("%s.cs", className)
 	filePath := filepath.Join(project.CodePath, "csharp", fileName)
@@ -331,7 +318,7 @@ func (s *GameConfService) generateCSharpCode(data []map[string]interface{}, expo
 }
 
 // generateJavaCode 生成Java代码
-func (s *GameConfService) generateJavaCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
+func generateJavaCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
 	className := ToPascalCase(table.Name)
 	fileName := fmt.Sprintf("%s.java", className)
 	filePath := filepath.Join(project.CodePath, "java", fileName)
@@ -382,7 +369,7 @@ func (s *GameConfService) generateJavaCode(data []map[string]interface{}, export
 }
 
 // generateGoCode 生成Go代码
-func (s *GameConfService) generateGoCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
+func generateGoCode(data []map[string]interface{}, export *models.GameConfExport, project *models.GameConfProject, table *models.GameConfTable) error {
 	structName := ToPascalCase(table.Name)
 	fileName := fmt.Sprintf("%s.go", ToSnakeCase(table.Name))
 	filePath := filepath.Join(project.CodePath, "go", fileName)
