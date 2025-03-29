@@ -55,11 +55,11 @@ func (m *serverconfModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Post("/game/serverlist", app.HasPermission("serverconf:update"), updateServerList)
-	app.RouterApi.Post("/game/lastserver", app.HasPermission("serverconf:update"), updateLastServer)
-	app.RouterApi.Post("/game/serverinfo", app.HasPermission("serverconf:update"), updateServerInfo)
-	app.RouterApi.Post("/game/noticelist", app.HasPermission("serverconf:update"), updateNoticeList)
-	app.RouterApi.Post("/game/noticenum", app.HasPermission("serverconf:update"), updateNoticeNum)
+	app.RouterApi.Post("/game/serverlist", app.HasPermission("serverconf:update"), updateServerListHandler)
+	app.RouterApi.Post("/game/lastserver", app.HasPermission("serverconf:update"), updateLastServerHandler)
+	app.RouterApi.Post("/game/serverinfo", app.HasPermission("serverconf:update"), updateServerInfoHandler)
+	app.RouterApi.Post("/game/noticelist", app.HasPermission("serverconf:update"), updateNoticeListHandler)
+	app.RouterApi.Post("/game/noticenum", app.HasPermission("serverconf:update"), updateNoticeNumHandler)
 
 	return nil
 }

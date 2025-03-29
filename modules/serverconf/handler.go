@@ -199,7 +199,7 @@ func getServerList(c *fiber.Ctx) error {
 // @Router /api/server/list [put]
 
 // 更新服务器列表
-func updateServerList(c *fiber.Ctx) error {
+func updateServerListHandler(c *fiber.Ctx) error {
 	var serverList ServerList
 	if err := c.BodyParser(&serverList); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -245,7 +245,7 @@ func getLastServer(c *fiber.Ctx) error {
 // @Router /api/server/last [put]
 
 // 更新最后登录服务器
-func updateLastServer(c *fiber.Ctx) error {
+func updateLastServerHandler(c *fiber.Ctx) error {
 	var lastServer LastServer
 	if err := c.BodyParser(&lastServer); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -295,7 +295,7 @@ func getServerInfo(c *fiber.Ctx) error {
 // @Router /api/server/info [put]
 
 // 更新服务器信息
-func updateServerInfo(c *fiber.Ctx) error {
+func updateServerInfoHandler(c *fiber.Ctx) error {
 	var data map[string]interface{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -362,7 +362,7 @@ func getNoticeList(c *fiber.Ctx) error {
 // @Router /api/server/notice [put]
 
 // 更新公告列表
-func updateNoticeList(c *fiber.Ctx) error {
+func updateNoticeListHandler(c *fiber.Ctx) error {
 	var noticeList NoticeList
 	if err := c.BodyParser(&noticeList); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
@@ -408,7 +408,7 @@ func getNoticeNum(c *fiber.Ctx) error {
 // @Router /api/server/notice/num [put]
 
 // 更新公告数量
-func updateNoticeNum(c *fiber.Ctx) error {
+func updateNoticeNumHandler(c *fiber.Ctx) error {
 	var noticeNum NoticeNum
 	if err := c.BodyParser(&noticeNum); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
