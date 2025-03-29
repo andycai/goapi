@@ -1,0 +1,15 @@
+{
+    "welcome": "欢迎使用UniTool",
+    "login": "登录",
+    "logout": "退出",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "提交",
+    "cancel": "取消",
+    "error": "错误",
+    "success": "成功",
+    "operation_success": "操作成功",
+    "operation_failed": "操作失败",
+    "invalid_credentials": "用户名或密码错误",
+    "session_expired": "会话已过期，请重新登录"
+}

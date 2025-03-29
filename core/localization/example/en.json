@@ -1,0 +1,15 @@
+{
+    "welcome": "Welcome to UniTool",
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "error": "Error",
+    "success": "Success",
+    "operation_success": "Operation completed successfully",
+    "operation_failed": "Operation failed",
+    "invalid_credentials": "Invalid username or password",
+    "session_expired": "Session expired, please login again"
+}
