@@ -200,7 +200,7 @@ func (s *RepoSyncService) checkoutRepo(repoType, url, path, username, password s
 	// 根据仓库类型执行检出操作
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return svn.Srv.Checkout(url, path, username, password)
+		return svn.Checkout(url, path, username, password)
 	case "git":
 		return git.Clone(url, path, "", username, password)
 	default:
@@ -269,7 +269,7 @@ func (s *RepoSyncService) updateRepo(repoType, path, username, password string) 
 	// 根据仓库类型执行更新操作
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return svn.Srv.Update(path)
+		return svn.Update(path)
 	case "git":
 		return git.Pull(path)
 	default:
@@ -286,7 +286,7 @@ func (s *RepoSyncService) getRepoCommits(repoType, path string, limit int) ([]Co
 	// 根据仓库类型获取提交记录
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return s.getSVNCommits(path, limit)
+		return s.getSvnCommits(path, limit)
 	case "git":
 		return s.getGitCommits(path, limit)
 	default:
@@ -294,15 +294,15 @@ func (s *RepoSyncService) getRepoCommits(repoType, path string, limit int) ([]Co
 	}
 }
 
-// getSVNCommits 获取SVN提交记录
-func (s *RepoSyncService) getSVNCommits(path string, limit int) ([]CommitRecord, error) {
-	// 获取SVN日志
-	logOutput, err := svn.Srv.Log(path, limit)
+// getSvnCommits 获取Svn提交记录
+func (s *RepoSyncService) getSvnCommits(path string, limit int) ([]CommitRecord, error) {
+	// 获取Svn日志
+	logOutput, err := svn.Log(path, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	// 解析SVN日志
+	// 解析Svn日志
 	var commits []CommitRecord
 	logEntries := strings.Split(logOutput, "------------------------------------------------------------------------")
 
@@ -339,7 +339,7 @@ func (s *RepoSyncService) getSVNCommits(path string, limit int) ([]CommitRecord,
 		}
 
 		// 获取变更文件列表
-		changedFiles, _ := s.getSVNChangedFiles(path, revision)
+		changedFiles, _ := s.getSvnChangedFiles(path, revision)
 
 		// 创建提交记录
 		commits = append(commits, CommitRecord{
@@ -355,8 +355,8 @@ func (s *RepoSyncService) getSVNCommits(path string, limit int) ([]CommitRecord,
 	return commits, nil
 }
 
-// getSVNChangedFiles 获取SVN变更文件列表
-func (s *RepoSyncService) getSVNChangedFiles(path, revision string) ([]string, error) {
+// getSvnChangedFiles 获取Svn变更文件列表
+func (s *RepoSyncService) getSvnChangedFiles(path, revision string) ([]string, error) {
 	// 执行svn diff命令获取变更文件
 	revInt, err := strconv.Atoi(revision)
 	if err != nil {
@@ -650,7 +650,7 @@ func (s *RepoSyncService) getFileChanges(repoType, path, revision string) ([]Fil
 	// 根据仓库类型获取文件变更列表
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return s.getSVNFileChanges(path, revision)
+		return s.getSvnFileChanges(path, revision)
 	case "git":
 		return s.getGitFileChanges(path, revision)
 	default:
@@ -658,8 +658,8 @@ func (s *RepoSyncService) getFileChanges(repoType, path, revision string) ([]Fil
 	}
 }
 
-// getSVNFileChanges 获取SVN文件变更列表
-func (s *RepoSyncService) getSVNFileChanges(path, revision string) ([]FileChange, error) {
+// getSvnFileChanges 获取Svn文件变更列表
+func (s *RepoSyncService) getSvnFileChanges(path, revision string) ([]FileChange, error) {
 	// 执行svn diff命令获取变更文件
 	cmd := exec.Command("svn", "diff", "--summarize", "-c", revision, path)
 	output, err := cmd.Output()
@@ -768,7 +768,7 @@ func (s *RepoSyncService) commitToRepo(repoType, path, message string) error {
 			switch status {
 			case "?":
 				// 未版本控制的文件，需要添加
-				if err := svn.Srv.Add(filePath); err != nil {
+				if err := svn.Add(filePath); err != nil {
 					return fmt.Errorf("添加文件失败 %s: %v", filePath, err)
 				}
 			case "!", "D":
@@ -781,7 +781,7 @@ func (s *RepoSyncService) commitToRepo(repoType, path, message string) error {
 		}
 
 		// 提交所有变更
-		return svn.Srv.Commit(path, message)
+		return svn.Commit(path, message)
 	case "git":
 		// 先添加所有变更
 		_, err := git.ExecGitCommand(path, "add", "-A")

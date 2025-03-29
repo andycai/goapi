@@ -7,7 +7,6 @@ import (
 )
 
 var app *core.App
-var Srv *SVNService
 
 type svnModule struct {
 	core.BaseModule
@@ -28,7 +27,7 @@ func (m *svnModule) Start() error {
 	}
 
 	// Initialize SVN service
-	Srv = initService()
+	initService()
 	return nil
 }
 

@@ -28,7 +28,7 @@ func checkout(c *fiber.Ctx) error {
 		})
 	}
 
-	err := srv.Checkout(req.URL, req.Path, req.Username, req.Password)
+	err := Checkout(req.URL, req.Path, req.Username, req.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -55,7 +55,7 @@ func update(c *fiber.Ctx) error {
 		})
 	}
 
-	err := srv.Update(req.Path)
+	err := Update(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -82,7 +82,7 @@ func commit(c *fiber.Ctx) error {
 		})
 	}
 
-	err := srv.Commit(req.Path, req.Message)
+	err := Commit(req.Path, req.Message)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -103,7 +103,7 @@ func status(c *fiber.Ctx) error {
 		})
 	}
 
-	status, err := srv.Status(path)
+	status, err := Status(path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -124,7 +124,7 @@ func info(c *fiber.Ctx) error {
 		})
 	}
 
-	info, err := srv.Info(path)
+	info, err := Info(path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -147,7 +147,7 @@ func log(c *fiber.Ctx) error {
 		})
 	}
 
-	log, err := srv.Log(path, limit)
+	log, err := Log(path, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -174,7 +174,7 @@ func revert(c *fiber.Ctx) error {
 		})
 	}
 
-	err := srv.Revert(req.Path)
+	err := Revert(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -201,7 +201,7 @@ func add(c *fiber.Ctx) error {
 		})
 	}
 
-	err := srv.Add(req.Path)
+	err := Add(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -228,7 +228,7 @@ func delete(c *fiber.Ctx) error {
 		})
 	}
 
-	err := srv.Delete(req.Path)
+	err := Delete(req.Path)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
