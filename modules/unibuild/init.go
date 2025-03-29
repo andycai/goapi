@@ -32,8 +32,8 @@ func (m *uniBuildModule) Start() error {
 
 func (m *uniBuildModule) AddPublicRouters() error {
 	// public
-	app.RouterPublicApi.Post("/unibuild/res", buildResources)
-	app.RouterPublicApi.Post("/unibuild/app", buildApp)
+	app.RouterPublicApi.Post("/unibuild/res", buildResourcesHandler)
+	app.RouterPublicApi.Post("/unibuild/app", buildAppHandler)
 
 	return nil
 }
