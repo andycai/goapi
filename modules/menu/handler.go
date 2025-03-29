@@ -8,8 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// listMenus 获取菜单列表
-func listMenus(c *fiber.Ctx) error {
+// listMenusHandler 获取菜单列表
+func listMenusHandler(c *fiber.Ctx) error {
 	menus, err := dao.GetMenus()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -19,8 +19,8 @@ func listMenus(c *fiber.Ctx) error {
 	return c.JSON(menus)
 }
 
-// getMenuTree 获取菜单树
-func getMenuTree(c *fiber.Ctx) error {
+// getMenuTreeHandler 获取菜单树
+func getMenuTreeHandler(c *fiber.Ctx) error {
 	menus, err := dao.GetMenus()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -31,8 +31,8 @@ func getMenuTree(c *fiber.Ctx) error {
 	return c.JSON(tree)
 }
 
-// createMenu 创建菜单
-func createMenu(c *fiber.Ctx) error {
+// createMenuHandler 创建菜单
+func createMenuHandler(c *fiber.Ctx) error {
 	menu := new(models.Menu)
 	if err := c.BodyParser(menu); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -52,8 +52,8 @@ func createMenu(c *fiber.Ctx) error {
 	return c.JSON(menu)
 }
 
-// updateMenu 更新菜单
-func updateMenu(c *fiber.Ctx) error {
+// updateMenuHandler 更新菜单
+func updateMenuHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -81,8 +81,8 @@ func updateMenu(c *fiber.Ctx) error {
 	return c.JSON(menu)
 }
 
-// deleteMenu 删除菜单
-func deleteMenu(c *fiber.Ctx) error {
+// deleteMenuHandler 删除菜单
+func deleteMenuHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

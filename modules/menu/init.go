@@ -34,7 +34,7 @@ func (m *menuModule) Start() error {
 }
 
 func (m *menuModule) AddPublicRouters() error {
-	app.RouterPublicApi.Get("/menus/public/tree", getMenuTree)
+	app.RouterPublicApi.Get("/menus/public/tree", getMenuTreeHandler)
 	return nil
 }
 
@@ -53,11 +53,11 @@ func (m *menuModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/menus", app.HasPermission("menu:view"), listMenus)
-	app.RouterApi.Get("/menus/tree", app.HasPermission("menu:view"), getMenuTree)
-	app.RouterApi.Post("/menus", app.HasPermission("menu:create"), createMenu)
-	app.RouterApi.Put("/menus/:id", app.HasPermission("menu:update"), updateMenu)
-	app.RouterApi.Delete("/menus/:id", app.HasPermission("menu:delete"), deleteMenu)
+	app.RouterApi.Get("/menus", app.HasPermission("menu:view"), listMenusHandler)
+	app.RouterApi.Get("/menus/tree", app.HasPermission("menu:view"), getMenuTreeHandler)
+	app.RouterApi.Post("/menus", app.HasPermission("menu:create"), createMenuHandler)
+	app.RouterApi.Put("/menus/:id", app.HasPermission("menu:update"), updateMenuHandler)
+	app.RouterApi.Delete("/menus/:id", app.HasPermission("menu:delete"), deleteMenuHandler)
 
 	return nil
 }

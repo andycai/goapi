@@ -15,8 +15,24 @@ func autoMigrate() error {
 
 // 初始化数据
 func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
+
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initMenus() error {
+	return nil
+}
+
+func initPermissions() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("gamelog") {
+	if app.IsInitializedModule("gamelog:permission") {
 		log.Println("游戏日志模块数据库已初始化，跳过")
 		return nil
 	}
@@ -33,16 +49,16 @@ func initData() error {
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "游戏日志搜索",
-				Code:        "gamelog:search",
-				Description: "搜索游戏日志",
+				Name:        "游戏日志收集",
+				Code:        "gamelog:create",
+				Description: "收集游戏日志",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "游戏日志导出",
-				Code:        "gamelog:export",
-				Description: "导出游戏日志",
+				Name:        "游戏日志删除",
+				Code:        "gamelog:delete",
+				Description: "删除游戏日志",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
@@ -54,7 +70,7 @@ func initData() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "gamelog",
+			Module:      "gamelog:permission",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

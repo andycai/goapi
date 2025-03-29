@@ -19,9 +19,26 @@ func autoMigrate() error {
 	)
 }
 
+// 初始化数据
 func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
+
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initMenus() error {
+	return nil
+}
+
+func initPermissions() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("gameconf") {
+	if app.IsInitializedModule("gameconf:permission") {
 		log.Println("游戏配置模块数据库已初始化，跳过")
 		return nil
 	}
@@ -66,7 +83,7 @@ func initData() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "gameconf",
+			Module:      "gameconf:permission",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

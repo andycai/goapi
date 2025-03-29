@@ -16,9 +16,16 @@ func autoMigrate() error {
 	)
 }
 
+// 初始化数据
 func initData() error {
-	initMenus()
-	initPermissions()
+	if err := initMenus(); err != nil {
+		return err
+	}
+
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -73,7 +80,7 @@ func initPermissions() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "parameter",
+			Module:      "parameter:permission",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

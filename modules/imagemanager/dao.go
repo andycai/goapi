@@ -15,8 +15,24 @@ func autoMigrate() error {
 
 // 初始化数据
 func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
+
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initMenus() error {
+	return nil
+}
+
+func initPermissions() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("imagemanager") {
+	if app.IsInitializedModule("imagemanager:permission") {
 		log.Println("图片管理模块数据库已初始化，跳过")
 		return nil
 	}
@@ -54,7 +70,7 @@ func initData() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "imagemanager",
+			Module:      "imagemanager:permission",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/andycai/unitool/models"
+	"gorm.io/gorm"
 )
 
 type MenuDao struct {
@@ -21,8 +22,79 @@ func autoMigrate() error {
 
 // 初始化数据
 func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
+
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initPermissions() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("menu") {
+	if app.IsInitializedModule("menu:permissions") {
+		log.Println("游戏日志模块数据库已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建游戏日志相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "菜单列表",
+				Code:        "menu:view",
+				Description: "查看菜单列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "创建菜单",
+				Code:        "menu:create",
+				Description: "创建新菜单",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "更新菜单",
+				Code:        "menu:update",
+				Description: "更新菜单信息",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除菜单",
+				Code:        "menu:delete",
+				Description: "删除菜单",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "menu:permissions",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("menu:system") {
 		log.Println("菜单模块数据库已初始化，跳过")
 		return nil
 	}
@@ -225,7 +297,7 @@ func initData() error {
 
 	// 标记模块已初始化
 	if err := app.DB.Create(&models.ModuleInit{
-		Module:      "menu",
+		Module:      "menu:system",
 		Initialized: 1,
 		CreatedAt:   now,
 		UpdatedAt:   now,

@@ -17,9 +17,26 @@ func autoMigrate() error {
 	)
 }
 
+// 初始化数据
 func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
+
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initMenus() error {
+	return nil
+}
+
+func initPermissions() error {
 	// 检查是否已初始化
-	if app.IsInitializedModule("adminlog") {
+	if app.IsInitializedModule("adminlog:permission") {
 		log.Println("管理员日志模块数据库已初始化，跳过")
 		return nil
 	}
@@ -32,6 +49,13 @@ func initData() error {
 				Name:        "管理员日志列表",
 				Code:        "adminlog:view",
 				Description: "查看管理员日志列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "管理员日志收集",
+				Code:        "adminlog:create",
+				Description: "收集管理员日志列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
@@ -50,7 +74,7 @@ func initData() error {
 
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
-			Module:      "adminlog",
+			Module:      "adminlog:permission",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
