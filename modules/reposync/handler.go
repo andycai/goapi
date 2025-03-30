@@ -3,6 +3,7 @@ package reposync
 import (
 	"strconv"
 
+	"github.com/andycai/unitool/core/utility/path"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,7 +17,7 @@ func saveConfigHandler(c *fiber.Ctx) error {
 	}
 
 	// 验证路径安全性
-	if !isValidPath(config.LocalPath1) || !isValidPath(config.LocalPath2) {
+	if !path.IsValid(config.LocalPath1) || !path.IsValid(config.LocalPath2) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的本地路径",
 		})

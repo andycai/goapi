@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andycai/unitool/core/utility/path"
 	"github.com/andycai/unitool/models"
 	"github.com/andycai/unitool/modules/git"
 	"github.com/andycai/unitool/modules/svn"
@@ -25,32 +26,6 @@ func initService() {
 
 	// 尝试加载配置
 	loadConfig()
-}
-
-// isValidPath 检查路径是否安全
-func isValidPath(path string) bool {
-	// 清理和规范化路径
-	cleanPath := filepath.Clean(path)
-
-	// 检查可疑模式
-	suspicious := []string{
-		"..",
-		"~",
-		"$",
-		"|",
-		">",
-		"<",
-		"&",
-		"`",
-	}
-
-	for _, pattern := range suspicious {
-		if strings.Contains(cleanPath, pattern) {
-			return false
-		}
-	}
-
-	return true
 }
 
 // saveConfig 保存配置
@@ -99,7 +74,7 @@ func loadConfig() error {
 // updateConfig 更新配置
 func updateConfig(conf *RepoConfig) error {
 	// 验证路径
-	if !isValidPath(config.LocalPath1) || !isValidPath(config.LocalPath2) {
+	if !path.IsValid(config.LocalPath1) || !path.IsValid(config.LocalPath2) {
 		return errors.New("无效的本地路径")
 	}
 
@@ -150,22 +125,22 @@ func checkoutRepos() error {
 }
 
 // checkoutRepo 检出单个仓库
-func checkoutRepo(repoType, url, path, username, password string) error {
-	if !isValidPath(path) {
+func checkoutRepo(repoType, url, repopath, username, password string) error {
+	if !path.IsValid(repopath) {
 		return errors.New("无效的本地路径")
 	}
 
 	// 确保目录存在
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(repopath), 0755); err != nil {
 		return err
 	}
 
 	// 根据仓库类型执行检出操作
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return svn.Checkout(url, path, username, password)
+		return svn.Checkout(url, repopath, username, password)
 	case "git":
-		return git.Clone(url, path, "", username, password)
+		return git.Clone(url, repopath, "", username, password)
 	default:
 		return fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
@@ -224,34 +199,34 @@ func getCommits(limit, page int) ([]CommitRecord, int, error) {
 }
 
 // updateRepo 更新仓库
-func updateRepo(repoType, path, username, password string) error {
-	if !isValidPath(path) {
+func updateRepo(repoType, repopath, username, password string) error {
+	if !path.IsValid(repopath) {
 		return errors.New("无效的本地路径")
 	}
 
 	// 根据仓库类型执行更新操作
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return svn.Update(path)
+		return svn.Update(repopath)
 	case "git":
-		return git.Pull(path)
+		return git.Pull(repopath)
 	default:
 		return fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
 }
 
 // getRepoCommits 获取仓库提交记录
-func getRepoCommits(repoType, path string, limit int) ([]CommitRecord, error) {
-	if !isValidPath(path) {
+func getRepoCommits(repoType, repopath string, limit int) ([]CommitRecord, error) {
+	if !path.IsValid(repopath) {
 		return nil, errors.New("无效的本地路径")
 	}
 
 	// 根据仓库类型获取提交记录
 	switch strings.ToLower(repoType) {
 	case "svn":
-		return getSvnCommits(path, limit)
+		return getSvnCommits(repopath, limit)
 	case "git":
-		return getGitCommits(path, limit)
+		return getGitCommits(repopath, limit)
 	default:
 		return nil, fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
@@ -696,8 +671,8 @@ func getGitFileChanges(path, revision string) ([]FileChange, error) {
 }
 
 // commitToRepo 提交到仓库
-func commitToRepo(repoType, path, message string) error {
-	if !isValidPath(path) {
+func commitToRepo(repoType, repopath, message string) error {
+	if !path.IsValid(repopath) {
 		return errors.New("无效的本地路径")
 	}
 
@@ -705,7 +680,7 @@ func commitToRepo(repoType, path, message string) error {
 	switch strings.ToLower(repoType) {
 	case "svn":
 		// 获取文件状态
-		cmd := exec.Command("svn", "status", path)
+		cmd := exec.Command("svn", "status", repopath)
 		output, err := cmd.Output()
 		if err != nil {
 			return fmt.Errorf("获取文件状态失败: %v", err)
@@ -744,15 +719,15 @@ func commitToRepo(repoType, path, message string) error {
 		}
 
 		// 提交所有变更
-		return svn.Commit(path, message)
+		return svn.Commit(repopath, message)
 	case "git":
 		// 先添加所有变更
-		_, err := git.ExecGitCommand(path, "add", "-A")
+		_, err := git.ExecGitCommand(repopath, "add", "-A")
 		if err != nil {
 			return err
 		}
 		// 提交变更
-		return git.Commit(path, message)
+		return git.Commit(repopath, message)
 	default:
 		return fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
@@ -782,7 +757,7 @@ func copyFile(src, dst string) error {
 // removeEmptyDirs 递归删除空目录
 func removeEmptyDirs(dir, rootDir string) error {
 	// 检查路径是否安全
-	if !isValidPath(dir) {
+	if !path.IsValid(dir) {
 		return errors.New("无效的目录路径")
 	}
 
