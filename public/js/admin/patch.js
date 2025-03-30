@@ -10,8 +10,10 @@ function patchManagement() {
     }
     return {
         config: {
-            source_dir: '',
-            target_dir: '',
+            patch_path: '',
+            zip_path: './data/patches',
+            branch: 'trunk',
+            platform: 'android',
             default_old_version: '',
             default_new_version: '',
             default_description: ''
@@ -112,7 +114,9 @@ function patchManagement() {
                     body: JSON.stringify({
                         old_version: this.oldVersion,
                         new_version: this.newVersion,
-                        description: this.description
+                        description: this.description,
+                        branch: this.config.branch,
+                        platform: this.config.platform
                     })
                 });
 
@@ -122,9 +126,9 @@ function patchManagement() {
                 }
 
                 await this.loadRecords();
-                this.oldVersion = '';
-                this.newVersion = '';
-                this.description = '';
+                // this.oldVersion = '';
+                // this.newVersion = '';
+                // this.description = '';
                 Alpine.store('notification').show('补丁包生成成功', 'success');
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');

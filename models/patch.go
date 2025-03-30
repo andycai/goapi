@@ -7,6 +7,8 @@ type PatchRecord struct {
 	OldVersion  string    `gorm:"size:50" json:"old_version"`
 	NewVersion  string    `gorm:"size:50" json:"new_version"`
 	Version     string    `gorm:"size:50;not null" json:"version"`
+	Branch      string    `gorm:"size:20;default:'trunk'" json:"branch"`
+	Platform    string    `gorm:"size:20;default:'android'" json:"platform"`
 	PatchFile   string    `gorm:"size:255;not null" json:"patch_file"`
 	Size        int64     `gorm:"not null" json:"size"`
 	FileCount   int       `gorm:"default:0" json:"file_count"`

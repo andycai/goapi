@@ -26,17 +26,34 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 目录配置 -->
+                    <!-- 环境配置 -->
                     <div class="space-y-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">目录配置</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">环境配置</h3>
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">源目录</label>
-                                <input type="text" x-model="config.source_dir" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">分支</label>
+                                <select x-model="config.branch" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="trunk">trunk</option>
+                                    <option value="publish">publish</option>
+                                    <option value="release">release</option>
+                                    <option value="alpha">alpha</option>
+                                </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">目标目录</label>
-                                <input type="text" x-model="config.target_dir" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">平台</label>
+                                <select x-model="config.platform" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="android">android</option>
+                                    <option value="ios">ios</option>
+                                    <option value="webgl">webgl</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">补丁路径</label>
+                                <input type="text" x-model="config.patch_path" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">ZIP存放路径</label>
+                                <input type="text" x-model="config.zip_path" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                             </div>
                         </div>
                     </div>
@@ -64,6 +81,8 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">版本</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">平台</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">分支</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">说明</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">状态</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">创建时间</th>
@@ -75,6 +94,8 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="record.id"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="record.version"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="record.platform"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="record.branch"></td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white" x-text="record.description"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="getStatusText(record.status)"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="formatDate(record.created_at)"></td>

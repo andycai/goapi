@@ -17,7 +17,7 @@ func saveConfigHandler(c *fiber.Ctx) error {
 	}
 
 	// 验证路径安全性
-	if !path.IsValid(config.SourceDir) || !path.IsValid(config.TargetDir) {
+	if !path.IsValid(config.PatchPath) || !path.IsValid(config.ZipPath) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的目录路径",
 		})
@@ -46,6 +46,8 @@ func generatePatchHandler(c *fiber.Ctx) error {
 		OldVersion  string `json:"old_version"`
 		NewVersion  string `json:"new_version"`
 		Description string `json:"description"`
+		Branch      string `json:"branch"`
+		Platform    string `json:"platform"`
 	}
 
 	var req GenerateRequest
@@ -56,7 +58,7 @@ func generatePatchHandler(c *fiber.Ctx) error {
 	}
 
 	// 生成补丁包
-	record, err := GeneratePatch(req.OldVersion, req.NewVersion, req.Description)
+	record, err := GeneratePatch(req.OldVersion, req.NewVersion, req.Description, req.Branch, req.Platform)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "生成补丁包失败: " + err.Error(),

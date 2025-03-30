@@ -21,7 +21,13 @@ var config *PatchConfig
 
 // initService 初始化服务
 func initService() {
-	config = &PatchConfig{ConfigPath: "./data/patch_config.json"}
+	config = &PatchConfig{
+		ConfigPath: "./data/patch_config.json",
+		Branch:     "trunk",
+		Platform:   "android",
+		ZipPath:    "./data/patches",
+		PatchPath:  "./data/patch",
+	}
 
 	// 尝试加载配置
 	loadConfig()
@@ -70,11 +76,12 @@ func loadConfig() error {
 // updateConfig 更新配置
 func updateConfig(conf *PatchConfig) error {
 	// 验证路径
-	if !path.IsValid(conf.SourceDir) || !path.IsValid(conf.TargetDir) {
+	if !path.IsValid(conf.PatchPath) || !path.IsValid(conf.ZipPath) {
 		return errors.New("无效的目录路径")
 	}
 
-	// 更新配置
+	// 保留原来的配置文件路径
+	conf.ConfigPath = config.ConfigPath
 	config = conf
 
 	// 保存配置
@@ -87,20 +94,32 @@ func getConfig() *PatchConfig {
 }
 
 // GeneratePatch 生成补丁包
-func GeneratePatch(oldVersion, newVersion, description string) (*models.PatchRecord, error) {
+func GeneratePatch(oldVersion, newVersion, description, branch, platform string) (*models.PatchRecord, error) {
 	if config == nil {
 		return nil, errors.New("配置为空")
 	}
 
+	// 构建源目录和目标目录路径
+	oldDir := filepath.Join(config.PatchPath, oldVersion)
+	newDir := filepath.Join(config.PatchPath, newVersion)
+
+	// 检查目录是否存在
+	if _, err := os.Stat(oldDir); os.IsNotExist(err) {
+		return nil, errors.New("旧版本目录不存在")
+	}
+	if _, err := os.Stat(newDir); os.IsNotExist(err) {
+		return nil, errors.New("新版本目录不存在")
+	}
+
 	// 比较文件差异
-	changes, err := compareDirectories(config.SourceDir, config.TargetDir)
+	changes, err := compareDirectories(oldDir, newDir)
 	if err != nil {
 		return nil, err
 	}
 
 	// 生成补丁包
-	outputZip := filepath.Join("./data/patches", fmt.Sprintf("%s_%s.zip", oldVersion, newVersion))
-	if err := createPatchZip(changes, outputZip); err != nil {
+	outputZip := filepath.Join(config.ZipPath, fmt.Sprintf("%s_%s_%s_%s.zip", oldVersion, newVersion, branch, platform))
+	if err := createPatchZip(changes, outputZip, newDir, branch, platform); err != nil {
 		return nil, err
 	}
 
@@ -109,8 +128,9 @@ func GeneratePatch(oldVersion, newVersion, description string) (*models.PatchRec
 		OldVersion:  oldVersion,
 		NewVersion:  newVersion,
 		Version:     fmt.Sprintf("%s_%s", oldVersion, newVersion),
+		Branch:      branch,
+		Platform:    platform,
 		PatchFile:   outputZip,
-		Size:        0, // 文件大小将在创建zip文件后更新
 		Description: description,
 		FileCount:   len(changes),
 		CreatedAt:   time.Now(),
@@ -130,11 +150,11 @@ func GeneratePatch(oldVersion, newVersion, description string) (*models.PatchRec
 }
 
 // compareDirectories 比较两个目录的差异
-func compareDirectories(sourceDir, targetDir string) ([]FileChange, error) {
+func compareDirectories(oldDir, newDir string) ([]FileChange, error) {
 	var changes []FileChange
 
 	// 遍历源目录
-	err := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(newDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -145,16 +165,16 @@ func compareDirectories(sourceDir, targetDir string) ([]FileChange, error) {
 		}
 
 		// 计算相对路径
-		relPath, err := filepath.Rel(sourceDir, path)
+		relPath, err := filepath.Rel(newDir, path)
 		if err != nil {
 			return err
 		}
 
 		// 计算目标文件路径
-		targetPath := filepath.Join(targetDir, relPath)
+		oldPath := filepath.Join(oldDir, relPath)
 
 		// 检查目标文件是否存在
-		targetInfo, err := os.Stat(targetPath)
+		oldInfo, err := os.Stat(oldPath)
 		if os.IsNotExist(err) {
 			// 文件在目标目录不存在，标记为新增
 			checksum, size, err := getFileInfo(path)
@@ -174,7 +194,7 @@ func compareDirectories(sourceDir, targetDir string) ([]FileChange, error) {
 		}
 
 		// 比较文件内容
-		if info.Size() != targetInfo.Size() || info.ModTime() != targetInfo.ModTime() {
+		if info.Size() != oldInfo.Size() || info.ModTime() != oldInfo.ModTime() {
 			checksum, size, err := getFileInfo(path)
 			if err != nil {
 				return err
@@ -196,7 +216,7 @@ func compareDirectories(sourceDir, targetDir string) ([]FileChange, error) {
 	}
 
 	// 查找已删除的文件
-	err = filepath.Walk(targetDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(oldDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -207,14 +227,14 @@ func compareDirectories(sourceDir, targetDir string) ([]FileChange, error) {
 		}
 
 		// 计算相对路径
-		relPath, err := filepath.Rel(targetDir, path)
+		relPath, err := filepath.Rel(oldDir, path)
 		if err != nil {
 			return err
 		}
 
 		// 检查源文件是否存在
-		sourcePath := filepath.Join(sourceDir, relPath)
-		if _, err := os.Stat(sourcePath); os.IsNotExist(err) {
+		newPath := filepath.Join(newDir, relPath)
+		if _, err := os.Stat(newPath); os.IsNotExist(err) {
 			// 文件在源目录不存在，标记为删除
 			changes = append(changes, FileChange{
 				Path:       relPath,
@@ -253,7 +273,7 @@ func getFileInfo(path string) (string, int64, error) {
 }
 
 // createPatchZip 创建补丁包
-func createPatchZip(changes []FileChange, outputZip string) error {
+func createPatchZip(changes []FileChange, outputZip string, newDir, branch, platform string) error {
 	// 确保输出目录存在
 	if err := os.MkdirAll(filepath.Dir(outputZip), 0755); err != nil {
 		return err
@@ -276,15 +296,15 @@ func createPatchZip(changes []FileChange, outputZip string) error {
 		}
 
 		// 打开源文件
-		sourcePath := filepath.Join(config.SourceDir, change.Path)
+		sourcePath := filepath.Join(newDir, change.Path)
 		sourceFile, err := os.Open(sourcePath)
 		if err != nil {
 			return err
 		}
 		defer sourceFile.Close()
 
-		// 构建zip中的文件路径，添加 publish/android/ 前缀
-		zipPath := filepath.Join("publish/android", change.Path)
+		// 构建zip中的文件路径，添加 branch/platform/ 前缀
+		zipPath := filepath.Join(branch, platform, change.Path)
 
 		// 创建zip文件条目
 		fileWriter, err := zipWriter.Create(zipPath)
@@ -313,7 +333,7 @@ func GetPatchRecords(limit, page int) ([]models.PatchRecord, int, error) {
 
 	// 分页查询
 	offset := (page - 1) * limit
-	if err := app.DB.Order("created_at desc").Offset(offset).Limit(limit).Find(&records).Error; err != nil {
+	if err := app.DB.Model(&models.PatchRecord{}).Order("created_at desc").Offset(offset).Limit(limit).Find(&records).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -334,22 +354,26 @@ func ApplyPatch(recordID uint) error {
 	}
 
 	// 打开zip文件
-	zip, err := zip.OpenReader(record.PatchFile)
+	r, err := zip.OpenReader(record.PatchFile)
 	if err != nil {
 		return err
 	}
-	defer zip.Close()
+	defer r.Close()
+
+	// 构建目标目录
+	targetDir := filepath.Join(config.PatchPath, record.NewVersion)
 
 	// 应用补丁
-	for _, file := range zip.File {
-		// 处理路径，移除publish/android前缀
+	for _, file := range r.File {
+		// 处理路径，移除branch/platform前缀
 		filePath := file.Name
-		if strings.HasPrefix(filePath, "publish/android/") {
-			filePath = strings.TrimPrefix(filePath, "publish/android/")
+		prefix := fmt.Sprintf("%s/%s/", record.Branch, record.Platform)
+		if strings.HasPrefix(filePath, prefix) {
+			filePath = strings.TrimPrefix(filePath, prefix)
 		}
 
 		// 构建目标文件路径
-		targetPath := filepath.Join(config.TargetDir, filePath)
+		targetPath := filepath.Join(targetDir, filePath)
 
 		// 确保目标目录存在
 		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
