@@ -300,6 +300,17 @@ func initMenus() error {
 			CreatedAt:  now,
 			UpdatedAt:  now,
 		},
+		{
+			ParentID:   toolsManage.ID,
+			Name:       "补丁管理",
+			Path:       "/admin/patch",
+			Icon:       "patch",
+			Sort:       5,
+			Permission: "patch:view",
+			IsShow:     true,
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
 	}
 
 	if err := app.DB.Create(&toolsMenus).Error; err != nil {

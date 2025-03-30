@@ -1,0 +1,8 @@
+{
+  "source_dir": "/Users/andy/Workspace/github/unity/Uni/Bundles/StandaloneOSX/DefaultPackage/2025-01-09-715",
+  "target_dir": "/Users/andy/Workspace/github/unity/Uni/Bundles/StandaloneOSX/DefaultPackage/2025-01-15-875",
+  "default_old_version": "2025033001",
+  "default_new_version": "2025033002",
+  "default_description": "热更补丁",
+  "config_path": "./data/patch_config.json"
+}
