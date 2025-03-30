@@ -8,6 +8,7 @@ import (
 	_ "github.com/andycai/unitool/modules/gamelog"    // 游戏日志
 	_ "github.com/andycai/unitool/modules/login"      // 登录
 	_ "github.com/andycai/unitool/modules/menu"       // 菜单
+	_ "github.com/andycai/unitool/modules/note"       // 笔记
 	_ "github.com/andycai/unitool/modules/parameter"  // 参数配置
 	_ "github.com/andycai/unitool/modules/patch"      // 补丁管理
 	_ "github.com/andycai/unitool/modules/permission" // 权限
@@ -18,7 +19,6 @@ import (
 	_ "github.com/andycai/unitool/modules/stats"      // 游戏计
 	_ "github.com/andycai/unitool/modules/unibuild"   // Unity构建
 	_ "github.com/andycai/unitool/modules/user"       // 用户
-	// _ "github.com/andycai/unitool/modules/note"
 	// _ "github.com/andycai/unitool/modules/bugtracker"
 	// _ "github.com/andycai/unitool/modules/filemanager"
 	// _ "github.com/andycai/unitool/modules/imagemanager"

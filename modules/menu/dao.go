@@ -106,7 +106,7 @@ func initMenus() error {
 	systemManage := models.Menu{
 		ParentID:   0,
 		Name:       "系统管理",
-		Path:       "/admin",
+		Path:       "/admin/system",
 		Icon:       "system",
 		Sort:       1,
 		Permission: "",
@@ -314,6 +314,74 @@ func initMenus() error {
 	}
 
 	if err := app.DB.Create(&toolsMenus).Error; err != nil {
+		return err
+	}
+
+	// web应用菜单组
+	webAppManage := models.Menu{
+		ParentID:   0,
+		Name:       "Web应用",
+		Path:       "/admin/webapp",
+		Icon:       "webapp",
+		Sort:       3,
+		Permission: "",
+		IsShow:     true,
+		CreatedAt:  now,
+		UpdatedAt:  now,
+	}
+	if err := app.DB.Create(&webAppManage).Error; err != nil {
+		return err
+	}
+
+	// web应用子菜单
+	webAppMenus := []models.Menu{
+		{
+			ParentID:   webAppManage.ID,
+			Name:       "笔记",
+			Path:       "/admin/notes",
+			Icon:       "note",
+			Sort:       1,
+			Permission: "note:view",
+			IsShow:     true,
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
+		{
+			ParentID:   webAppManage.ID,
+			Name:       "项目管理",
+			Path:       "/admin/bugtracker",
+			Icon:       "bugtracker",
+			Sort:       2,
+			Permission: "bugtracker:view",
+			IsShow:     true,
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
+		{
+			ParentID:   webAppManage.ID,
+			Name:       "文件管理",
+			Path:       "/admin/filemanager",
+			Icon:       "filemanager",
+			Sort:       3,
+			Permission: "filemanager:view",
+			IsShow:     true,
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
+		{
+			ParentID:   webAppManage.ID,
+			Name:       "图片管理",
+			Path:       "/admin/imagemanager",
+			Icon:       "imagemanager",
+			Sort:       4,
+			Permission: "imagemanager:view",
+			IsShow:     true,
+			CreatedAt:  now,
+			UpdatedAt:  now,
+		},
+	}
+
+	if err := app.DB.Create(&webAppMenus).Error; err != nil {
 		return err
 	}
 
