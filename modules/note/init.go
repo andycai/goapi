@@ -43,18 +43,20 @@ func (m *noteModule) AddAuthRouters() error {
 	// 管理后台路由
 	app.RouterAdmin.Get("/notes", app.HasPermission("note:view"), listNotesHandler)
 
-	// API路由
+	// API路由 - 调整顺序，将具体路径放在参数路径之前
 	app.RouterApi.Get("/notes/tree", app.HasPermission("note:view"), getNoteTreeHandler)
-	app.RouterApi.Get("/notes/:id", app.HasPermission("note:view"), getNoteDetailHandler)
-	app.RouterApi.Post("/notes", app.HasPermission("note:create"), createNoteHandler)
-	app.RouterApi.Put("/notes/:id", app.HasPermission("note:update"), updateNoteHandler)
-	app.RouterApi.Delete("/notes/:id", app.HasPermission("note:delete"), deleteNoteHandler)
 
-	// 分类操作
+	// 分类操作 - 移动到参数路由之前
 	app.RouterApi.Get("/notes/categories", app.HasPermission("note:category:view"), listCategoriesHandler)
 	app.RouterApi.Post("/notes/categories", app.HasPermission("note:category:create"), createCategoryHandler)
 	app.RouterApi.Put("/notes/categories/:id", app.HasPermission("note:category:update"), updateCategoryHandler)
 	app.RouterApi.Delete("/notes/categories/:id", app.HasPermission("note:category:delete"), deleteCategoryHandler)
+
+	// 参数路由放在最后
+	app.RouterApi.Get("/notes/:id", app.HasPermission("note:view"), getNoteDetailHandler)
+	app.RouterApi.Post("/notes", app.HasPermission("note:create"), createNoteHandler)
+	app.RouterApi.Put("/notes/:id", app.HasPermission("note:update"), updateNoteHandler)
+	app.RouterApi.Delete("/notes/:id", app.HasPermission("note:delete"), deleteNoteHandler)
 
 	return nil
 }

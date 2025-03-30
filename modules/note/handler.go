@@ -55,15 +55,6 @@ func getNoteDetailHandler(c *fiber.Ctx) error {
 	return c.JSON(note)
 }
 
-type NoteRequest struct {
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	CategoryID uint   `json:"category_id"`
-	ParentID   uint   `json:"parent_id"`
-	IsPublic   uint8  `json:"is_public"`
-	RoleIDs    []uint `json:"role_ids"`
-}
-
 // createNoteHandler 处理创建笔记
 func createNoteHandler(c *fiber.Ctx) error {
 	var req NoteRequest
@@ -71,7 +62,7 @@ func createNoteHandler(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
 	}
 
-	user := c.Locals("user").(*models.User)
+	user := app.CurrentUser(c)
 
 	note := &models.Note{
 		Title:      req.Title,
@@ -112,7 +103,7 @@ func updateNoteHandler(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "笔记不存在"})
 	}
 
-	user := c.Locals("user").(*models.User)
+	user := app.CurrentUser(c)
 
 	note.Title = req.Title
 	note.Content = req.Content
@@ -155,14 +146,6 @@ func deleteNoteHandler(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "删除成功"})
 }
 
-type CategoryRequest struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ParentID    uint   `json:"parent_id"`
-	IsPublic    uint8  `json:"is_public"`
-	RoleIDs     []uint `json:"role_ids"`
-}
-
 // createCategoryHandler 处理创建分类
 func createCategoryHandler(c *fiber.Ctx) error {
 	var req CategoryRequest
@@ -170,7 +153,7 @@ func createCategoryHandler(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "无效的请求数据"})
 	}
 
-	user := c.Locals("user").(*models.User)
+	user := app.CurrentUser(c)
 
 	category := &models.NoteCategory{
 		Name:        req.Name,
@@ -210,7 +193,7 @@ func updateCategoryHandler(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "分类不存在"})
 	}
 
-	user := c.Locals("user").(*models.User)
+	user := app.CurrentUser(c)
 
 	category.Name = req.Name
 	category.Description = req.Description

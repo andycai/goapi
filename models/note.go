@@ -20,7 +20,7 @@ type NoteCategory struct {
 	Parent   *NoteCategory   `json:"parent,omitempty" gorm:"foreignKey:ParentID"`
 	Children []*NoteCategory `json:"children,omitempty" gorm:"foreignKey:ParentID"`
 	Notes    []*Note         `json:"notes,omitempty" gorm:"foreignKey:CategoryID"`
-	Roles    []*Role         `json:"roles,omitempty" gorm:"many2many:category_permissions"`
+	Roles    []*Role         `json:"roles,omitempty" gorm:"many2many:category_permissions;foreignKey:ID;joinForeignKey:CategoryID;References:ID;joinReferences:RoleID"`
 }
 
 // Note 笔记
@@ -41,7 +41,7 @@ type Note struct {
 	Category *NoteCategory `json:"category,omitempty"`
 	Parent   *Note         `json:"parent,omitempty" gorm:"foreignKey:ParentID"`
 	Children []*Note       `json:"children,omitempty" gorm:"foreignKey:ParentID"`
-	Roles    []*Role       `json:"roles,omitempty" gorm:"many2many:note_permissions"`
+	Roles    []*Role       `json:"roles,omitempty" gorm:"many2many:note_permissions;foreignKey:ID;joinForeignKey:NoteID;References:ID;joinReferences:RoleID"`
 }
 
 // NotePermission 笔记权限
