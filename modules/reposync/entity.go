@@ -19,12 +19,12 @@ type RepoConfig struct {
 
 // CommitRecord 提交记录
 type CommitRecord struct {
-	Revision     string    `json:"revision"`      // 版本号
-	Comment      string    `json:"comment"`       // 提交内容
-	Author       string    `json:"author"`        // 提交人
-	Time         time.Time `json:"time"`          // 提交时间
-	Synced       bool      `json:"synced"`        // 是否已同步
-	ChangedFiles []string  `json:"changed_files"` // 变更的文件列表
+	Revision     string       `json:"revision"`      // 版本号
+	Comment      string       `json:"comment"`       // 提交内容
+	Author       string       `json:"author"`        // 提交人
+	Time         time.Time    `json:"time"`          // 提交时间
+	Synced       bool         `json:"synced"`        // 是否已同步
+	ChangedFiles []FileChange `json:"changed_files"` // 变更的文件列表
 }
 
 // FileChange 文件变更

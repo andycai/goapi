@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -268,7 +269,15 @@ func getSvnCommits(path string, limit int) ([]CommitRecord, error) {
 
 		// 解析时间
 		timeStr := headerParts[2]
-		commitTime, _ := time.Parse("2006-01-02 15:04:05 +0800", timeStr)
+		// 移除括号中的额外信息
+		if idx := strings.Index(timeStr, " ("); idx != -1 {
+			timeStr = strings.TrimSpace(timeStr[:idx])
+		}
+		commitTime, err := time.Parse("2006-01-02 15:04:05 -0700", timeStr)
+		if err != nil {
+			// 如果解析失败，使用当前时间
+			commitTime = time.Now()
+		}
 
 		// 提取注释
 		comment := ""
@@ -277,7 +286,10 @@ func getSvnCommits(path string, limit int) ([]CommitRecord, error) {
 		}
 
 		// 获取变更文件列表
-		changedFiles, _ := getSvnChangedFiles(path, revision)
+		changedFiles, err := getSvnFileChanges(path, revision)
+		if err != nil {
+			changedFiles = []FileChange{} // 如果获取失败，使用空列表
+		}
 
 		// 创建提交记录
 		commits = append(commits, CommitRecord{
@@ -293,36 +305,104 @@ func getSvnCommits(path string, limit int) ([]CommitRecord, error) {
 	return commits, nil
 }
 
-// getSvnChangedFiles 获取Svn变更文件列表
-func getSvnChangedFiles(path, revision string) ([]string, error) {
-	// 执行svn diff命令获取变更文件
-	revInt, err := strconv.Atoi(revision)
-	if err != nil {
-		return nil, fmt.Errorf("无效的版本号: %v", err)
-	}
-	cmd := exec.Command("svn", "diff", "--summarize", "-r", fmt.Sprintf("%d:%d", revInt, revInt-1), path)
+// getSvnFileChanges 获取Svn文件变更列表
+func getSvnFileChanges(path, revision string) ([]FileChange, error) {
+	// 执行svn log命令获取上一个版本号
+	cmd := exec.Command("svn", "log", "-r", fmt.Sprintf("%s:1", revision), "--limit", "2", path)
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("获取SVN日志失败: %v", err)
+	}
+
+	// 解析日志获取版本号
+	lines := strings.Split(string(output), "\n")
+	var prevRevision string
+	for _, line := range lines {
+		if strings.HasPrefix(line, "r") {
+			parts := strings.Split(line, " | ")
+			if len(parts) > 0 {
+				rev := strings.TrimPrefix(parts[0], "r")
+				if rev != revision {
+					prevRevision = rev
+					break
+				}
+			}
+		}
+	}
+
+	if prevRevision == "" {
+		// 如果是第一个版本，获取该版本的所有文件作为新增
+		cmd = exec.Command("svn", "list", "-r", revision, path)
+		output, err = cmd.Output()
+		if err != nil {
+			return nil, fmt.Errorf("获取SVN文件列表失败: %v", err)
+		}
+
+		// 解析输出
+		var changes []FileChange
+		lines = strings.Split(string(output), "\n")
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+
+			// 所有文件都标记为新增
+			changes = append(changes, FileChange{
+				Path:       line,
+				ChangeType: "A",
+			})
+
+			// 限制最大文件数为50
+			if len(changes) >= 50 {
+				break
+			}
+		}
+
+		return changes, nil
+	}
+
+	// 执行svn diff命令获取变更文件
+	cmd = exec.Command("svn", "diff", "--summarize", "-r", fmt.Sprintf("%s:%s", prevRevision, revision), path)
+	output, err = cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("获取SVN差异失败: %v", err)
 	}
 
 	// 解析输出
-	var files []string
-	lines := strings.Split(string(output), "\n")
+	var changes []FileChange
+	lines = strings.Split(string(output), "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
 		}
 
-		// 格式: A path/to/file.txt
+		// 格式: A/M/D path/to/file.txt
 		parts := strings.SplitN(line, " ", 2)
 		if len(parts) == 2 {
-			files = append(files, strings.TrimSpace(parts[1]))
+			changeType := strings.TrimSpace(parts[0])
+			filePath := strings.TrimSpace(parts[1])
+
+			// 计算相对路径
+			relPath, err := filepath.Rel(path, filePath)
+			if err != nil {
+				continue
+			}
+
+			changes = append(changes, FileChange{
+				Path:       relPath,
+				ChangeType: changeType,
+			})
+
+			// 限制最大文件数为50
+			if len(changes) >= 50 {
+				break
+			}
 		}
 	}
 
-	return files, nil
+	return changes, nil
 }
 
 // getGitCommits 获取Git提交记录
@@ -358,7 +438,10 @@ func getGitCommits(path string, limit int) ([]CommitRecord, error) {
 		}
 
 		// 获取变更文件列表
-		changedFiles, _ := getGitChangedFiles(path, revision)
+		changedFiles, err := getGitFileChanges(path, revision)
+		if err != nil {
+			changedFiles = []FileChange{} // 如果获取失败，使用空列表
+		}
 
 		// 创建提交记录
 		commits = append(commits, CommitRecord{
@@ -411,8 +494,8 @@ func getGitCommitDetails(path, revision string) (*GitCommitDetails, error) {
 	}, nil
 }
 
-// getGitChangedFiles 获取Git变更文件列表
-func getGitChangedFiles(path, revision string) ([]string, error) {
+// getGitFileChanges 获取Git文件变更列表
+func getGitFileChanges(path, revision string) ([]FileChange, error) {
 	// 执行git show命令获取变更文件
 	cmd := exec.Command("git", "-C", path, "show", "--name-status", "--pretty=format:", revision)
 	output, err := cmd.Output()
@@ -421,7 +504,7 @@ func getGitChangedFiles(path, revision string) ([]string, error) {
 	}
 
 	// 解析输出
-	var files []string
+	var changes []FileChange
 	lines := strings.Split(string(output), "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -432,18 +515,39 @@ func getGitChangedFiles(path, revision string) ([]string, error) {
 		// 格式: A path/to/file.txt
 		parts := strings.SplitN(line, "\t", 2)
 		if len(parts) == 2 {
-			files = append(files, parts[1])
+			changeType := parts[0]
+			filePath := parts[1]
+
+			changes = append(changes, FileChange{
+				Path:       filePath,
+				ChangeType: changeType,
+			})
 		}
 	}
 
-	return files, nil
+	return changes, nil
 }
 
-// SyncCommits 同步提交记录
+// SyncCommits 同步选中的提交记录
 func SyncCommits(revisions []string) error {
 	if config == nil {
 		return errors.New("配置为空")
 	}
+
+	// 对版本号进行排序（从小到大）
+	sort.Slice(revisions, func(i, j int) bool {
+		// 尝试将版本号转换为数字进行比较
+		numI, errI := strconv.Atoi(revisions[i])
+		numJ, errJ := strconv.Atoi(revisions[j])
+
+		// 如果两个都是数字，按数字大小排序
+		if errI == nil && errJ == nil {
+			return numI < numJ
+		}
+
+		// 如果不是数字，按字符串排序
+		return revisions[i] < revisions[j]
+	})
 
 	// 更新第一个仓库
 	err := updateRepo(
@@ -468,8 +572,8 @@ func SyncCommits(revisions []string) error {
 
 	// 筛选需要同步的提交记录
 	var selectedCommits []CommitRecord
-	for _, commit := range commits {
-		for _, rev := range revisions {
+	for _, rev := range revisions {
+		for _, commit := range commits {
 			if commit.Revision == rev {
 				selectedCommits = append(selectedCommits, commit)
 				break
@@ -478,10 +582,10 @@ func SyncCommits(revisions []string) error {
 	}
 
 	// 同步每个提交记录
-	for _, commit := range selectedCommits {
-		err := syncCommit(commit)
+	for i := range selectedCommits {
+		err := syncCommit(selectedCommits[i])
 		if err != nil {
-			return fmt.Errorf("同步提交记录 %s 失败: %v", commit.Revision, err)
+			return fmt.Errorf("同步提交记录 %s 失败: %v", selectedCommits[i].Revision, err)
 		}
 	}
 
@@ -506,6 +610,17 @@ func syncCommit(commit CommitRecord) error {
 			Status:   2, // 同步失败
 		})
 		return fmt.Errorf("获取变更文件列表失败: %v", err)
+	}
+
+	// 更新第一个仓库
+	err = updateRepo(
+		config.RepoType2,
+		config.LocalPath2,
+		config.Username2,
+		config.Password2,
+	)
+	if err != nil {
+		return fmt.Errorf("更新第二个仓库失败: %v", err)
 	}
 
 	// 处理每个变更文件
@@ -574,13 +689,30 @@ func syncCommit(commit CommitRecord) error {
 	}
 
 	// 记录同步成功状态
-	return app.DB.Create(&models.RepoSyncRecord{
+	err = app.DB.Create(&models.RepoSyncRecord{
 		Revision: commit.Revision,
 		Comment:  commit.Comment,
 		Author:   commit.Author,
 		SyncTime: time.Now(),
 		Status:   1, // 同步成功
 	}).Error
+
+	if err != nil {
+		return fmt.Errorf("记录同步成功状态失败: %v", err)
+	}
+
+	// 更新第一个仓库
+	err = updateRepo(
+		config.RepoType2,
+		config.LocalPath2,
+		config.Username2,
+		config.Password2,
+	)
+	if err != nil {
+		return fmt.Errorf("更新第二个仓库失败2: %v", err)
+	}
+
+	return nil
 }
 
 // getFileChanges 获取文件变更列表
@@ -594,80 +726,6 @@ func getFileChanges(repoType, path, revision string) ([]FileChange, error) {
 	default:
 		return nil, fmt.Errorf("不支持的仓库类型: %s", repoType)
 	}
-}
-
-// getSvnFileChanges 获取Svn文件变更列表
-func getSvnFileChanges(path, revision string) ([]FileChange, error) {
-	// 执行svn diff命令获取变更文件
-	cmd := exec.Command("svn", "diff", "--summarize", "-c", revision, path)
-	output, err := cmd.Output()
-	if err != nil {
-		return nil, err
-	}
-
-	// 解析输出
-	var changes []FileChange
-	lines := strings.Split(string(output), "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-
-		// 格式: A path/to/file.txt
-		parts := strings.SplitN(line, " ", 2)
-		if len(parts) == 2 {
-			changeType := parts[0]
-			filePath := strings.TrimSpace(parts[1])
-
-			// 计算相对路径
-			relPath, err := filepath.Rel(path, filePath)
-			if err != nil {
-				continue
-			}
-
-			changes = append(changes, FileChange{
-				Path:       relPath,
-				ChangeType: changeType,
-			})
-		}
-	}
-
-	return changes, nil
-}
-
-// getGitFileChanges 获取Git文件变更列表
-func getGitFileChanges(path, revision string) ([]FileChange, error) {
-	// 执行git show命令获取变更文件
-	cmd := exec.Command("git", "-C", path, "show", "--name-status", "--pretty=format:", revision)
-	output, err := cmd.Output()
-	if err != nil {
-		return nil, err
-	}
-
-	// 解析输出
-	var changes []FileChange
-	lines := strings.Split(string(output), "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-
-		// 格式: A path/to/file.txt
-		parts := strings.SplitN(line, "\t", 2)
-		if len(parts) == 2 {
-			changeType := parts[0]
-			filePath := parts[1]
-
-			changes = append(changes, FileChange{
-				Path:       filePath,
-				ChangeType: changeType,
-			})
-		}
-	}
-
-	return changes, nil
 }
 
 // commitToRepo 提交到仓库

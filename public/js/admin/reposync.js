@@ -129,12 +129,24 @@ function reposyncManagement() {
             }
 
             try {
+                // 对版本号进行排序（从小到大）
+                const sortedRevisions = [...this.selectedCommits].sort((a, b) => {
+                    // 如果是数字版本号，按数字大小排序
+                    const numA = parseInt(a);
+                    const numB = parseInt(b);
+                    if (!isNaN(numA) && !isNaN(numB)) {
+                        return numA - numB;
+                    }
+                    // 如果不是数字，按字符串排序
+                    return a.localeCompare(b);
+                });
+
                 const response = await fetch('/api/reposync/sync', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ revisions: this.selectedCommits })
+                    body: JSON.stringify({ revisions: sortedRevisions })
                 });
 
                 if (!response.ok) {
@@ -156,7 +168,7 @@ function reposyncManagement() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ revision })
+                    body: JSON.stringify({ revisions: [revision] })
                 });
 
                 if (!response.ok) {
@@ -180,6 +192,15 @@ function reposyncManagement() {
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        },
+
+        getChangeTypeText(changeType) {
+            const types = {
+                'A': '新增',
+                'M': '修改',
+                'D': '删除'
+            };
+            return types[changeType] || changeType;
         }
     };
 }
