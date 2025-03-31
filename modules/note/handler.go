@@ -14,6 +14,7 @@ func listNotesHandler(c *fiber.Ctx) error {
 	return c.Render("admin/notes", fiber.Map{
 		"Title": "笔记管理",
 		"Scripts": []string{
+			"/static/js/marked-15.0.7.js",
 			"/static/js/admin/notes.js",
 		},
 	}, "admin/layout")
