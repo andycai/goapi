@@ -846,3 +846,117 @@ func removeEmptyDirs(dir, rootDir string) error {
 	// 递归检查父目录
 	return removeEmptyDirs(filepath.Dir(dir), rootDir)
 }
+
+// SyncChangesBetweenRevisions 同步两个版本之间的变更
+func SyncChangesBetweenRevisions(fromRev, toRev string) (int, error) {
+	if config == nil {
+		return 0, errors.New("配置为空")
+	}
+
+	// 更新第一个仓库
+	err := updateRepo(
+		config.RepoType1,
+		config.LocalPath1,
+		config.Username1,
+		config.Password1,
+	)
+	if err != nil {
+		return 0, fmt.Errorf("更新第一个仓库失败: %v", err)
+	}
+
+	// 获取两个版本之间的变更
+	var cmd *exec.Cmd
+	if config.RepoType1 == "svn" {
+		cmd = exec.Command("svn", "diff", "--summarize", "-r",
+			fmt.Sprintf("%s:%s", fromRev, toRev), config.LocalPath1)
+	} else if config.RepoType1 == "git" {
+		cmd = exec.Command("git", "-C", config.LocalPath1, "diff",
+			"--name-status", fromRev, toRev)
+	} else {
+		return 0, fmt.Errorf("不支持的仓库类型: %s", config.RepoType1)
+	}
+
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, fmt.Errorf("获取变更失败: %v", err)
+	}
+
+	// 解析变更
+	var changes []FileChange
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		var changeType, filePath string
+		if config.RepoType1 == "svn" {
+			parts := strings.SplitN(line, " ", 2)
+			if len(parts) == 2 {
+				changeType = strings.TrimSpace(parts[0])
+				filePath = strings.TrimSpace(parts[1])
+				relPath, err := filepath.Rel(config.LocalPath1, filePath)
+				if err == nil {
+					filePath = relPath
+				}
+			}
+		} else { // git
+			parts := strings.SplitN(line, "\t", 2)
+			if len(parts) == 2 {
+				changeType = parts[0]
+				filePath = parts[1]
+			}
+		}
+
+		if changeType != "" && filePath != "" {
+			changes = append(changes, FileChange{
+				Path:       filePath,
+				ChangeType: changeType,
+			})
+		}
+	}
+
+	// 同步变更
+	// 更新目标仓库
+	if err := updateRepo(
+		config.RepoType2,
+		config.LocalPath2,
+		config.Username2,
+		config.Password2,
+	); err != nil {
+		return 0, fmt.Errorf("更新目标仓库失败: %v", err)
+	}
+
+	// 处理每个变更
+	for _, change := range changes {
+		sourcePath := filepath.Join(config.LocalPath1, change.Path)
+		targetPath := filepath.Join(config.LocalPath2, change.Path)
+
+		switch change.ChangeType {
+		case "A", "M": // 新增或修改
+			sourceInfo, err := os.Stat(sourcePath)
+			if err != nil {
+				continue // 跳过不存在的文件
+			}
+
+			if sourceInfo.IsDir() {
+				os.MkdirAll(targetPath, 0755)
+			} else {
+				os.MkdirAll(filepath.Dir(targetPath), 0755)
+				copyFile(sourcePath, targetPath)
+			}
+		case "D": // 删除
+			os.RemoveAll(targetPath)
+			removeEmptyDirs(filepath.Dir(targetPath), config.LocalPath2)
+		}
+	}
+
+	// 提交变更
+	message := fmt.Sprintf("Sync changes between %s and %s", fromRev, toRev)
+	if err := commitToRepo(config.RepoType2, config.LocalPath2, message); err != nil {
+		return 0, fmt.Errorf("提交变更失败: %v", err)
+	}
+
+	return len(changes), nil
+}

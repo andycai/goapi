@@ -35,6 +35,12 @@ func (m *reposyncModule) Start() error {
 	return nil
 }
 
+func (m *reposyncModule) AddPublicRouters() error {
+	// 公开API
+	app.RouterPublicApi.Post("/v2/reposync/sync", syncPublicCommitsHandler)
+	return nil
+}
+
 func (m *reposyncModule) AddAuthRouters() error {
 	// 管理页面
 	app.RouterAdmin.Get("/reposync", app.HasPermission("reposync:view"), func(c *fiber.Ctx) error {

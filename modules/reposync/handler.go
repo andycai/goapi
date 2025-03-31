@@ -108,3 +108,57 @@ func syncCommitsHandler(c *fiber.Ctx) error {
 		"message": "同步成功",
 	})
 }
+
+// syncPublicCommitsHandler 公开的同步API，同步两个版本间的差异
+func syncPublicCommitsHandler(c *fiber.Ctx) error {
+	var req struct {
+		FromRevision string `json:"fromRevision"`
+		ToRevision   string `json:"toRevision"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的请求数据",
+		})
+	}
+
+	if req.FromRevision == "" || req.ToRevision == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "fromRevision 和 toRevision 不能为空",
+		})
+	}
+
+	// 检查版本号大小关系
+	// 尝试将版本号转换为数字进行比较
+	fromNum, fromErr := strconv.Atoi(req.FromRevision)
+	toNum, toErr := strconv.Atoi(req.ToRevision)
+
+	if fromErr == nil && toErr == nil {
+		// 如果都是数字，直接比较数值
+		if fromNum >= toNum {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "fromRevision 必须小于 toRevision",
+			})
+		}
+	} else {
+		// 如果不是数字，尝试按字符串比较
+		// 对于某些版本号形式，字符串比较可能不准确
+		if req.FromRevision >= req.ToRevision {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "fromRevision 必须小于 toRevision",
+			})
+		}
+	}
+
+	changeCount, err := SyncChangesBetweenRevisions(req.FromRevision, req.ToRevision)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "同步成功",
+		"changes": changeCount,
+	})
+}
