@@ -37,7 +37,8 @@ func (m *reposyncModule) Start() error {
 
 func (m *reposyncModule) AddPublicRouters() error {
 	// 公开API
-	app.RouterPublicApi.Post("/v2/reposync/sync", syncPublicCommitsHandler)
+	app.RouterPublicApi.Post("/reposync/rangesync", syncPublicCommitsHandler)
+	app.RouterPublicApi.Post("/reposync/autosync", syncPublicAutoHandler)
 	return nil
 }
 

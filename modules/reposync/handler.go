@@ -162,3 +162,35 @@ func syncPublicCommitsHandler(c *fiber.Ctx) error {
 		"changes": changeCount,
 	})
 }
+
+// syncPublicAutoHandler 自动同步未同步的提交记录
+func syncPublicAutoHandler(c *fiber.Ctx) error {
+	fromRev, toRev, err := FindUnsyncedRevisionRange()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// 如果没有找到未同步的提交，返回成功但无变更
+	if fromRev == "" || toRev == "" {
+		return c.JSON(fiber.Map{
+			"message": "没有需要同步的提交",
+			"changes": 0,
+		})
+	}
+
+	changeCount, err := SyncChangesBetweenRevisions(fromRev, toRev)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "同步成功",
+		"changes": changeCount,
+		"from":    fromRev,
+		"to":      toRev,
+	})
+}

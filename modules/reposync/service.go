@@ -960,3 +960,52 @@ func SyncChangesBetweenRevisions(fromRev, toRev string) (int, error) {
 
 	return len(changes), nil
 }
+
+// FindUnsyncedRevisionRange 查找未同步的版本范围
+func FindUnsyncedRevisionRange() (string, string, error) {
+	if config == nil {
+		return "", "", errors.New("配置为空")
+	}
+
+	// 更新第一个仓库
+	err := updateRepo(
+		config.RepoType1,
+		config.LocalPath1,
+		config.Username1,
+		config.Password1,
+	)
+	if err != nil {
+		return "", "", fmt.Errorf("更新第一个仓库失败: %v", err)
+	}
+
+	// 获取最近100条提交记录
+	commits, err := getRepoCommits(
+		config.RepoType1,
+		config.LocalPath1,
+		100,
+	)
+	if err != nil {
+		return "", "", fmt.Errorf("获取提交记录失败: %v", err)
+	}
+
+	if len(commits) == 0 {
+		return "", "", nil
+	}
+
+	// 找到未同步的最小和最大revision
+	var minRev, maxRev string
+	for _, commit := range commits {
+		// 检查是否已同步
+		var record models.RepoSyncRecord
+		result := app.DB.Where("revision = ?", commit.Revision).First(&record)
+
+		if result.Error != nil { // 未找到记录，说明未同步
+			if minRev == "" {
+				minRev = commit.Revision
+			}
+			maxRev = commit.Revision
+		}
+	}
+
+	return minRev, maxRev, nil
+}
