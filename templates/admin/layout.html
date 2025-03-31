@@ -5,6 +5,7 @@
     <title>管理后台 - {{ .Title }}</title>
     <script src="/static/js/alpine-3.14.9.js" defer></script>
     <script src="/static/js/tailwind-3.4.16.js"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/admin/layout.css">
     <script>
         tailwind.config = {
@@ -38,51 +39,7 @@
                         }
                     }
                 }
-            },
-            plugins: [
-                function({ addUtilities }) {
-                    const newUtilities = {
-                        '.scrollbar-thin': {
-                            'scrollbar-width': 'thin',
-                            '&::-webkit-scrollbar': {
-                                width: '8px',
-                                height: '8px',
-                            },
-                        },
-                        '.scrollbar-thumb-rounded-full': {
-                            '&::-webkit-scrollbar-thumb': {
-                                'border-radius': '9999px',
-                            },
-                        },
-                        '.scrollbar-track-rounded-full': {
-                            '&::-webkit-scrollbar-track': {
-                                'border-radius': '9999px',
-                            },
-                        },
-                        '.scrollbar-thumb-gray-300': {
-                            '&::-webkit-scrollbar-thumb': {
-                                'background-color': '#D1D5DB',
-                            },
-                        },
-                        '.dark .dark\\:scrollbar-thumb-gray-600': {
-                            '&::-webkit-scrollbar-thumb': {
-                                'background-color': '#4B5563',
-                            },
-                        },
-                        '.scrollbar-track-gray-100': {
-                            '&::-webkit-scrollbar-track': {
-                                'background-color': '#F3F4F6',
-                            },
-                        },
-                        '.dark .dark\\:scrollbar-track-gray-800': {
-                            '&::-webkit-scrollbar-track': {
-                                'background-color': '#1F2937',
-                            },
-                        },
-                    };
-                    addUtilities(newUtilities, ['responsive', 'dark']);
-                }
-            ]
+            }
         };
     </script>
     
