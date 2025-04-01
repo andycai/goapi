@@ -194,3 +194,45 @@ func syncPublicAutoHandler(c *fiber.Ctx) error {
 		"to":      toRev,
 	})
 }
+
+// refreshCommitsHandler 刷新提交记录
+func refreshCommitsHandler(c *fiber.Ctx) error {
+	var req struct {
+		Limit int `json:"limit"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的请求数据",
+		})
+	}
+
+	if req.Limit <= 0 || req.Limit > 1000 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "limit 必须在 1-1000 之间",
+		})
+	}
+
+	if err := RefreshCommits(req.Limit); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "刷新提交记录失败: " + err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "刷新提交记录成功",
+	})
+}
+
+// clearSyncDataHandler 清空同步数据
+func clearSyncDataHandler(c *fiber.Ctx) error {
+	if err := ClearSyncData(); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "清空数据失败: " + err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "清空数据成功",
+	})
+}

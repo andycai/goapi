@@ -59,6 +59,8 @@ func (m *reposyncModule) AddAuthRouters() error {
 	app.RouterApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkoutHandler)
 	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:view"), listCommitsHandler)
 	app.RouterApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommitsHandler)
+	app.RouterApi.Post("/reposync/refresh", app.HasPermission("reposync:view"), refreshCommitsHandler)
+	app.RouterApi.Post("/reposync/clear", app.HasPermission("reposync:config"), clearSyncDataHandler)
 
 	return nil
 }

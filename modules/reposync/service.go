@@ -1009,3 +1009,66 @@ func FindUnsyncedRevisionRange() (string, string, error) {
 
 	return minRev, maxRev, nil
 }
+
+// RefreshCommits 刷新提交记录
+func RefreshCommits(limit int) error {
+	if config == nil {
+		return errors.New("配置为空")
+	}
+
+	// 更新第一个仓库
+	err := updateRepo(
+		config.RepoType1,
+		config.LocalPath1,
+		config.Username1,
+		config.Password1,
+	)
+	if err != nil {
+		return fmt.Errorf("更新第一个仓库失败: %v", err)
+	}
+
+	// 获取最近的提交记录
+	commits, err := getRepoCommits(
+		config.RepoType1,
+		config.LocalPath1,
+		limit,
+	)
+	if err != nil {
+		return fmt.Errorf("获取提交记录失败: %v", err)
+	}
+
+	// 遍历提交记录，将未同步的记录添加到数据库
+	for _, commit := range commits {
+		// 检查是否已存在
+		var record models.RepoSyncRecord
+		result := app.DB.Where("revision = ?", commit.Revision).First(&record)
+
+		if result.Error != nil { // 未找到记录，说明未同步
+			// 创建新记录
+			err = app.DB.Create(&models.RepoSyncRecord{
+				Revision: commit.Revision,
+				Comment:  commit.Comment,
+				Author:   commit.Author,
+				SyncTime: time.Now(),
+				Status:   0, // 未同步状态
+			}).Error
+
+			if err != nil {
+				return fmt.Errorf("创建同步记录失败: %v", err)
+			}
+		}
+	}
+
+	return nil
+}
+
+// ClearSyncData 清空同步数据
+func ClearSyncData() error {
+	// 删除所有同步记录
+	result := app.DB.Exec("DELETE FROM repoSyncRecords")
+	if result.Error != nil {
+		return fmt.Errorf("清空同步数据失败: %v", result.Error)
+	}
+
+	return nil
+}

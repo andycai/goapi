@@ -28,6 +28,7 @@ function reposyncManagement() {
         pageSize: 10,
         totalRecords: 0,
         totalPages: 1,
+        refreshLimit: 100,
 
         init() {
             this.loadConfig();
@@ -201,6 +202,50 @@ function reposyncManagement() {
                 'D': '删除'
             };
             return types[changeType] || changeType;
+        },
+
+        async refreshCommits() {
+            try {
+                const response = await fetch('/api/reposync/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ limit: this.refreshLimit })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '刷新提交记录失败');
+                }
+
+                await this.loadCommits();
+                Alpine.store('notification').show('刷新提交记录成功', 'success');
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
+        },
+
+        async clearSyncData() {
+            if (!confirm('确定要清空所有同步数据吗？此操作不可恢复！')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/reposync/clear', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '清空数据失败');
+                }
+
+                await this.loadCommits();
+                Alpine.store('notification').show('清空数据成功', 'success');
+            } catch (error) {
+                Alpine.store('notification').show(error.message, 'error');
+            }
         }
     };
 }

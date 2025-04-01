@@ -72,7 +72,16 @@
                 </div>
             </div>
             <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
-                <div>
+                <div class="space-x-3">
+                    <div class="inline-flex items-center space-x-2">
+                        <input type="number" x-model="refreshLimit" min="1" max="1000" class="w-20 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <button type="button" @click="refreshCommits" class="px-4 py-2 text-sm font-medium text-white bg-yellow-600 border border-transparent rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                            刷新提交
+                        </button>
+                    </div>
+                    <button type="button" @click="clearSyncData" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        清空数据
+                    </button>
                     <button type="button" @click="syncSelectedCommits" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         批量同步
                     </button>
@@ -84,6 +93,7 @@
                     <button type="button" @click="checkoutRepos" class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         检出仓库
                     </button>
+                </div>
             </div>
         </form>
     </div>
