@@ -26,4 +26,5 @@ const (
 	ModulePriorityBugTracker   = 8002 // 功能-Bug 跟踪
 	ModulePriorityNote         = 8003 // 功能-笔记
 	ModulePriorityCiTask       = 8004 // 功能-CI/CD 任务
+	ModulePriorityFund         = 8005 // 功能-基金
 )

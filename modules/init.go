@@ -5,6 +5,7 @@ import (
 	_ "github.com/andycai/unitool/modules/adminlog"   // 后台操作日志
 	_ "github.com/andycai/unitool/modules/browse"     // 浏览文件
 	_ "github.com/andycai/unitool/modules/citask"     // 构建任务
+	_ "github.com/andycai/unitool/modules/fund"       // 基金
 	_ "github.com/andycai/unitool/modules/gamelog"    // 游戏日志
 	_ "github.com/andycai/unitool/modules/login"      // 登录
 	_ "github.com/andycai/unitool/modules/menu"       // 菜单
