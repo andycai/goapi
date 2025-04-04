@@ -1064,10 +1064,9 @@ func RefreshCommits(limit int) error {
 
 // ClearSyncData 清空同步数据
 func ClearSyncData() error {
-	// 删除所有同步记录
-	result := app.DB.Exec("DELETE FROM repoSyncRecords")
-	if result.Error != nil {
-		return fmt.Errorf("清空同步数据失败: %v", result.Error)
+	// 使用 model 方式删除所有同步记录
+	if err := app.DB.Unscoped().Where("1 = 1").Delete(&models.RepoSyncRecord{}).Error; err != nil {
+		return fmt.Errorf("清空同步数据失败: %v", err)
 	}
 
 	return nil
