@@ -1,6 +1,6 @@
-# UnityTool
+# Goapi
 
-UnityTool is a comprehensive web-based management platform designed for Unity
+Goapi is a comprehensive web-based management platform designed for Unity
 game development teams. It provides a suite of tools and services to streamline
 the game development workflow, including version control management,
 configuration management, and development tools integration.
