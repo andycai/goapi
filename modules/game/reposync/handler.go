@@ -3,7 +3,7 @@ package reposync
 import (
 	"strconv"
 
-	"github.com/andycai/unitool/core/utility/path"
+	"github.com/andycai/goapi/core/utility/path"
 	"github.com/gofiber/fiber/v2"
 )
 

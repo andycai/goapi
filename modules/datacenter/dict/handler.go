@@ -3,7 +3,7 @@ package dict
 import (
 	"strconv"
 
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 )
 

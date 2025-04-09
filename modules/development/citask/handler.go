@@ -16,8 +16,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/andycai/unitool/models"
-	"github.com/andycai/unitool/modules/system/adminlog"
+	"github.com/andycai/goapi/models"
+	"github.com/andycai/goapi/modules/system/adminlog"
 	"github.com/gofiber/fiber/v2"
 	"github.com/robfig/cron/v3"
 	"golang.org/x/text/encoding/simplifiedchinese"

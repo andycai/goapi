@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andycai/unitool/core/utility/path"
-	"github.com/andycai/unitool/models"
-	"github.com/andycai/unitool/modules/interface/git"
-	"github.com/andycai/unitool/modules/interface/svn"
+	"github.com/andycai/goapi/core/utility/path"
+	"github.com/andycai/goapi/models"
+	"github.com/andycai/goapi/modules/interface/git"
+	"github.com/andycai/goapi/modules/interface/svn"
 )
 
 var config *RepoConfig
