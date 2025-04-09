@@ -1,0 +1,261 @@
+<div x-data="dictManagement()" class="space-y-6">
+    <!-- 字典类型管理 -->
+    <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">字典类型管理</h2>
+        <button @click="openAddTypeModal(); $dispatch('open-type-modal')" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            添加字典类型
+        </button>
+    </div>
+
+    <!-- 字典类型表格 -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">名称</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">类型</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">备注</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">创建时间</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    <template x-for="dictType in dictTypes" :key="dictType.id">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="dictType.id"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="dictType.name"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="dictType.type"></td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-white" x-text="dictType.remark || '-'"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="formatDate(dictType.created_at)"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <button @click="viewDictData(dictType.type, dictType.name)" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                        查看数据
+                                    </button>
+                                    <button @click="openEditTypeModal(dictType); $dispatch('open-type-modal')" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                        编辑
+                                    </button>
+                                    <button @click="deleteType(dictType.id)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                        删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 字典类型分页 -->
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <label class="text-sm text-gray-700 dark:text-gray-300">每页显示：</label>
+                <select x-model="typesPageSize" @change="changeTypePage(1)" class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 text-sm">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span class="text-sm text-gray-700 dark:text-gray-300">总记录数：<span x-text="totalTypeRecords"></span></span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button @click="changeTypePage(1)" :disabled="currentTypePage === 1" :class="{'opacity-50 cursor-not-allowed': currentTypePage === 1}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                    首页
+                </button>
+                <button @click="changeTypePage(currentTypePage - 1)" :disabled="currentTypePage === 1" :class="{'opacity-50 cursor-not-allowed': currentTypePage === 1}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                    上一页
+                </button>
+                <span class="text-sm text-gray-700 dark:text-gray-300">第 <span x-text="currentTypePage"></span> / <span x-text="typePages"></span> 页</span>
+                <button @click="changeTypePage(currentTypePage + 1)" :disabled="currentTypePage === typePages" :class="{'opacity-50 cursor-not-allowed': currentTypePage === typePages}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                    下一页
+                </button>
+                <button @click="changeTypePage(typePages)" :disabled="currentTypePage === typePages" :class="{'opacity-50 cursor-not-allowed': currentTypePage === typePages}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                    末页
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 字典数据管理 -->
+    <div x-show="showDictData" class="space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">字典数据管理 - <span x-text="currentDictTypeName + ' [' + currentDictType + ']'"></span></h2>
+            <button @click="openAddDataModal(); $dispatch('open-data-modal')" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                添加字典数据
+            </button>
+        </div>
+
+        <!-- 字典数据表格 -->
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">标签</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">值</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">排序</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">备注</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">创建时间</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                        <template x-for="data in dictData" :key="data.id">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="data.id"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="data.label"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="data.value"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="data.sort"></td>
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white" x-text="data.remark || '-'"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="formatDate(data.created_at)"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button @click="openEditDataModal(data); $dispatch('open-data-modal')" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                            编辑
+                                        </button>
+                                        <button @click="deleteData(data.id)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                            删除
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 字典数据分页 -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <label class="text-sm text-gray-700 dark:text-gray-300">每页显示：</label>
+                    <select x-model="dataPageSize" @change="changeDataPage(1)" class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 text-sm">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">总记录数：<span x-text="totalDataRecords"></span></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button @click="changeDataPage(1)" :disabled="currentDataPage === 1" :class="{'opacity-50 cursor-not-allowed': currentDataPage === 1}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                        首页
+                    </button>
+                    <button @click="changeDataPage(currentDataPage - 1)" :disabled="currentDataPage === 1" :class="{'opacity-50 cursor-not-allowed': currentDataPage === 1}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                        上一页
+                    </button>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">第 <span x-text="currentDataPage"></span> / <span x-text="dataPages"></span> 页</span>
+                    <button @click="changeDataPage(currentDataPage + 1)" :disabled="currentDataPage === dataPages" :class="{'opacity-50 cursor-not-allowed': currentDataPage === dataPages}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                        下一页
+                    </button>
+                    <button @click="changeDataPage(dataPages)" :disabled="currentDataPage === dataPages" :class="{'opacity-50 cursor-not-allowed': currentDataPage === dataPages}" class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                        末页
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 字典类型模态框 -->
+    <div id="typeModal" x-data="{ 
+        open: false, 
+        title: () => $data.typeModalAction === 'add' ? '添加字典类型' : '编辑字典类型'
+    }" x-show="open" @click.away="open = false" @open-type-modal.window="open = true" class="fixed inset-0 z-10 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" x-text="title()"></h3>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label for="typeName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">名称</label>
+                                    <input type="text" x-model="typeForm.name" id="typeName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label for="typeCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">类型编码</label>
+                                    <input type="text" x-model="typeForm.type" id="typeCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                    <div class="mt-1 text-sm text-gray-500">类型编码必须唯一</div>
+                                </div>
+                                <div>
+                                    <label for="typeRemark" class="block text-sm font-medium text-gray-700 dark:text-gray-300">备注</label>
+                                    <textarea x-model="typeForm.remark" id="typeRemark" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button @click="saveType()" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        保存
+                    </button>
+                    <button @click="open = false" x-ref="close" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 字典数据模态框 -->
+    <div id="dataModal" x-data="{ 
+        open: false, 
+        title: () => $data.dataModalAction === 'add' ? '添加字典数据' : '编辑字典数据'
+    }" x-show="open" @click.away="open = false" @open-data-modal.window="open = true" class="fixed inset-0 z-10 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" x-text="title()"></h3>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label for="dataType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">类型编码</label>
+                                    <input type="text" x-model="dataForm.type" id="dataType" readonly class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500">
+                                </div>
+                                <div>
+                                    <label for="dataLabel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">标签</label>
+                                    <input type="text" x-model="dataForm.label" id="dataLabel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label for="dataValue" class="block text-sm font-medium text-gray-700 dark:text-gray-300">值</label>
+                                    <input type="text" x-model="dataForm.value" id="dataValue" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label for="dataSort" class="block text-sm font-medium text-gray-700 dark:text-gray-300">排序</label>
+                                    <input type="number" x-model="dataForm.sort" id="dataSort" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label for="dataRemark" class="block text-sm font-medium text-gray-700 dark:text-gray-300">备注</label>
+                                    <textarea x-model="dataForm.remark" id="dataRemark" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button @click="saveData()" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        保存
+                    </button>
+                    <button @click="open = false" x-ref="close" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
