@@ -1,6 +1,6 @@
 package gamelog
 
-import "github.com/andycai/unitool/models"
+import "github.com/andycai/goapi/models"
 
 // LogReq 日志请求结构体
 type LogReq struct {

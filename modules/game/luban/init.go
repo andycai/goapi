@@ -1,8 +1,8 @@
 package luban
 
 import (
-	"github.com/andycai/unitool/core"
-	"github.com/andycai/unitool/enum"
+	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
 

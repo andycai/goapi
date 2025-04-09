@@ -3,7 +3,7 @@ package bugtracker
 import (
 	"errors"
 
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/models"
 )
 
 // createProject Create project methods

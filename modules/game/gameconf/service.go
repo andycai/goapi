@@ -10,7 +10,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/models"
 	"github.com/xuri/excelize/v2"
 	"gopkg.in/yaml.v3"
 )

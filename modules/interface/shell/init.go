@@ -1,8 +1,8 @@
 package shell
 
 import (
-	"github.com/andycai/unitool/core"
-	"github.com/andycai/unitool/enum"
+	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/enum"
 )
 
 var app *core.App

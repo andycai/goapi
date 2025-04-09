@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"

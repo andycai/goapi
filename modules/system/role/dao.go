@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/models"
 	"gorm.io/gorm"
 )
 

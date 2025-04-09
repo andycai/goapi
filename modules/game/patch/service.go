@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andycai/unitool/core/utility/path"
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/core/utility/path"
+	"github.com/andycai/goapi/models"
 )
 
 var config *PatchConfig

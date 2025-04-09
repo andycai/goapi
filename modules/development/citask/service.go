@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/models"
 	"github.com/robfig/cron/v3"
 )
 
