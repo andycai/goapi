@@ -2,8 +2,11 @@ package adminlog
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	ModulePriorityAdminLog = 1005 // 系统-管理员活动日志
 )
 
 var app *core.App
@@ -13,7 +16,7 @@ type adminlogModule struct {
 }
 
 func init() {
-	core.RegisterModule(&adminlogModule{}, enum.ModulePriorityAdminLog)
+	core.RegisterModule(&adminlogModule{}, ModulePriorityAdminLog)
 }
 
 func (m *adminlogModule) Awake(a *core.App) error {

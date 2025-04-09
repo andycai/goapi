@@ -2,8 +2,11 @@ package login
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	ModulePriorityLogin = 100 // 登录管理
 )
 
 var app *core.App
@@ -13,7 +16,7 @@ type loginModule struct {
 }
 
 func init() {
-	core.RegisterModule(&loginModule{}, enum.ModulePriorityLogin)
+	core.RegisterModule(&loginModule{}, ModulePriorityLogin)
 }
 
 func (m *loginModule) Awake(a *core.App) error {

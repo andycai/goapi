@@ -2,8 +2,11 @@ package role
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	ModulePriorityRole = 1001 // 系统-角色管理
 )
 
 var app *core.App
@@ -13,7 +16,7 @@ type roleModule struct {
 }
 
 func init() {
-	core.RegisterModule(&roleModule{}, enum.ModulePriorityRole)
+	core.RegisterModule(&roleModule{}, ModulePriorityRole)
 }
 
 func (m *roleModule) Awake(a *core.App) error {

@@ -2,8 +2,11 @@ package user
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	ModulePriorityUser = 1000 // 系统-用户管理
 )
 
 var app *core.App
@@ -13,7 +16,7 @@ type userModule struct {
 }
 
 func init() {
-	core.RegisterModule(&userModule{}, enum.ModulePriorityUser)
+	core.RegisterModule(&userModule{}, ModulePriorityUser)
 }
 
 func (m *userModule) Awake(a *core.App) error {

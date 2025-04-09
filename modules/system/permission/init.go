@@ -2,8 +2,11 @@ package permission
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	ModulePriorityPermission = 1002 // 系统-权限管理
 )
 
 var app *core.App
@@ -13,7 +16,7 @@ type permissionModule struct {
 }
 
 func init() {
-	core.RegisterModule(&permissionModule{}, enum.ModulePriorityPermission)
+	core.RegisterModule(&permissionModule{}, ModulePriorityPermission)
 }
 
 func (m *permissionModule) Awake(a *core.App) error {
