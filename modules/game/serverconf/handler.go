@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/andycai/unitool/modules/adminlog"
+	"github.com/andycai/unitool/modules/system/adminlog"
 	"github.com/gofiber/fiber/v2"
 )
 

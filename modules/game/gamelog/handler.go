@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/andycai/unitool/models"
-	"github.com/andycai/unitool/modules/adminlog"
+	"github.com/andycai/unitool/modules/system/adminlog"
 
 	"github.com/gofiber/fiber/v2"
 )

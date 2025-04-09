@@ -15,8 +15,8 @@ import (
 
 	"github.com/andycai/unitool/core/utility/path"
 	"github.com/andycai/unitool/models"
-	"github.com/andycai/unitool/modules/git"
-	"github.com/andycai/unitool/modules/svn"
+	"github.com/andycai/unitool/modules/interface/git"
+	"github.com/andycai/unitool/modules/interface/svn"
 )
 
 var config *RepoConfig
