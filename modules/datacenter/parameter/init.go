@@ -2,8 +2,11 @@ package parameter
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	ModulePriorityParameter = 2001 // 数据中心-参数管理
 )
 
 var app *core.App
@@ -13,7 +16,7 @@ type parameterModule struct {
 }
 
 func init() {
-	core.RegisterModule(&parameterModule{}, enum.ModulePriorityParameter)
+	core.RegisterModule(&parameterModule{}, ModulePriorityParameter)
 }
 
 func (m *parameterModule) Awake(a *core.App) error {

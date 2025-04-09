@@ -2,8 +2,11 @@ package dict
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	ModulePriorityDict = 2000 // 数据中心-字典管理
 )
 
 var app *core.App
@@ -13,8 +16,7 @@ type dictModule struct {
 }
 
 func init() {
-	// 使用权限管理的优先级+1，将字典模块放在权限管理模块之后
-	core.RegisterModule(&dictModule{}, enum.ModulePriorityPermission+1)
+	core.RegisterModule(&dictModule{}, ModulePriorityDict)
 }
 
 func (m *dictModule) Awake(a *core.App) error {
