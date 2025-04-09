@@ -318,13 +318,18 @@ func getSvnFileChanges(path, revision string) ([]FileChange, error) {
 	lines := strings.Split(string(output), "\n")
 	var prevRevision string
 	for _, line := range lines {
-		if strings.HasPrefix(line, "r") {
-			parts := strings.Split(line, " | ")
-			if len(parts) > 0 {
+		// 检查是否符合SVN日志格式：r123 | user | 2023-01-01 12:00:00 +0800
+		parts := strings.Split(line, " | ")
+		if len(parts) >= 3 {
+			// 检查版本号格式：r123
+			if strings.HasPrefix(parts[0], "r") && len(parts[0]) > 1 {
 				rev := strings.TrimPrefix(parts[0], "r")
-				if rev != revision {
-					prevRevision = rev
-					break
+				// 验证版本号是否为数字
+				if _, err := strconv.Atoi(rev); err == nil {
+					if rev != revision {
+						prevRevision = rev
+						break
+					}
 				}
 			}
 		}
