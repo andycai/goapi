@@ -83,7 +83,11 @@ func FindDuplicateGuids(targetPath, notificationURL string) (*FindGuidLog, error
 		log.Status = 2
 		log.Message = fmt.Sprintf("查找GUID失败: %v", err)
 		log.UpdatedAt = time.Now()
-		UpdateFindGuidLog(log)
+		UpdateFindGuidLog(log.ID, map[string]interface{}{
+			"status":     log.Status,
+			"message":    log.Message,
+			"updated_at": log.UpdatedAt,
+		})
 		return log, err
 	}
 
@@ -108,7 +112,11 @@ func FindDuplicateGuids(targetPath, notificationURL string) (*FindGuidLog, error
 			log.Status = 2
 			log.Message = fmt.Sprintf("保存重复GUID记录失败: %v", err)
 			log.UpdatedAt = time.Now()
-			UpdateFindGuidLog(log)
+			UpdateFindGuidLog(log.ID, map[string]interface{}{
+				"status":     log.Status,
+				"message":    log.Message,
+				"updated_at": log.UpdatedAt,
+			})
 			return log, err
 		}
 	}
@@ -123,7 +131,11 @@ func FindDuplicateGuids(targetPath, notificationURL string) (*FindGuidLog, error
 		log.Status = 2
 		log.Message = fmt.Sprintf("准备通知数据失败: %v", err)
 		log.UpdatedAt = time.Now()
-		UpdateFindGuidLog(log)
+		UpdateFindGuidLog(log.ID, map[string]interface{}{
+			"status":     log.Status,
+			"message":    log.Message,
+			"updated_at": log.UpdatedAt,
+		})
 		return log, err
 	}
 
@@ -133,7 +145,11 @@ func FindDuplicateGuids(targetPath, notificationURL string) (*FindGuidLog, error
 		log.Status = 2
 		log.Message = fmt.Sprintf("发送通知失败: %v", err)
 		log.UpdatedAt = time.Now()
-		UpdateFindGuidLog(log)
+		UpdateFindGuidLog(log.ID, map[string]interface{}{
+			"status":     log.Status,
+			"message":    log.Message,
+			"updated_at": log.UpdatedAt,
+		})
 		return log, err
 	}
 	defer resp.Body.Close()
@@ -143,7 +159,12 @@ func FindDuplicateGuids(targetPath, notificationURL string) (*FindGuidLog, error
 	log.DuplicateCount = len(duplicates)
 	log.Message = fmt.Sprintf("成功找到 %d 个重复的GUID", len(duplicates))
 	log.UpdatedAt = time.Now()
-	UpdateFindGuidLog(log)
+	UpdateFindGuidLog(log.ID, map[string]interface{}{
+		"status":          log.Status,
+		"duplicate_count": log.DuplicateCount,
+		"message":         log.Message,
+		"updated_at":      log.UpdatedAt,
+	})
 
 	return log, nil
 }
