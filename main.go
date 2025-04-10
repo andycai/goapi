@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andycai/unitool/core"
-	_ "github.com/andycai/unitool/docs" // 导入 swagger docs
-	"github.com/andycai/unitool/lib/database"
-	_ "github.com/andycai/unitool/modules"
+	"github.com/andycai/goapi/core"
+	_ "github.com/andycai/goapi/docs" // 导入 swagger docs
+	"github.com/andycai/goapi/lib/database"
+	_ "github.com/andycai/goapi/modules"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/swagger"
@@ -34,7 +34,7 @@ var (
 // @contact.email huayicai@gamil.com
 
 // @license.name MIT
-// @license.url https://github.com/andycai/unitool/blob/main/LICENSE
+// @license.url https://github.com/andycai/goapi/blob/main/LICENSE
 
 // @host localhost:3000
 // @BasePath /api/v1

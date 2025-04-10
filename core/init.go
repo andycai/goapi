@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/andycai/unitool/core/collections"
+	"github.com/andycai/goapi/core/collections"
 )
 
 type Module interface {

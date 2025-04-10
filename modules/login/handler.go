@@ -3,8 +3,8 @@ package login
 import (
 	"time"
 
-	"github.com/andycai/unitool/core"
-	"github.com/andycai/unitool/models"
+	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
