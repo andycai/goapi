@@ -19,6 +19,7 @@ import (
 	_ "github.com/andycai/unitool/modules/shell"      // 命令脚本执行
 	_ "github.com/andycai/unitool/modules/stats"      // 游戏计
 	_ "github.com/andycai/unitool/modules/unibuild"   // Unity构建
+	_ "github.com/andycai/unitool/modules/unitool"    // Unity工具
 	_ "github.com/andycai/unitool/modules/user"       // 用户
 	// _ "github.com/andycai/unitool/modules/bugtracker"
 	// _ "github.com/andycai/unitool/modules/filemanager"
