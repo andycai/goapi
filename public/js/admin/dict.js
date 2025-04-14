@@ -133,12 +133,19 @@ function dictManagement() {
         async saveType() {
             try {
                 const url = this.typeModalAction === 'add' ? '/api/dict/type/add' : '/api/dict/type/edit';
+                
+                // 确保id是整数
+                const formData = {
+                    ...this.typeForm,
+                    id: parseInt(this.typeForm.id, 10) || 0
+                };
+                
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.typeForm)
+                    body: JSON.stringify(formData)
                 });
 
                 if (!response.ok) {
@@ -168,7 +175,7 @@ function dictManagement() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id: id })
+                    body: JSON.stringify({ id: parseInt(id, 10) })
                 });
 
                 if (!response.ok) {
@@ -227,12 +234,20 @@ function dictManagement() {
         async saveData() {
             try {
                 const url = this.dataModalAction === 'add' ? '/api/dict/data/add' : '/api/dict/data/edit';
+                
+                // 确保id和sort是整数
+                const formData = {
+                    ...this.dataForm,
+                    id: parseInt(this.dataForm.id, 10) || 0,
+                    sort: parseInt(this.dataForm.sort, 10) || 0
+                };
+                
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.dataForm)
+                    body: JSON.stringify(formData)
                 });
 
                 if (!response.ok) {
@@ -262,7 +277,7 @@ function dictManagement() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id: id })
+                    body: JSON.stringify({ id: parseInt(id, 10) })
                 });
 
                 if (!response.ok) {

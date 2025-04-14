@@ -2,6 +2,7 @@ package modules
 
 // 新增的模块必须在这里进行导入，不然模块 init 方法不会执行
 import (
+	_ "github.com/andycai/goapi/modules/datacenter/dict"      // 字典
 	_ "github.com/andycai/goapi/modules/datacenter/parameter" // 参数配置
 	_ "github.com/andycai/goapi/modules/development/citask"   // 构建任务
 	_ "github.com/andycai/goapi/modules/game/browse"          // 浏览文件
@@ -20,7 +21,6 @@ import (
 	_ "github.com/andycai/goapi/modules/system/role"          // 角色
 	_ "github.com/andycai/goapi/modules/system/user"          // 用户
 	_ "github.com/andycai/goapi/modules/webapp/fund"          // 基金
-	// _ "github.com/andycai/goapi/modules/datacenter/dict"       // 字典
 	// _ "github.com/andycai/goapi/modules/development/bugtracker" // 缺陷管理
 	// _ "github.com/andycai/goapi/modules/knowledge/filemanager" // 文件管理
 	// _ "github.com/andycai/goapi/modules/knowledge/imagemanager" // 图片管理
