@@ -154,50 +154,66 @@ func getCommits(limit, page int) ([]CommitRecord, int, error) {
 		return nil, 0, errors.New("配置为空")
 	}
 
-	// 更新第一个仓库
-	err := updateRepo(
-		config.RepoType1,
-		config.LocalPath1,
-		config.Username1,
-		config.Password1,
-	)
-	if err != nil {
-		return nil, 0, fmt.Errorf("更新第一个仓库失败: %v", err)
-	}
-
-	// 获取提交记录
-	commits, err := getRepoCommits(
-		config.RepoType1,
-		config.LocalPath1,
-		limit*5, // 获取更多记录以便分页
-	)
-	if err != nil {
-		return nil, 0, fmt.Errorf("获取提交记录失败: %v", err)
-	}
-
-	// 获取同步状态
-	for i := range commits {
-		var record models.RepoSyncRecord
-		result := app.DB.Where("revision = ?", commits[i].Revision).First(&record)
-		if result.Error == nil {
-			commits[i].Synced = record.Status == 1 // 1表示同步成功
-		}
-	}
+	// 直接从数据库获取同步记录
+	var records []models.RepoSyncRecord
+	var total int64
 
 	// 获取总记录数
-	totalCount := len(commits)
-
-	// 分页
-	start := (page - 1) * limit
-	end := start + limit
-	if start >= totalCount {
-		return []CommitRecord{}, totalCount, nil
-	}
-	if end > totalCount {
-		end = totalCount
+	if err := app.DB.Model(&models.RepoSyncRecord{}).Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("获取提交记录总数失败: %v", err)
 	}
 
-	return commits[start:end], totalCount, nil
+	// 分页查询，按照创建时间倒序排列
+	offset := (page - 1) * limit
+	if err := app.DB.Order("id DESC").Offset(offset).Limit(limit).Find(&records).Error; err != nil {
+		return nil, 0, fmt.Errorf("查询提交记录失败: %v", err)
+	}
+
+	// 转换为CommitRecord格式
+	commits := make([]CommitRecord, 0, len(records))
+	for _, record := range records {
+		// 解析受影响的文件列表
+		var changedFiles []FileChange
+		if record.AffectedFiles != "" {
+			// 格式为 "A:file1.txt,file2.txt;M:file3.txt,file4.txt;D:file5.txt"
+			sections := strings.Split(record.AffectedFiles, ";")
+			for _, section := range sections {
+				parts := strings.SplitN(section, ":", 2)
+				if len(parts) != 2 {
+					continue
+				}
+
+				changeType := parts[0]
+				fileList := strings.Split(parts[1], ",")
+
+				// 处理可能带有省略号和计数的情况
+				lastFile := fileList[len(fileList)-1]
+				if strings.Contains(lastFile, "...（共") {
+					fileList = fileList[:len(fileList)-1]
+				}
+
+				for _, file := range fileList {
+					changedFiles = append(changedFiles, FileChange{
+						Path:       file,
+						ChangeType: changeType,
+					})
+				}
+			}
+		}
+
+		commit := CommitRecord{
+			Revision:       record.Revision,
+			Comment:        record.Comment,
+			Author:         record.Author,
+			Time:           record.SyncTime,
+			Synced:         record.Status == 1, // 1表示同步成功
+			AffectedIssues: record.AffectedIssues,
+			ChangedFiles:   changedFiles,
+		}
+		commits = append(commits, commit)
+	}
+
+	return commits, int(total), nil
 }
 
 // updateRepo 更新仓库
@@ -1092,6 +1108,21 @@ func RefreshCommits(limit int) error {
 	if err != nil {
 		return fmt.Errorf("获取提交记录失败: %v", err)
 	}
+
+	// 对提交记录按照 revision 从小到大排序
+	sort.Slice(commits, func(i, j int) bool {
+		// 尝试将版本号转换为数字进行比较
+		numI, errI := strconv.Atoi(commits[i].Revision)
+		numJ, errJ := strconv.Atoi(commits[j].Revision)
+
+		// 如果两个都是数字，按数字大小排序
+		if errI == nil && errJ == nil {
+			return numI < numJ
+		}
+
+		// 如果不是数字，按字符串排序
+		return commits[i].Revision < commits[j].Revision
+	})
 
 	// 遍历提交记录，将未同步的记录添加到数据库
 	for _, commit := range commits {

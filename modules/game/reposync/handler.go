@@ -1,9 +1,11 @@
 package reposync
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/andycai/goapi/core/utility/path"
+	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -56,26 +58,37 @@ func checkoutHandler(c *fiber.Ctx) error {
 // listCommitsHandler 获取提交记录列表
 func listCommitsHandler(c *fiber.Ctx) error {
 	// 获取分页参数
-	limit, err := strconv.Atoi(c.Query("limit", "10"))
-	if err != nil || limit <= 0 {
-		limit = 10
-	}
-
 	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil || page <= 0 {
+	if err != nil || page < 1 {
 		page = 1
 	}
 
-	commits, totalCount, err := getCommits(limit, page)
+	pageSize, err := strconv.Atoi(c.Query("pageSize", "10"))
+	if err != nil || pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
+
+	// 获取提交记录
+	commits, total, err := getCommits(pageSize, page)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "获取提交记录失败: " + err.Error(),
+			"error": fmt.Sprintf("获取提交记录失败: %v", err),
 		})
 	}
 
+	// 添加受影响的问题列表
+	for i := range commits {
+		// 从数据库获取问题列表
+		var record models.RepoSyncRecord
+		if app.DB.Where("revision = ?", commits[i].Revision).First(&record).Error == nil {
+			commits[i].AffectedIssues = record.AffectedIssues
+		}
+	}
+
+	// 返回响应
 	return c.JSON(fiber.Map{
 		"commits": commits,
-		"total":   totalCount,
+		"total":   total,
 	})
 }
 

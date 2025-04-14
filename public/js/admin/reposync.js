@@ -29,6 +29,7 @@ function reposyncManagement() {
         totalRecords: 0,
         totalPages: 1,
         refreshLimit: 100,
+        openFileLists: new Set(), // 跟踪哪些提交的文件列表是展开的
 
         init() {
             this.loadConfig();
@@ -97,6 +98,7 @@ function reposyncManagement() {
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
                 this.selectedCommits = [];
                 this.selectAll = false;
+                this.openFileLists = new Set(); // 重置打开的文件列表
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
             }
@@ -202,6 +204,26 @@ function reposyncManagement() {
                 'D': '删除'
             };
             return types[changeType] || changeType;
+        },
+        
+        // 根据类型获取文件列表
+        getFilesByType(files, type) {
+            if (!files) return [];
+            return files.filter(file => file.change_type === type);
+        },
+        
+        // 切换文件列表的显示状态
+        toggleFileList(revision) {
+            if (this.openFileLists.has(revision)) {
+                this.openFileLists.delete(revision);
+            } else {
+                this.openFileLists.add(revision);
+            }
+        },
+        
+        // 检查文件列表是否打开
+        isFileListOpen(revision) {
+            return this.openFileLists.has(revision);
         },
 
         async refreshCommits() {
