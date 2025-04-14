@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -608,11 +609,13 @@ func syncCommit(commit CommitRecord) error {
 	if err != nil {
 		// 记录同步失败状态
 		app.DB.Create(&models.RepoSyncRecord{
-			Revision: commit.Revision,
-			Comment:  commit.Comment,
-			Author:   commit.Author,
-			SyncTime: time.Now(),
-			Status:   2, // 同步失败
+			Revision:       commit.Revision,
+			Comment:        commit.Comment,
+			Author:         commit.Author,
+			AffectedIssues: extractIssueNumbers(commit.Comment),
+			AffectedFiles:  formatAffectedFiles(commit.ChangedFiles),
+			SyncTime:       time.Now(),
+			Status:         2, // 同步失败
 		})
 		return fmt.Errorf("获取变更文件列表失败: %v", err)
 	}
@@ -693,13 +696,21 @@ func syncCommit(commit CommitRecord) error {
 		return err
 	}
 
+	// 解析问题编号
+	affectedIssues := extractIssueNumbers(commit.Comment)
+
+	// 格式化受影响的文件
+	affectedFiles := formatAffectedFiles(changes)
+
 	// 记录同步成功状态
 	err = app.DB.Create(&models.RepoSyncRecord{
-		Revision: commit.Revision,
-		Comment:  commit.Comment,
-		Author:   commit.Author,
-		SyncTime: time.Now(),
-		Status:   1, // 同步成功
+		Revision:       commit.Revision,
+		Comment:        commit.Comment,
+		Author:         commit.Author,
+		AffectedIssues: affectedIssues,
+		AffectedFiles:  affectedFiles,
+		SyncTime:       time.Now(),
+		Status:         1, // 同步成功
 	}).Error
 
 	if err != nil {
@@ -1015,6 +1026,46 @@ func FindUnsyncedRevisionRange() (string, string, error) {
 	return minRev, maxRev, nil
 }
 
+// formatAffectedFiles 格式化受影响的文件列表
+func formatAffectedFiles(changes []FileChange) string {
+	if len(changes) == 0 {
+		return ""
+	}
+
+	// 按类型分组文件
+	filesByType := make(map[string][]string)
+	for _, change := range changes {
+		filesByType[change.ChangeType] = append(filesByType[change.ChangeType], change.Path)
+	}
+
+	// 构建格式化的字符串
+	var parts []string
+
+	// 按照A（新增）、M（修改）、D（删除）的顺序处理
+	changeTypes := []string{"A", "M", "D"}
+	for _, changeType := range changeTypes {
+		files := filesByType[changeType]
+		if len(files) > 0 {
+			// 最多显示10个文件，避免字符串过长
+			displayCount := len(files)
+			if displayCount > 10 {
+				displayCount = 10
+			}
+
+			formattedPart := fmt.Sprintf("%s:%s", changeType, strings.Join(files[:displayCount], ","))
+
+			// 如果有更多文件，添加省略标记
+			if len(files) > 10 {
+				formattedPart += fmt.Sprintf("...（共%d个）", len(files))
+			}
+
+			parts = append(parts, formattedPart)
+		}
+	}
+
+	return strings.Join(parts, ";")
+}
+
 // RefreshCommits 刷新提交记录
 func RefreshCommits(limit int) error {
 	if config == nil {
@@ -1048,23 +1099,106 @@ func RefreshCommits(limit int) error {
 		var record models.RepoSyncRecord
 		result := app.DB.Where("revision = ?", commit.Revision).First(&record)
 
+		// 解析提交消息中的问题编号
+		affectedIssues := extractIssueNumbers(commit.Comment)
+
+		// 获取变更文件列表并格式化
+		var affectedFiles string
+		if len(commit.ChangedFiles) > 0 {
+			affectedFiles = formatAffectedFiles(commit.ChangedFiles)
+		} else {
+			// 如果提交记录中没有变更文件信息，尝试从仓库获取
+			changes, err := getFileChanges(
+				config.RepoType1,
+				config.LocalPath1,
+				commit.Revision,
+			)
+			if err == nil && len(changes) > 0 {
+				affectedFiles = formatAffectedFiles(changes)
+			}
+		}
+
 		if result.Error != nil { // 未找到记录，说明未同步
 			// 创建新记录
 			err = app.DB.Create(&models.RepoSyncRecord{
-				Revision: commit.Revision,
-				Comment:  commit.Comment,
-				Author:   commit.Author,
-				SyncTime: time.Now(),
-				Status:   0, // 未同步状态
+				Revision:       commit.Revision,
+				Comment:        commit.Comment,
+				Author:         commit.Author,
+				SyncTime:       time.Now(),
+				Status:         0, // 未同步状态
+				AffectedIssues: affectedIssues,
+				AffectedFiles:  affectedFiles,
 			}).Error
 
 			if err != nil {
 				return fmt.Errorf("创建同步记录失败: %v", err)
 			}
+		} else {
+			// 需要更新的字段
+			updates := make(map[string]interface{})
+
+			// 更新问题列表（如果为空且新解析出的不为空）
+			if record.AffectedIssues == "" && affectedIssues != "" {
+				updates["affected_issues"] = affectedIssues
+			}
+
+			// 更新文件列表（如果为空且新解析出的不为空）
+			if record.AffectedFiles == "" && affectedFiles != "" {
+				updates["affected_files"] = affectedFiles
+			}
+
+			// 如果有需要更新的字段
+			if len(updates) > 0 {
+				err = app.DB.Model(&record).Updates(updates).Error
+				if err != nil {
+					return fmt.Errorf("更新同步记录失败: %v", err)
+				}
+			}
 		}
 	}
 
 	return nil
+}
+
+// extractIssueNumbers 从提交消息中提取问题编号
+// 支持格式: #123, fix #123, close #123, fixed #123, closes #123, JIRA-123, BUG-123, ISSUE-123
+func extractIssueNumbers(comment string) string {
+	var issues []string
+
+	// 匹配 #123 格式
+	hashTagRegex := regexp.MustCompile(`#(\d+)`)
+	hashMatches := hashTagRegex.FindAllStringSubmatch(comment, -1)
+	for _, match := range hashMatches {
+		if len(match) > 1 {
+			issues = append(issues, "#"+match[1])
+		}
+	}
+
+	// 匹配 JIRA-123, BUG-123, ISSUE-123 等格式
+	issueKeyRegex := regexp.MustCompile(`(JIRA|BUG|ISSUE|TASK)-(\d+)`)
+	keyMatches := issueKeyRegex.FindAllStringSubmatch(comment, -1)
+	for _, match := range keyMatches {
+		if len(match) > 2 {
+			issues = append(issues, match[1]+"-"+match[2])
+		}
+	}
+
+	// 去重
+	uniqueIssues := make(map[string]bool)
+	var result []string
+	for _, issue := range issues {
+		if !uniqueIssues[issue] {
+			uniqueIssues[issue] = true
+			result = append(result, issue)
+		}
+	}
+
+	// 最多保存前5个问题编号
+	if len(result) > 5 {
+		result = result[:5]
+	}
+
+	return strings.Join(result, ", ")
 }
 
 // ClearSyncData 清空同步数据
