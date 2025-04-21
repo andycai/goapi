@@ -27,5 +27,6 @@ const (
 	ModulePriorityNote         = 8003 // 功能-笔记
 	ModulePriorityCiTask       = 8004 // 功能-CI/CD 任务
 	ModulePriorityFund         = 8005 // 功能-基金
-	ModulePriorityUnitool      = 8006 // 功能-Uniy工具
+	ModulePriorityUnitool      = 8006 // 功能-Unity工具
+	ModulePriorityCommand      = 8007 // 功能-命令行
 )
