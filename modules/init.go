@@ -6,6 +6,7 @@ import (
 	_ "github.com/andycai/goapi/modules/datacenter/parameter" // 参数配置
 	_ "github.com/andycai/goapi/modules/development/citask"   // 构建任务
 	_ "github.com/andycai/goapi/modules/game/browse"          // 浏览文件
+	_ "github.com/andycai/goapi/modules/game/channel"         // 渠道
 	_ "github.com/andycai/goapi/modules/game/gamelog"         // 游戏日志
 	_ "github.com/andycai/goapi/modules/game/patch"           // 补丁管理
 	_ "github.com/andycai/goapi/modules/game/reposync"        // 仓库文件同步
@@ -20,7 +21,7 @@ import (
 	_ "github.com/andycai/goapi/modules/system/permission"    // 权限
 	_ "github.com/andycai/goapi/modules/system/role"          // 角色
 	_ "github.com/andycai/goapi/modules/system/user"          // 用户
-	_ "github.com/andycai/goapi/modules/webapp/fund"          // 基金
+	// _ "github.com/andycai/goapi/modules/webapp/fund"          // 基金
 	// _ "github.com/andycai/goapi/modules/development/bugtracker" // 缺陷管理
 	// _ "github.com/andycai/goapi/modules/knowledge/filemanager" // 文件管理
 	// _ "github.com/andycai/goapi/modules/knowledge/imagemanager" // 图片管理

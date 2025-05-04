@@ -42,12 +42,12 @@ function channelManagement() {
 
         async loadChannels() {
             try {
-                const response = await fetch(`/api/channels?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/channel/list?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) {
                     throw new Error('Failed to load channels');
                 }
                 const data = await response.json();
-                this.channels = data.data;
+                this.channels = data.channels;
                 this.totalRecords = data.total;
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
@@ -58,7 +58,7 @@ function channelManagement() {
 
         async createChannel() {
             try {
-                const response = await fetch('/api/channels', {
+                const response = await fetch('/api/channel', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ function channelManagement() {
 
         async updateChannel() {
             try {
-                const response = await fetch(`/api/channels/${this.editingChannel.id}`, {
+                const response = await fetch(`/api/channel/${this.editingChannel.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ function channelManagement() {
             }
 
             try {
-                const response = await fetch(`/api/channels/${id}`, {
+                const response = await fetch(`/api/channel/${id}`, {
                     method: 'DELETE'
                 });
 
