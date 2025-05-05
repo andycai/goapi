@@ -1,12 +1,11 @@
 // Menu management functionality
 function menuManagement() {
     return {
-        menuTree: [],
+        menus: [],
         parentMenus: [],
-        showModal: false,
-        editMode: false,
-        currentMenu: null,
-        form: {
+        currentMenu: {
+            id: 0,
+            menu_id: 0,
             parent_id: 0,
             name: '',
             path: '',
@@ -15,10 +14,33 @@ function menuManagement() {
             sort: 0,
             is_show: true
         },
+        showPanel: false,
+        isEditing: false,
+        panelTitle: '新建菜单',
         loading: false,
 
+        init() {
+            this.loadMenus();
+        },
+
+        async loadMenus() {
+            try {
+                const treeResponse = await fetch('/api/admin/menus/tree');
+                if (!treeResponse.ok) throw new Error('获取菜单树失败');
+                this.menus = await treeResponse.json();
+
+                const response = await fetch('/api/admin/menus');
+                if (!response.ok) throw new Error('获取菜单列表失败');
+                const menus = await response.json();
+                this.parentMenus = menus.filter(menu => menu.parent_id === 0);
+            } catch (error) {
+                console.error('Error loading menus:', error);
+                ShowError('加载菜单失败');
+            }
+        },
+
         get flattenedMenus() {
-            if (!this.menuTree || !Array.isArray(this.menuTree) || this.menuTree.length === 0) {
+            if (!this.menus || !Array.isArray(this.menus) || this.menus.length === 0) {
                 return [];
             }
             
@@ -34,33 +56,13 @@ function menuManagement() {
                 }
             };
             
-            this.menuTree.forEach(menuNode => processMenu(menuNode));
+            this.menus.forEach(menuNode => processMenu(menuNode));
             return flattened;
         },
 
-        init() {
-            this.fetchMenus();
-        },
-
-        async fetchMenus() {
-            try {
-                const treeResponse = await fetch('/api/admin/menus/tree');
-                if (!treeResponse.ok) throw new Error('获取菜单树失败');
-                this.menuTree = await treeResponse.json();
-
-                const response = await fetch('/api/admin/menus');
-                if (!response.ok) throw new Error('获取菜单列表失败');
-                const menus = await response.json();
-                this.parentMenus = menus.filter(menu => menu.parent_id === 0);
-            } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
-            }
-        },
-
-        createMenu() {
-            this.editMode = false;
-            this.currentMenu = null;
-            this.form = {
+        openCreatePanel() {
+            this.currentMenu = {
+                menu_id: 0,
                 parent_id: 0,
                 name: '',
                 path: '',
@@ -69,91 +71,86 @@ function menuManagement() {
                 sort: 0,
                 is_show: true
             };
-            this.showModal = true;
+            this.isEditing = false;
+            this.panelTitle = '新建菜单';
+            this.showPanel = true;
         },
 
         editMenu(menu) {
-            this.editMode = true;
-            this.currentMenu = menu;
-            this.form = {
-                parent_id: menu.parent_id,
-                name: menu.name,
-                path: menu.path,
-                icon: menu.icon,
-                permission: menu.permission,
-                sort: menu.sort,
-                is_show: menu.is_show
-            };
-            this.showModal = true;
+            this.currentMenu = { ...menu };
+            this.isEditing = true;
+            this.panelTitle = '编辑菜单';
+            this.showPanel = true;
         },
 
-        closeModal() {
-            this.showModal = false;
-            this.editMode = false;
-            this.currentMenu = null;
-            this.form = {
-                parent_id: 0,
-                name: '',
-                path: '',
-                icon: '',
-                permission: '',
-                sort: 0,
-                is_show: true
-            };
+        closePanel() {
+            this.showPanel = false;
         },
 
-        async submitForm() {
-            if (this.loading) return;
-            this.loading = true;
-
+        async createMenu() {
             try {
-                const url = this.editMode ? `/api/admin/menus/${this.currentMenu.id}` : '/api/admin/menus';
-                const method = this.editMode ? 'PUT' : 'POST';
-                
-                const response = await fetch(url, {
-                    method,
+                this.loading = true;
+                const response = await fetch('/api/admin/menus', {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.form)
+                    body: JSON.stringify(this.currentMenu)
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || '操作失败');
-                }
-
-                Alpine.store('notification').show(
-                    this.editMode ? '菜单更新成功' : '菜单创建成功',
-                    'success'
-                );
-                this.closeModal();
-                this.fetchMenus();
+                if (!response.ok) throw new Error('Failed to create menu');
+                
+                await this.loadMenus();
+                this.closePanel();
+                ShowMessage('菜单创建成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                console.error('Error creating menu:', error);
+                ShowError('创建菜单失败');
             } finally {
                 this.loading = false;
             }
         },
 
-        async deleteMenu(id) {
-            if (!confirm('确定要删除这个菜单吗？如果是父级菜单，其下的子菜单也会被删除。')) return;
+        async updateMenu() {
+            try {
+                this.loading = true;
+                const response = await fetch(`/api/admin/menus/${this.currentMenu.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.currentMenu)
+                });
+
+                if (!response.ok) throw new Error('Failed to update menu');
+                
+                await this.loadMenus();
+                this.closePanel();
+                ShowMessage('菜单更新成功');
+            } catch (error) {
+                console.error('Error updating menu:', error);
+                ShowError('更新菜单失败');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async deleteMenu(menuId) {
+            if (!confirm('确定要删除这个菜单吗？')) return;
 
             try {
-                const response = await fetch(`/api/admin/menus/${id}`, {
+                const response = await fetch(`/api/admin/menus/${menuId}`, {
                     method: 'DELETE'
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || '删除失败');
-                }
-
-                Alpine.store('notification').show('菜单删除成功', 'success');
-                this.fetchMenus();
+                if (!response.ok) throw new Error('Failed to delete menu');
+                
+                await this.loadMenus();
+                ShowMessage('菜单删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                console.error('Error deleting menu:', error);
+                ShowError('删除菜单失败');
             }
         }
-    }
+    };
 } 

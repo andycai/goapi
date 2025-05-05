@@ -422,7 +422,7 @@ func (d *MenuDao) BuildMenuTree(menus []*models.Menu, parentID uint) []*MenuTree
 		if menu.ParentID == parentID {
 			node := &MenuTree{
 				Menu:     menu,
-				Children: d.BuildMenuTree(menus, menu.ID),
+				Children: d.BuildMenuTree(menus, menu.MenuID),
 			}
 			tree = append(tree, node)
 		}

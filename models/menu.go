@@ -9,6 +9,7 @@ import (
 // Menu 菜单模型
 type Menu struct {
 	ID         uint           `gorm:"primarykey" json:"id"`
+	MenuID     uint           `gorm:"index" json:"menu_id"`          // 菜单ID，0表示根菜单
 	ParentID   uint           `gorm:"index" json:"parent_id"`        // 父菜单ID，0表示根菜单
 	Name       string         `gorm:"size:50;not null" json:"name"`  // 菜单名称
 	Path       string         `gorm:"size:100;not null" json:"path"` // 菜单路径
