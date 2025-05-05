@@ -66,49 +66,49 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-            </div>
+                </div>
             <form @submit.prevent="isEditing ? updateUser() : createUser()">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">用户名</label>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">用户名</label>
                         <input type="text" x-model="currentUser.username" 
                                :disabled="isEditing"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">密码</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">密码</label>
                         <input type="password" x-model="currentUser.password" 
                                :placeholder="isEditing ? '不修改请留空' : ''"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">昵称</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">昵称</label>
                         <input type="text" x-model="currentUser.nickname" 
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">角色</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">角色</label>
                         <select x-model.number="currentUser.role_id" 
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                            <option value="">请选择角色</option>
-                            <template x-for="role in roles" :key="role.id">
-                                <option :value="role.id" x-text="role.name"></option>
-                            </template>
-                        </select>
-                    </div>
+                                    <option value="">请选择角色</option>
+                                    <template x-for="role in roles" :key="role.id">
+                                        <option :value="role.id" x-text="role.name"></option>
+                                    </template>
+                                </select>
+                            </div>
                     <div x-show="isEditing">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">状态</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">状态</label>
                         <select x-model.number="currentUser.status" 
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                            <option :value="1">启用</option>
-                            <option :value="0">禁用</option>
-                        </select>
-                    </div>
+                                    <option :value="1">启用</option>
+                                    <option :value="0">禁用</option>
+                                </select>
+                            </div>
                     <div class="pt-4">
                         <button type="submit" class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             <span x-text="isEditing ? '保存' : '创建'"></span>
-                        </button>
-                    </div>
+                            </button>
+                        </div>
                 </div>
             </form>
         </div>

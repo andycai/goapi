@@ -1,6 +1,7 @@
 package channel
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -336,6 +337,95 @@ func removeServerFromGroupHandler(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "移除成功",
+	})
+}
+
+func updateServerGroupServerHandler(c *fiber.Ctx) error {
+	groupId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的分组ID",
+		})
+	}
+
+	groupServerId, err := strconv.Atoi(c.Params("groupServerId"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的服务器组服务器ID",
+		})
+	}
+
+	var data map[string]interface{}
+	if err := c.BodyParser(&data); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的请求数据",
+		})
+	}
+
+	// Validate required fields
+	requiredFields := []string{"physical_server_id", "server_id", "name", "server_status", "available", "merge_id"}
+	for _, field := range requiredFields {
+		if _, exists := data[field]; !exists {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": fmt.Sprintf("缺少必要字段: %s", field),
+			})
+		}
+	}
+
+	physicalServerId, ok := data["physical_server_id"].(float64)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的物理服务器ID类型",
+		})
+	}
+
+	// Convert types
+	serverId, ok := data["server_id"].(float64)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的服务器ID类型",
+		})
+	}
+
+	serverStatus, ok := data["server_status"].(float64)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的服务器状态类型",
+		})
+	}
+
+	available, ok := data["available"].(bool)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的可用状态类型",
+		})
+	}
+
+	mergeId, ok := data["merge_id"].(float64)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的合并ID类型",
+		})
+	}
+
+	// Create update data map
+	updateData := map[string]interface{}{
+		"physical_server_id": uint(physicalServerId),
+		"server_id":          uint(serverId),
+		"name":               data["name"].(string),
+		"server_status":      uint(serverStatus),
+		"available":          available,
+		"merge_id":           uint(mergeId),
+	}
+
+	if err := UpdateServerGroupServer(uint(groupId), uint(groupServerId), updateData); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "更新服务器组服务器失败: " + err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "更新成功",
 	})
 }
 

@@ -64,38 +64,38 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-            </div>
+                </div>
             <form @submit.prevent="isEditing ? updateRole() : createRole()">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">角色名称</label>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">角色名称</label>
                         <input type="text" x-model="currentRole.name" 
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">描述</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">描述</label>
                         <input type="text" x-model="currentRole.description" 
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">权限</label>
-                        <div class="grid grid-cols-4 gap-4">
-                            <template x-for="perm in permissions" :key="perm.id">
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" 
-                                           :value="perm.id"
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">权限</label>
+                                <div class="grid grid-cols-4 gap-4">
+                                    <template x-for="perm in permissions" :key="perm.id">
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" 
+                                                   :value="perm.id"
                                            x-model="currentRole.permissions"
                                            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300" x-text="perm.name"></span>
-                                </label>
-                            </template>
-                        </div>
-                    </div>
+                                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300" x-text="perm.name"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
                     <div class="pt-4">
                         <button type="submit" class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             <span x-text="isEditing ? '保存' : '创建'"></span>
-                        </button>
-                    </div>
+                            </button>
+                        </div>
                 </div>
             </form>
         </div>

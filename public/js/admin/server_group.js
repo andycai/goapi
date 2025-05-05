@@ -138,10 +138,74 @@ function serverGroupManagement() {
                     throw new Error('Failed to load group servers');
                 }
                 const data = await response.json();
-                this.groupServers = data.data;
+                this.groupServers = data.data.map(server => ({
+                    ...server,
+                    isEditing: false,
+                    editData: {
+                        server_id: server.server_id,
+                        name: server.name,
+                        server_status: server.server_status,
+                        available: server.available,
+                        merge_id: server.merge_id
+                    }
+                }));
             } catch (error) {
                 console.error('Error loading group servers:', error);
                 ShowError('加载服务器组中的服务器失败');
+            }
+        },
+
+        startEditServer(server) {
+            server.isEditing = true;
+            server.editData = {
+                physical_server_id: server.physical_server_id,
+                server_id: server.server_id,
+                name: server.name,
+                server_status: server.server_status,
+                available: server.available,
+                merge_id: server.merge_id
+            };
+        },
+
+        cancelEditServer(server) {
+            server.isEditing = false;
+        },
+
+        async saveServerEdit(server) {
+            try {
+                const editData = {
+                    physical_server_id: parseInt(server.editData.physical_server_id),
+                    server_id: parseInt(server.editData.server_id),
+                    name: server.editData.name,
+                    server_status: parseInt(server.editData.server_status),
+                    available: server.editData.available === 'true' || server.editData.available === true,
+                    merge_id: parseInt(server.editData.merge_id)
+                };
+
+                const response = await fetch(`/api/admin/server_groups/${this.currentServerGroup.id}/servers/${server.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(editData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update server');
+                }
+
+                // Update local data
+                server.physical_server_id = editData.physical_server_id;
+                server.server_id = editData.server_id;
+                server.name = editData.name;
+                server.server_status = editData.server_status;
+                server.available = editData.available;
+                server.merge_id = editData.merge_id;
+                server.isEditing = false;
+                ShowMessage('更新服务器成功');
+            } catch (error) {
+                console.error('Error updating server:', error);
+                ShowError('更新服务器失败');
             }
         },
 

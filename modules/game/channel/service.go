@@ -182,3 +182,49 @@ func UpdateAnnouncementWithValidation(id uint, data map[string]interface{}) erro
 
 	return UpdateAnnouncement(id, data)
 }
+
+// UpdateServerGroupServer 更新服务器组中的服务器记录
+func UpdateServerGroupServer(groupID uint, groupServerID uint, data map[string]interface{}) error {
+	// 验证服务器组是否存在
+	if _, err := GetServerGroupByID(groupID); err != nil {
+		return errors.New("服务器组不存在")
+	}
+
+	// 验证服务器记录是否存在
+	var server ServerGroupServer
+	if err := app.DB.Where("id = ? AND group_id = ?", groupServerID, groupID).First(&server).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return errors.New("服务器记录不存在")
+		}
+		return err
+	}
+
+	// 如果更新了 server_id，需要验证新的物理服务器是否存在
+	if serverIDValue, ok := data["server_id"]; ok {
+		physicalServerIDValue, ok := data["physical_server_id"]
+		if !ok {
+			return errors.New("物理服务器ID不能为空")
+		}
+
+		physicalServerID := physicalServerIDValue.(uint)
+		serverID := serverIDValue.(uint)
+		if _, err := GetPhysicalServerByID(physicalServerID); err != nil {
+			return errors.New("物理服务器不存在")
+		}
+
+		// 验证新的服务器ID是否已经在同一分组中的其他记录中使用
+		var count int64
+		if err := app.DB.Model(&ServerGroupServer{}).
+			Where("group_id = ? AND server_id = ? AND id != ?", groupID, serverID, groupServerID).
+			Count(&count).Error; err != nil {
+			return err
+		}
+
+		if count > 0 {
+			return errors.New("该服务器已存在于该分组中")
+		}
+	}
+
+	// 更新记录
+	return app.DB.Model(&server).Updates(data).Error
+}

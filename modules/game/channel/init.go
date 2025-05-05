@@ -100,6 +100,7 @@ func (m *channelModule) AddAuthRouters() error {
 	app.RouterAdminApi.Get("/server_groups/:id/servers", app.HasPermission("server:view"), getServerGroupServersHandler)
 	app.RouterAdminApi.Post("/server_groups/:id/servers/:serverId", app.HasPermission("server:manage"), addServerToGroupHandler)
 	app.RouterAdminApi.Delete("/server_groups/:id/servers/:serverId", app.HasPermission("server:manage"), removeServerFromGroupHandler)
+	app.RouterAdminApi.Put("/server_groups/:id/servers/:groupServerId", app.HasPermission("server:manage"), updateServerGroupServerHandler)
 
 	// 公告相关
 	app.RouterAdminApi.Get("/announcements", app.HasPermission("announcement:view"), getAnnouncementsHandler)

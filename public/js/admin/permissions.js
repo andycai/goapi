@@ -120,7 +120,7 @@ function permissionManagement() {
                 });
 
                 if (!response.ok) throw new Error('删除权限失败');
-                
+
                 await this.loadPermissions();
                 ShowMessage('权限删除成功');
             } catch (error) {
