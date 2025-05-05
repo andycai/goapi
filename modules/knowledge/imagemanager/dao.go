@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/andycai/goapi/enum"
 	"github.com/andycai/goapi/models"
 	"gorm.io/gorm"
 )
@@ -27,7 +28,44 @@ func initData() error {
 }
 
 func initMenus() error {
-	return nil
+	// 检查是否已初始化
+	if app.IsInitializedModule("imagemanager:menu") {
+		log.Println("图片管理模块菜单已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建图片管理菜单
+		imageMenu := models.Menu{
+			MenuID:     4002,
+			ParentID:   enum.MenuIdWebApp,
+			Name:       "图片管理",
+			Path:       "/admin/imagemanager",
+			Icon:       "imagemanager",
+			Sort:       2,
+			Permission: "imagemanager:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&imageMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "imagemanager:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func initPermissions() error {

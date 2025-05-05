@@ -45,12 +45,12 @@ func initMenus() error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建Bug跟踪菜单
 		bugMenu := models.Menu{
-			MenuID:     5003,
-			ParentID:   enum.MenuIdDevelopment,
+			MenuID:     4004,
+			ParentID:   enum.MenuIdWebApp,
 			Name:       "Bug跟踪",
 			Path:       "/admin/bugtracker",
 			Icon:       "bugtracker",
-			Sort:       3,
+			Sort:       4,
 			Permission: "bugtracker:view",
 			IsShow:     true,
 			CreatedAt:  time.Now(),

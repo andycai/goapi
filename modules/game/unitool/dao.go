@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/andycai/goapi/enum"
 	"github.com/andycai/goapi/models"
 	"gorm.io/gorm"
 )
@@ -20,6 +21,10 @@ func autoMigrate() error {
 // 初始化数据
 func initData() error {
 	if err := initPermissions(); err != nil {
+		return err
+	}
+
+	if err := initMenus(); err != nil {
 		return err
 	}
 
@@ -60,6 +65,47 @@ func initPermissions() error {
 		// 标记模块已初始化
 		if err := tx.Create(&models.ModuleInit{
 			Module:      "unitool:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("unitool:menu") {
+		log.Println("Unity工具模块菜单已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建Unity工具菜单
+		toolMenu := models.Menu{
+			MenuID:     3009,
+			ParentID:   enum.MenuIdGame,
+			Name:       "Unity工具",
+			Path:       "/admin/unitool",
+			Icon:       "unitool",
+			Sort:       9,
+			Permission: "unitool:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&toolMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "unitool:menu",
 			Initialized: 1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

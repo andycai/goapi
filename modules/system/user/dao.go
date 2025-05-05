@@ -42,8 +42,65 @@ func initMenus() error {
 		return nil
 	}
 
+	// 初始化数据
+	now := time.Now()
+
 	// 开始事务
 	return app.DB.Transaction(func(tx *gorm.DB) error {
+		parentMenus := []*models.Menu{
+			{
+				MenuID:     enum.MenuIdSystem,
+				ParentID:   0,
+				Name:       "系统管理",
+				Path:       "/admin/system",
+				Icon:       "system",
+				Sort:       1,
+				Permission: "",
+				IsShow:     true,
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+			{
+				MenuID:     enum.MenuIdTools,
+				ParentID:   0,
+				Name:       "系统工具",
+				Path:       "/admin/tools",
+				Icon:       "tools",
+				Sort:       2,
+				Permission: "",
+				IsShow:     true,
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+			{
+				MenuID:     enum.MenuIdGame,
+				ParentID:   0,
+				Name:       "游戏管理",
+				Path:       "/admin/game",
+				Icon:       "game",
+				Sort:       3,
+				Permission: "",
+				IsShow:     true,
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+			{
+				MenuID:     enum.MenuIdWebApp,
+				ParentID:   0,
+				Name:       "Web应用",
+				Path:       "/admin/webapp",
+				Icon:       "webapp",
+				Sort:       4,
+				Permission: "",
+				IsShow:     true,
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+		}
+		if err := app.DB.CreateInBatches(parentMenus, len(parentMenus)).Error; err != nil {
+			return err
+		}
+
 		// 创建用户管理菜单
 		userMenu := models.Menu{
 			MenuID:     1001,
@@ -54,8 +111,8 @@ func initMenus() error {
 			Sort:       1,
 			Permission: "user:view",
 			IsShow:     true,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
+			CreatedAt:  now,
+			UpdatedAt:  now,
 		}
 
 		if err := tx.Create(&userMenu).Error; err != nil {
@@ -66,8 +123,8 @@ func initMenus() error {
 		if err := tx.Create(&models.ModuleInit{
 			Module:      "user:menu",
 			Initialized: 1,
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			CreatedAt:   now,
+			UpdatedAt:   now,
 		}).Error; err != nil {
 			return err
 		}

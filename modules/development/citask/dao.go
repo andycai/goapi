@@ -30,17 +30,17 @@ func initData() error {
 func initMenus() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("citask:menu") {
-		log.Println("CI任务模块菜单已初始化，跳过")
+		log.Println("构建任务模块菜单已初始化，跳过")
 		return nil
 	}
 
 	// 开始事务
 	return app.DB.Transaction(func(tx *gorm.DB) error {
-		// 创建CI任务菜单
+		// 创建构建任务菜单
 		taskMenu := models.Menu{
-			MenuID:     5001,
-			ParentID:   enum.MenuIdDevelopment,
-			Name:       "CI任务",
+			MenuID:     2001,
+			ParentID:   enum.MenuIdTools,
+			Name:       "构建任务",
 			Path:       "/admin/citask",
 			Icon:       "citask",
 			Sort:       1,

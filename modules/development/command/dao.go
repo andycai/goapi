@@ -87,8 +87,8 @@ func initMenus() error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建命令菜单
 		commandMenu := models.Menu{
-			MenuID:     5002,
-			ParentID:   enum.MenuIdDevelopment,
+			MenuID:     2002,
+			ParentID:   enum.MenuIdTools,
 			Name:       "命令管理",
 			Path:       "/admin/command",
 			Icon:       "command",
