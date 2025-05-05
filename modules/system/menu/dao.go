@@ -17,7 +17,7 @@ func NewMenuDao() *MenuDao {
 
 // 数据迁移
 func autoMigrate() error {
-	return app.DB.AutoMigrate(&Menu{})
+	return app.DB.AutoMigrate(&models.Menu{})
 }
 
 // 初始化数据
@@ -103,7 +103,7 @@ func initMenus() error {
 	now := time.Now()
 
 	// 系统管理菜单组
-	systemManage := Menu{
+	systemManage := models.Menu{
 		ParentID:   0,
 		Name:       "系统管理",
 		Path:       "/admin/system",
@@ -119,7 +119,7 @@ func initMenus() error {
 	}
 
 	// 系统管理子菜单
-	systemMenus := []Menu{
+	systemMenus := []models.Menu{
 		{
 			ParentID:   systemManage.ID,
 			Name:       "用户管理",
@@ -193,7 +193,7 @@ func initMenus() error {
 	}
 
 	// 游戏管理菜单组
-	gameManage := Menu{
+	gameManage := models.Menu{
 		ParentID:   0,
 		Name:       "游戏管理",
 		Path:       "/admin/game",
@@ -209,7 +209,7 @@ func initMenus() error {
 	}
 
 	// 游戏管理子菜单
-	gameMenus := []Menu{
+	gameMenus := []models.Menu{
 		{
 			ParentID:   gameManage.ID,
 			Name:       "游戏日志",
@@ -239,7 +239,7 @@ func initMenus() error {
 	}
 
 	// 系统工具菜单组
-	toolsManage := Menu{
+	toolsManage := models.Menu{
 		ParentID:   0,
 		Name:       "系统工具",
 		Path:       "/admin/tools",
@@ -255,7 +255,7 @@ func initMenus() error {
 	}
 
 	// 系统工具子菜单
-	toolsMenus := []Menu{
+	toolsMenus := []models.Menu{
 		{
 			ParentID:   toolsManage.ID,
 			Name:       "构建任务",
@@ -318,7 +318,7 @@ func initMenus() error {
 	}
 
 	// web应用菜单组
-	webAppManage := Menu{
+	webAppManage := models.Menu{
 		ParentID:   0,
 		Name:       "Web应用",
 		Path:       "/admin/webapp",
@@ -334,7 +334,7 @@ func initMenus() error {
 	}
 
 	// web应用子菜单
-	webAppMenus := []Menu{
+	webAppMenus := []models.Menu{
 		{
 			ParentID:   webAppManage.ID,
 			Name:       "笔记",
@@ -399,15 +399,15 @@ func initMenus() error {
 }
 
 // GetMenus 获取所有菜单
-func (d *MenuDao) GetMenus() ([]*Menu, error) {
-	var menus []*Menu
+func (d *MenuDao) GetMenus() ([]*models.Menu, error) {
+	var menus []*models.Menu
 	result := app.DB.Order("sort asc").Find(&menus)
 	return menus, result.Error
 }
 
 // GetMenusByPermissions 根据权限获取菜单
-func (d *MenuDao) GetMenusByPermissions(permissions []string) ([]*Menu, error) {
-	var menus []*Menu
+func (d *MenuDao) GetMenusByPermissions(permissions []string) ([]*models.Menu, error) {
+	var menus []*models.Menu
 	result := app.DB.Where("permission IN ? OR permission = ''", permissions).
 		Where("is_show = ?", true).
 		Order("sort asc").
@@ -416,7 +416,7 @@ func (d *MenuDao) GetMenusByPermissions(permissions []string) ([]*Menu, error) {
 }
 
 // BuildMenuTree 构建菜单树
-func (d *MenuDao) BuildMenuTree(menus []*Menu, parentID uint) []*MenuTree {
+func (d *MenuDao) BuildMenuTree(menus []*models.Menu, parentID uint) []*MenuTree {
 	var tree []*MenuTree
 	for _, menu := range menus {
 		if menu.ParentID == parentID {
@@ -431,28 +431,28 @@ func (d *MenuDao) BuildMenuTree(menus []*Menu, parentID uint) []*MenuTree {
 }
 
 // CreateMenu 创建菜单
-func (d *MenuDao) CreateMenu(menu *Menu) error {
+func (d *MenuDao) CreateMenu(menu *models.Menu) error {
 	return app.DB.Create(menu).Error
 }
 
 // UpdateMenu 更新菜单
-func (d *MenuDao) UpdateMenu(menu *Menu) error {
+func (d *MenuDao) UpdateMenu(menu *models.Menu) error {
 	return app.DB.Save(menu).Error
 }
 
 // DeleteMenu 删除菜单
 func (d *MenuDao) DeleteMenu(id uint) error {
 	// 先删除子菜单
-	if err := app.DB.Where("parent_id = ?", id).Delete(&Menu{}).Error; err != nil {
+	if err := app.DB.Where("parent_id = ?", id).Delete(&models.Menu{}).Error; err != nil {
 		return err
 	}
 	// 再删除当前菜单
-	return app.DB.Delete(&Menu{}, id).Error
+	return app.DB.Delete(&models.Menu{}, id).Error
 }
 
 // GetMenuByID 根据ID获取菜单
-func (d *MenuDao) GetMenuByID(id uint) (*Menu, error) {
-	var menu Menu
+func (d *MenuDao) GetMenuByID(id uint) (*models.Menu, error) {
+	var menu models.Menu
 	result := app.DB.First(&menu, id)
 	return &menu, result.Error
 }

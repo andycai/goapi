@@ -1,4 +1,4 @@
-package menu
+package models
 
 import (
 	"time"
@@ -19,10 +19,4 @@ type Menu struct {
 	CreatedAt  time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt  time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
-// MenuTree 菜单树结构
-type MenuTree struct {
-	Menu     *Menu       `json:"menu"`
-	Children []*MenuTree `json:"children"`
 }
