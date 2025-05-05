@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/andycai/goapi/enum"
 	"github.com/andycai/goapi/models"
 	"gorm.io/gorm"
 )
@@ -31,7 +32,44 @@ func initData() error {
 }
 
 func initMenus() error {
-	return nil
+	// 检查是否已初始化
+	if app.IsInitializedModule("reposync:menu") {
+		log.Println("仓库同步模块菜单已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建仓库同步菜单
+		repoMenu := models.Menu{
+			MenuID:     3006,
+			ParentID:   enum.MenuIdGame,
+			Name:       "仓库同步",
+			Path:       "/admin/reposync",
+			Icon:       "reposync",
+			Sort:       6,
+			Permission: "reposync:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&repoMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "reposync:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func initPermissions() error {

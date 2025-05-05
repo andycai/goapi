@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/andycai/goapi/enum"
 	"github.com/andycai/goapi/models"
 	"gorm.io/gorm"
 )
@@ -27,7 +28,44 @@ func initData() error {
 }
 
 func initMenus() error {
-	return nil
+	// 检查是否已初始化
+	if app.IsInitializedModule("gamelog:menu") {
+		log.Println("游戏日志模块菜单已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建游戏日志菜单
+		logMenu := models.Menu{
+			MenuID:     3004,
+			ParentID:   enum.MenuIdGame,
+			Name:       "游戏日志",
+			Path:       "/admin/gamelog",
+			Icon:       "gamelog",
+			Sort:       4,
+			Permission: "gamelog:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&logMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "gamelog:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func initPermissions() error {
