@@ -3,7 +3,6 @@ package menu
 import (
 	"fmt"
 
-	"github.com/andycai/goapi/models"
 	"github.com/andycai/goapi/modules/system/adminlog"
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,7 +32,7 @@ func getMenuTreeHandler(c *fiber.Ctx) error {
 
 // createMenuHandler 创建菜单
 func createMenuHandler(c *fiber.Ctx) error {
-	menu := new(models.Menu)
+	menu := new(Menu)
 	if err := c.BodyParser(menu); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的请求数据",
@@ -61,7 +60,7 @@ func updateMenuHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	menu := new(models.Menu)
+	menu := new(Menu)
 	if err := c.BodyParser(menu); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的请求数据",
