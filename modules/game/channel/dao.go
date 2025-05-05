@@ -44,20 +44,58 @@ func initMenus() error {
 	// 开始事务
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建渠道菜单
-		channelMenu := models.Menu{
-			MenuID:     3002,
-			ParentID:   enum.MenuIdGame,
-			Name:       "渠道管理",
-			Path:       "/admin/channel",
-			Icon:       "channel",
-			Sort:       2,
-			Permission: "channel:view",
-			IsShow:     true,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
+		channelMenus := []*models.Menu{
+			{
+				MenuID:     3002,
+				ParentID:   enum.MenuIdGame,
+				Name:       "渠道管理",
+				Path:       "/admin/channel",
+				Icon:       "channel",
+				Sort:       2,
+				Permission: "channel:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				MenuID:     3012,
+				ParentID:   enum.MenuIdGame,
+				Name:       "物理服务器",
+				Path:       "/admin/physical_servers",
+				Icon:       "physical_server",
+				Sort:       12,
+				Permission: "server:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				MenuID:     3013,
+				ParentID:   enum.MenuIdGame,
+				Name:       "服务器分组",
+				Path:       "/admin/server_groups",
+				Icon:       "server_group",
+				Sort:       13,
+				Permission: "server:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				MenuID:     3014,
+				ParentID:   enum.MenuIdGame,
+				Name:       "公告管理",
+				Path:       "/admin/announcement",
+				Icon:       "announcement",
+				Sort:       14,
+				Permission: "announcement:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
 		}
 
-		if err := tx.Create(&channelMenu).Error; err != nil {
+		if err := tx.CreateInBatches(channelMenus, len(channelMenus)).Error; err != nil {
 			return err
 		}
 

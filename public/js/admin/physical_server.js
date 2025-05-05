@@ -10,14 +10,14 @@ function physicalServerManagement() {
         panelTitle: '',
         currentServer: {
             id: 0,
-            serverId: 0,
+            server_id: 0,
             name: '',
-            serverStatus: 1,
+            server_status: 1,
             available: true,
-            mergeId: 0,
+            merge_id: 0,
             online: 0,
-            serverPort: 0,
-            serverIp: ''
+            server_port: 0,
+            server_ip: ''
         },
 
         init() {
@@ -57,14 +57,14 @@ function physicalServerManagement() {
             this.panelTitle = '创建物理服务器';
             this.currentServer = {
                 id: 0,
-                serverId: 0,
+                server_id: 0,
                 name: '',
-                serverStatus: 1,
+                server_status: 1,
                 available: true,
-                mergeId: 0,
+                merge_id: 0,
                 online: 0,
-                serverPort: 0,
-                serverIp: ''
+                server_port: 0,
+                server_ip: ''
             };
             this.showPanel = true;
         },
@@ -86,11 +86,11 @@ function physicalServerManagement() {
                 const serverData = {
                     ...this.currentServer,
                     id: parseInt(this.currentServer.id) || 0,
-                    serverId: parseInt(this.currentServer.serverId) || 0,
-                    serverStatus: parseInt(this.currentServer.serverStatus) || 1,
-                    mergeId: parseInt(this.currentServer.mergeId) || 0,
+                    server_id: parseInt(this.currentServer.server_id) || 0,
+                    server_status: parseInt(this.currentServer.server_status) || 1,
+                    merge_id: parseInt(this.currentServer.merge_id) || 0,
                     online: parseInt(this.currentServer.online) || 0,
-                    serverPort: parseInt(this.currentServer.serverPort) || 0,
+                    server_port: parseInt(this.currentServer.server_port) || 0,
                     available: this.currentServer.available === 'true' || this.currentServer.available === true
                 };
 
@@ -118,11 +118,11 @@ function physicalServerManagement() {
                 // Convert string values to numbers where needed
                 const serverData = {
                     ...this.currentServer,
-                    serverId: parseInt(this.currentServer.serverId) || 0,
-                    serverStatus: parseInt(this.currentServer.serverStatus) || 1,
-                    mergeId: parseInt(this.currentServer.mergeId) || 0,
+                    server_id: parseInt(this.currentServer.server_id) || 0,
+                    server_status: parseInt(this.currentServer.server_status) || 1,
+                    merge_id: parseInt(this.currentServer.merge_id) || 0,
                     online: parseInt(this.currentServer.online) || 0,
-                    serverPort: parseInt(this.currentServer.serverPort) || 0,
+                    server_port: parseInt(this.currentServer.server_port) || 0,
                     available: this.currentServer.available === 'true' || this.currentServer.available === true
                 };
 

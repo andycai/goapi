@@ -24,12 +24,12 @@ function serverGroupManagement() {
 
         async loadServerGroups() {
             try {
-                const response = await fetch(`/api/admin/server-groups?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/admin/server_groups?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) {
                     throw new Error('Failed to load server groups');
                 }
                 const data = await response.json();
-                this.serverGroups = data.data;
+                this.serverGroups = data.groups;
                 this.totalRecords = data.total;
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
@@ -40,7 +40,7 @@ function serverGroupManagement() {
 
         async createServerGroup() {
             try {
-                const response = await fetch('/api/admin/server-groups', {
+                const response = await fetch('/api/admin/server_groups', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ function serverGroupManagement() {
 
         async updateServerGroup() {
             try {
-                const response = await fetch(`/api/admin/server-groups/${this.editingServerGroup.id}`, {
+                const response = await fetch(`/api/admin/server_groups/${this.editingServerGroup.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ function serverGroupManagement() {
             }
 
             try {
-                const response = await fetch(`/api/admin/server-groups/${id}`, {
+                const response = await fetch(`/api/admin/server_groups/${id}`, {
                     method: 'DELETE'
                 });
 
@@ -108,7 +108,7 @@ function serverGroupManagement() {
 
         async loadGroupServers(groupId) {
             try {
-                const response = await fetch(`/api/admin/server-groups/${groupId}/servers`);
+                const response = await fetch(`/api/admin/server_groups/${groupId}/servers`);
                 if (!response.ok) {
                     throw new Error('Failed to load group servers');
                 }
@@ -122,7 +122,7 @@ function serverGroupManagement() {
 
         async loadAvailableServers() {
             try {
-                const response = await fetch('/api/admin/physical-servers');
+                const response = await fetch('/api/admin/physical_servers');
                 if (!response.ok) {
                     throw new Error('Failed to load available servers');
                 }
@@ -136,7 +136,7 @@ function serverGroupManagement() {
 
         async addServerToGroup(groupId, serverId) {
             try {
-                const response = await fetch(`/api/admin/server-groups/${groupId}/servers/${serverId}`, {
+                const response = await fetch(`/api/admin/server_groups/${groupId}/servers/${serverId}`, {
                     method: 'POST'
                 });
 
@@ -159,7 +159,7 @@ function serverGroupManagement() {
             }
 
             try {
-                const response = await fetch(`/api/admin/server-groups/${groupId}/servers/${serverId}`, {
+                const response = await fetch(`/api/admin/server_groups/${groupId}/servers/${serverId}`, {
                     method: 'DELETE'
                 });
 

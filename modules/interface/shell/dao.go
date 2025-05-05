@@ -33,7 +33,7 @@ func initMenus() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("shell:permission") {
-		log.Println("Shell模块数据库已初始化，跳过")
+		log.Println("[Shell模块]权限数据已初始化，跳过")
 		return nil
 	}
 

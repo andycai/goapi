@@ -34,9 +34,9 @@
                     <template x-for="server in physicalServers" :key="server.id">
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="server.id"></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="server.serverId"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="server.server_id"></td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white" x-text="server.name"></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="getServerStatusText(server.serverStatus)"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="getServerStatusText(server.server_status)"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="server.available ? '是' : '否'"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="server.online"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
@@ -100,7 +100,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">服务器ID</label>
-                        <input type="text" x-model="currentServer.serverId" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <input type="text" x-model="currentServer.server_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">服务器名称</label>
@@ -108,7 +108,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">服务器状态</label>
-                        <select x-model="currentServer.serverStatus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <select x-model="currentServer.server_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                             <option value="0">维护中</option>
                             <option value="1">正常</option>
                             <option value="2">爆满</option>
@@ -123,7 +123,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">合服ID</label>
-                        <input type="text" x-model="currentServer.mergeId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <input type="text" x-model="currentServer.merge_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">在线人数</label>
@@ -131,11 +131,11 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">服务器端口</label>
-                        <input type="number" x-model="currentServer.serverPort" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <input type="number" x-model="currentServer.server_port" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">服务器IP</label>
-                        <input type="text" x-model="currentServer.serverIp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <input type="text" x-model="currentServer.server_ip" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                     </div>
                     <div class="pt-4">
                         <button type="submit" class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

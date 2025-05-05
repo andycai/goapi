@@ -1,6 +1,7 @@
 package git
 
 import (
+	"log"
 	"time"
 
 	"github.com/andycai/goapi/models"
@@ -31,6 +32,7 @@ func initMenus() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("git:permission") {
+		log.Println("[git模块]权限数据已初始化，跳过")
 		return nil
 	}
 
