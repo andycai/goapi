@@ -33,7 +33,7 @@ function bugtrackerManagement() {
 
         async fetchProjects() {
             try {
-                const response = await fetch('/api/bugtracker/projects');
+                const response = await fetch('/api/admin/bugtracker/projects');
                 if (!response.ok) throw new Error('获取项目列表失败');
                 this.projects = await response.json();
             } catch (error) {
@@ -60,7 +60,7 @@ function bugtrackerManagement() {
 
         async submitProject() {
             try {
-                const url = this.editMode ? `/api/bugtracker/projects/${this.form.id}` : '/api/bugtracker/projects';
+                const url = this.editMode ? `/api/admin/bugtracker/projects/${this.form.id}` : '/api/admin/bugtracker/projects';
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 const formData = { ...this.form };
@@ -93,7 +93,7 @@ function bugtrackerManagement() {
             if (!confirm('确定要删除这个项目吗？')) return;
 
             try {
-                const response = await fetch(`/api/bugtracker/projects/${id}`, {
+                const response = await fetch(`/api/admin/bugtracker/projects/${id}`, {
                     method: 'DELETE',
                 });
 
@@ -114,7 +114,7 @@ function bugtrackerManagement() {
 
         async fetchProjectIssues(projectId) {
             try {
-                const response = await fetch(`/api/bugtracker/projects/${projectId}/issues`);
+                const response = await fetch(`/api/admin/bugtracker/projects/${projectId}/issues`);
                 if (!response.ok) throw new Error('获取问题列表失败');
                 this.currentProjectIssues = await response.json();
             } catch (error) {
@@ -143,8 +143,8 @@ function bugtrackerManagement() {
         async submitIssue() {
             try {
                 const url = this.editMode 
-                    ? `/api/bugtracker/projects/${this.currentProject.id}/issues/${this.issueForm.id}` 
-                    : `/api/bugtracker/projects/${this.currentProject.id}/issues`;
+                    ? `/api/admin/bugtracker/projects/${this.currentProject.id}/issues/${this.issueForm.id}` 
+                    : `/api/admin/bugtracker/projects/${this.currentProject.id}/issues`;
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 const formData = { ...this.issueForm };
@@ -177,7 +177,7 @@ function bugtrackerManagement() {
             if (!confirm('确定要删除这个问题吗？')) return;
 
             try {
-                const response = await fetch(`/api/bugtracker/projects/${this.currentProject.id}/issues/${id}`, {
+                const response = await fetch(`/api/admin/bugtracker/projects/${this.currentProject.id}/issues/${id}`, {
                     method: 'DELETE',
                 });
 
@@ -198,7 +198,7 @@ function bugtrackerManagement() {
 
         async fetchIssueComments(issueId) {
             try {
-                const response = await fetch(`/api/bugtracker/issues/${issueId}/comments`);
+                const response = await fetch(`/api/admin/bugtracker/issues/${issueId}/comments`);
                 if (!response.ok) throw new Error('获取评论列表失败');
                 this.currentIssueComments = await response.json();
             } catch (error) {
@@ -208,7 +208,7 @@ function bugtrackerManagement() {
 
         async submitComment() {
             try {
-                const response = await fetch(`/api/bugtracker/issues/${this.currentIssue.id}/comments`, {
+                const response = await fetch(`/api/admin/bugtracker/issues/${this.currentIssue.id}/comments`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -46,10 +46,10 @@ func (m *roleModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/roles", app.HasPermission("role:view"), listRolesHandler)
-	app.RouterApi.Post("/roles", app.HasPermission("role:create"), createRoleHandler)
-	app.RouterApi.Put("/roles/:id", app.HasPermission("role:update"), updateRoleHandler)
-	app.RouterApi.Delete("/roles/:id", app.HasPermission("role:delete"), deleteRoleHandler)
+	app.RouterAdminApi.Get("/roles", app.HasPermission("role:view"), listRolesHandler)
+	app.RouterAdminApi.Post("/roles", app.HasPermission("role:create"), createRoleHandler)
+	app.RouterAdminApi.Put("/roles/:id", app.HasPermission("role:update"), updateRoleHandler)
+	app.RouterAdminApi.Delete("/roles/:id", app.HasPermission("role:delete"), deleteRoleHandler)
 
 	return nil
 }

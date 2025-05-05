@@ -2,9 +2,10 @@ package imagemanager
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityImageManager = 5003 // 功能-图片管理
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type imagemanagerModule struct {
 }
 
 func init() {
-	core.RegisterModule(&imagemanagerModule{}, enum.ModulePriorityImageManager)
+	core.RegisterModule(&imagemanagerModule{}, ModulePriorityImageManager)
 }
 
 func (m *imagemanagerModule) Awake(a *core.App) error {
@@ -45,15 +46,15 @@ func (m *imagemanagerModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Get("/imagemanager/list", app.HasPermission("imagemanager:view"), listFilesHandler)
-	app.RouterApi.Post("/imagemanager/upload", app.HasPermission("imagemanager:upload"), uploadHandler)
-	app.RouterApi.Post("/imagemanager/delete", app.HasPermission("imagemanager:delete"), deleteHandler)
-	app.RouterApi.Post("/imagemanager/rename", app.HasPermission("imagemanager:rename"), renameHandler)
-	app.RouterApi.Post("/imagemanager/move", app.HasPermission("imagemanager:move"), moveHandler)
-	app.RouterApi.Post("/imagemanager/copy", app.HasPermission("imagemanager:copy"), copyHandler)
-	app.RouterApi.Get("/imagemanager/info", app.HasPermission("imagemanager:info"), infoHandler)
-	app.RouterApi.Get("/imagemanager/thumbnail", app.HasPermission("imagemanager:view"), thumbnailHandler)
-	app.RouterApi.Get("/imagemanager/view", app.HasPermission("imagemanager:view"), viewHandler)
+	app.RouterAdminApi.Get("/imagemanager/list", app.HasPermission("imagemanager:view"), listFilesHandler)
+	app.RouterAdminApi.Post("/imagemanager/upload", app.HasPermission("imagemanager:upload"), uploadHandler)
+	app.RouterAdminApi.Post("/imagemanager/delete", app.HasPermission("imagemanager:delete"), deleteHandler)
+	app.RouterAdminApi.Post("/imagemanager/rename", app.HasPermission("imagemanager:rename"), renameHandler)
+	app.RouterAdminApi.Post("/imagemanager/move", app.HasPermission("imagemanager:move"), moveHandler)
+	app.RouterAdminApi.Post("/imagemanager/copy", app.HasPermission("imagemanager:copy"), copyHandler)
+	app.RouterAdminApi.Get("/imagemanager/info", app.HasPermission("imagemanager:info"), infoHandler)
+	app.RouterAdminApi.Get("/imagemanager/thumbnail", app.HasPermission("imagemanager:view"), thumbnailHandler)
+	app.RouterAdminApi.Get("/imagemanager/view", app.HasPermission("imagemanager:view"), viewHandler)
 
 	return nil
 }

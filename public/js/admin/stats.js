@@ -219,7 +219,7 @@ function statsManagement() {
                     ...this.filters
                 });
 
-                const response = await fetch(`/api/stats?${params}`);
+                const response = await fetch(`/api/admin/stats?${params}`);
                 if (!response.ok) throw new Error('获取统计列表失败');
                 const data = await response.json();
                 this.stats = data.stats;
@@ -247,7 +247,7 @@ function statsManagement() {
 
         async fetchStatDetails(loginId) {
             try {
-                const response = await fetch(`/api/stats/details?login_id=${loginId}`);
+                const response = await fetch(`/api/admin/stats/details?login_id=${loginId}`);
                 if (!response.ok) throw new Error('获取统计详情失败');
                 
                 const data = await response.json();
@@ -641,7 +641,7 @@ function statsManagement() {
             if (!confirm('确定要删除这条统计记录吗？')) return;
 
             try {
-                const response = await fetch(`/api/stats/${id}`, {
+                const response = await fetch(`/api/admin/stats/${id}`, {
                     method: 'DELETE'
                 });
 
@@ -661,7 +661,7 @@ function statsManagement() {
             if (!confirm('确定要清理旧数据吗？此操作不可恢复。')) return;
 
             try {
-                const response = await fetch(`/api/stats/before?date=${this.filters.endDate}`, {
+                const response = await fetch(`/api/admin/stats/before?date=${this.filters.endDate}`, {
                     method: 'DELETE'
                 });
 

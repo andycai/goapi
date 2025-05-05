@@ -26,7 +26,7 @@ function physicalServerManagement() {
 
         async loadPhysicalServers() {
             try {
-                const response = await fetch(`/api/physical_servers?page=${this.currentPage}&pageSize=${this.pageSize}`);
+                const response = await fetch(`/api/admin/physical_servers?page=${this.currentPage}&pageSize=${this.pageSize}`);
                 const data = await response.json();
                 this.physicalServers = data.servers;
                 this.totalRecords = data.total;
@@ -94,7 +94,7 @@ function physicalServerManagement() {
                     available: this.currentServer.available === 'true' || this.currentServer.available === true
                 };
 
-                const response = await fetch('/api/physical_servers', {
+                const response = await fetch('/api/admin/physical_servers', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ function physicalServerManagement() {
                     available: this.currentServer.available === 'true' || this.currentServer.available === true
                 };
 
-                const response = await fetch(`/api/physical_servers/${this.currentServer.id}`, {
+                const response = await fetch(`/api/admin/physical_servers/${this.currentServer.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ function physicalServerManagement() {
         async deletePhysicalServer(id) {
             if (confirm('确定要删除这个物理服务器吗？')) {
                 try {
-                    const response = await fetch(`/api/physical_servers/${id}`, {
+                    const response = await fetch(`/api/admin/physical_servers/${id}`, {
                         method: 'DELETE'
                     });
 

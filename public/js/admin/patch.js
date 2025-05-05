@@ -34,7 +34,7 @@ function patchManagement() {
 
         async loadConfig() {
             try {
-                const response = await fetch('/api/patch/config');
+                const response = await fetch('/api/admin/patch/config');
                 if (!response.ok) throw new Error('加载配置失败');
                 const data = await response.json();
                 if (data) {
@@ -61,7 +61,7 @@ function patchManagement() {
                 this.config.default_new_version = this.newVersion;
                 this.config.default_old_version = this.oldVersion;
                 this.config.default_description = this.description;
-                const response = await fetch('/api/patch/config', {
+                const response = await fetch('/api/admin/patch/config', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ function patchManagement() {
 
         async loadRecords() {
             try {
-                const response = await fetch(`/api/patch/records?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/admin/patch/records?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) throw new Error('加载补丁记录失败');
                 const data = await response.json();
                 this.records = data.records;
@@ -106,7 +106,7 @@ function patchManagement() {
             }
 
             try {
-                const response = await fetch('/api/patch/generate', {
+                const response = await fetch('/api/admin/patch/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ function patchManagement() {
 
         async applyPatch(recordId) {
             try {
-                const response = await fetch('/api/patch/apply', {
+                const response = await fetch('/api/admin/patch/apply', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

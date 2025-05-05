@@ -2,9 +2,10 @@ package patch
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityPatch = 9905 // 游戏-热更新
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type patchModule struct {
 }
 
 func init() {
-	core.RegisterModule(&patchModule{}, enum.ModulePriorityPatch)
+	core.RegisterModule(&patchModule{}, ModulePriorityPatch)
 }
 
 func (m *patchModule) Awake(a *core.App) error {
@@ -47,11 +48,11 @@ func (m *patchModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	app.RouterApi.Post("/patch/config", app.HasPermission("patch:config"), saveConfigHandler)
-	app.RouterApi.Get("/patch/config", app.HasPermission("patch:config"), getConfigHandler)
-	app.RouterApi.Post("/patch/generate", app.HasPermission("patch:generate"), generatePatchHandler)
-	app.RouterApi.Get("/patch/records", app.HasPermission("patch:view"), listPatchRecordsHandler)
-	app.RouterApi.Post("/patch/apply", app.HasPermission("patch:apply"), applyPatchHandler)
+	app.RouterAdminApi.Post("/patch/config", app.HasPermission("patch:config"), saveConfigHandler)
+	app.RouterAdminApi.Get("/patch/config", app.HasPermission("patch:config"), getConfigHandler)
+	app.RouterAdminApi.Post("/patch/generate", app.HasPermission("patch:generate"), generatePatchHandler)
+	app.RouterAdminApi.Get("/patch/records", app.HasPermission("patch:view"), listPatchRecordsHandler)
+	app.RouterAdminApi.Post("/patch/apply", app.HasPermission("patch:apply"), applyPatchHandler)
 
 	return nil
 }

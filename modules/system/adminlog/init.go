@@ -46,8 +46,8 @@ func (m *adminlogModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/adminlog", app.HasPermission("adminlog:view"), listLogsHandler)
-	app.RouterApi.Delete("/adminlog", app.HasPermission("adminlog:delete"), deleteLogsHandler)
+	app.RouterAdminApi.Get("/adminlog", app.HasPermission("adminlog:view"), listLogsHandler)
+	app.RouterAdminApi.Delete("/adminlog", app.HasPermission("adminlog:delete"), deleteLogsHandler)
 
 	return nil
 }

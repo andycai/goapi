@@ -2,15 +2,6 @@
  * 字典管理
  */
 function dictManagement() {
-    window.Alpine = window.Alpine || {};
-    if (!Alpine.store('notification')) {
-        Alpine.store('notification', {
-            show: (message, type) => {
-                console.error(message);
-            },
-            after: () => {}
-        });
-    }
     return {
         // 字典类型数据
         dictTypes: [],
@@ -57,7 +48,7 @@ function dictManagement() {
         // 加载字典类型列表
         async loadDictTypes() {
             try {
-                const response = await fetch(`/api/dict/type/list?page=${this.currentTypePage}&limit=${this.typesPageSize}`);
+                const response = await fetch(`/api/admin/dict/type/list?page=${this.currentTypePage}&limit=${this.typesPageSize}`);
                 if (!response.ok) throw new Error('加载字典类型失败');
                 const data = await response.json();
                 this.dictTypes = data.dictTypes;
@@ -73,7 +64,7 @@ function dictManagement() {
             if (!this.currentDictType) return;
             
             try {
-                const response = await fetch(`/api/dict/data/list?type=${this.currentDictType}&page=${this.currentDataPage}&limit=${this.dataPageSize}`);
+                const response = await fetch(`/api/admin/dict/data/list?type=${this.currentDictType}&page=${this.currentDataPage}&limit=${this.dataPageSize}`);
                 if (!response.ok) throw new Error('加载字典数据失败');
                 const data = await response.json();
                 this.dictData = data.dictData;
@@ -132,7 +123,7 @@ function dictManagement() {
         // 保存字典类型
         async saveType() {
             try {
-                const url = this.typeModalAction === 'add' ? '/api/dict/type/add' : '/api/dict/type/edit';
+                const url = this.typeModalAction === 'add' ? '/api/admin/dict/type/add' : '/api/admin/dict/type/edit';
                 
                 // 确保id是整数
                 const formData = {
@@ -170,7 +161,7 @@ function dictManagement() {
             }
 
             try {
-                const response = await fetch('/api/dict/type/delete', {
+                const response = await fetch('/api/admin/dict/type/delete', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -233,7 +224,7 @@ function dictManagement() {
         // 保存字典数据
         async saveData() {
             try {
-                const url = this.dataModalAction === 'add' ? '/api/dict/data/add' : '/api/dict/data/edit';
+                const url = this.dataModalAction === 'add' ? '/api/admin/dict/data/add' : '/api/admin/dict/data/edit';
                 
                 // 确保id和sort是整数
                 const formData = {
@@ -272,7 +263,7 @@ function dictManagement() {
             }
 
             try {
-                const response = await fetch('/api/dict/data/delete', {
+                const response = await fetch('/api/admin/dict/data/delete', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

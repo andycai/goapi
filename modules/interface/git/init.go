@@ -2,9 +2,10 @@ package git
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityGit = 9003 // 接口-Git 接口
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type gitModule struct {
 }
 
 func init() {
-	core.RegisterModule(&gitModule{}, enum.ModulePriorityGit)
+	core.RegisterModule(&gitModule{}, ModulePriorityGit)
 }
 
 func (m *gitModule) Awake(a *core.App) error {
@@ -43,17 +44,17 @@ func (m *gitModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Post("/git/clone", app.HasPermission("git:clone"), cloneHandler)
-	app.RouterApi.Post("/git/pull", app.HasPermission("git:pull"), pullHandler)
-	app.RouterApi.Post("/git/push", app.HasPermission("git:push"), pushHandler)
-	app.RouterApi.Get("/git/status", app.HasPermission("git:status"), statusHandler)
-	app.RouterApi.Get("/git/log", app.HasPermission("git:log"), logHandler)
-	app.RouterApi.Post("/git/commit", app.HasPermission("git:commit"), commitHandler)
-	app.RouterApi.Post("/git/checkout", app.HasPermission("git:checkout"), checkoutHandler)
-	app.RouterApi.Post("/git/branch", app.HasPermission("git:branch"), branchHandler)
-	app.RouterApi.Post("/git/merge", app.HasPermission("git:merge"), mergeHandler)
-	app.RouterApi.Post("/git/reset", app.HasPermission("git:reset"), resetHandler)
-	app.RouterApi.Post("/git/stash", app.HasPermission("git:stash"), stashHandler)
+	app.RouterAdminApi.Post("/git/clone", app.HasPermission("git:clone"), cloneHandler)
+	app.RouterAdminApi.Post("/git/pull", app.HasPermission("git:pull"), pullHandler)
+	app.RouterAdminApi.Post("/git/push", app.HasPermission("git:push"), pushHandler)
+	app.RouterAdminApi.Get("/git/status", app.HasPermission("git:status"), statusHandler)
+	app.RouterAdminApi.Get("/git/log", app.HasPermission("git:log"), logHandler)
+	app.RouterAdminApi.Post("/git/commit", app.HasPermission("git:commit"), commitHandler)
+	app.RouterAdminApi.Post("/git/checkout", app.HasPermission("git:checkout"), checkoutHandler)
+	app.RouterAdminApi.Post("/git/branch", app.HasPermission("git:branch"), branchHandler)
+	app.RouterAdminApi.Post("/git/merge", app.HasPermission("git:merge"), mergeHandler)
+	app.RouterAdminApi.Post("/git/reset", app.HasPermission("git:reset"), resetHandler)
+	app.RouterAdminApi.Post("/git/stash", app.HasPermission("git:stash"), stashHandler)
 
 	return nil
 }

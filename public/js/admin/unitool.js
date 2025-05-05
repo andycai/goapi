@@ -1,13 +1,4 @@
 function unitoolManagement() {
-    window.Alpine = window.Alpine || {};
-    if (!Alpine.store('notification')) {
-        Alpine.store('notification', {
-            show: (message, type) => {
-                console.error(message);
-            },
-            after: () => {}
-        });
-    }
     return {
         searchParams: {
             targetPath: '',
@@ -27,7 +18,7 @@ function unitoolManagement() {
 
         async loadLogs() {
             try {
-                const response = await fetch(`/api/unitool/logs?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/admin/unitool/logs?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) throw new Error('加载日志列表失败');
                 const data = await response.json();
                 this.logs = data.logs;
@@ -79,7 +70,7 @@ function unitoolManagement() {
 
         async viewDuplicateDetails(logId) {
             try {
-                const response = await fetch(`/api/unitool/duplicates/${logId}`);
+                const response = await fetch(`/api/admin/unitool/duplicates/${logId}`);
                 if (!response.ok) throw new Error('获取重复GUID详情失败');
                 const data = await response.json();
                 this.duplicateGuids = data.duplicates;

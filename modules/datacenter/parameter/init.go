@@ -43,11 +43,11 @@ func (m *parameterModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	app.RouterApi.Get("/parameters", app.HasPermission("parameter:view"), listParametersHandler)
-	app.RouterApi.Get("/parameters/:id", app.HasPermission("parameter:view"), getParameterHandler)
-	app.RouterApi.Post("/parameters", app.HasPermission("parameter:create"), createParameterHandler)
-	app.RouterApi.Put("/parameters/:id", app.HasPermission("parameter:edit"), updateParameterHandler)
-	app.RouterApi.Delete("/parameters/:id", app.HasPermission("parameter:delete"), deleteParameterHandler)
+	app.RouterAdminApi.Get("/parameters", app.HasPermission("parameter:view"), listParametersHandler)
+	app.RouterAdminApi.Get("/parameters/:id", app.HasPermission("parameter:view"), getParameterHandler)
+	app.RouterAdminApi.Post("/parameters", app.HasPermission("parameter:create"), createParameterHandler)
+	app.RouterAdminApi.Put("/parameters/:id", app.HasPermission("parameter:edit"), updateParameterHandler)
+	app.RouterAdminApi.Delete("/parameters/:id", app.HasPermission("parameter:delete"), deleteParameterHandler)
 
 	return nil
 }

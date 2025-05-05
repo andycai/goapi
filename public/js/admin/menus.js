@@ -44,11 +44,11 @@ function menuManagement() {
 
         async fetchMenus() {
             try {
-                const treeResponse = await fetch('/api/menus/tree');
+                const treeResponse = await fetch('/api/admin/menus/tree');
                 if (!treeResponse.ok) throw new Error('获取菜单树失败');
                 this.menuTree = await treeResponse.json();
 
-                const response = await fetch('/api/menus');
+                const response = await fetch('/api/admin/menus');
                 if (!response.ok) throw new Error('获取菜单列表失败');
                 const menus = await response.json();
                 this.parentMenus = menus.filter(menu => menu.parent_id === 0);
@@ -107,7 +107,7 @@ function menuManagement() {
             this.loading = true;
 
             try {
-                const url = this.editMode ? `/api/menus/${this.currentMenu.id}` : '/api/menus';
+                const url = this.editMode ? `/api/admin/menus/${this.currentMenu.id}` : '/api/admin/menus';
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 const response = await fetch(url, {
@@ -140,7 +140,7 @@ function menuManagement() {
             if (!confirm('确定要删除这个菜单吗？如果是父级菜单，其下的子菜单也会被删除。')) return;
 
             try {
-                const response = await fetch(`/api/menus/${id}`, {
+                const response = await fetch(`/api/admin/menus/${id}`, {
                     method: 'DELETE'
                 });
 

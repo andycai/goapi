@@ -22,7 +22,7 @@ function userManagement() {
 
         async loadUsers() {
             try {
-                const response = await fetch('/api/users');
+                const response = await fetch('/api/admin/users');
                 if (!response.ok) throw new Error('Failed to load users');
                 this.users = await response.json();
             } catch (error) {
@@ -33,7 +33,7 @@ function userManagement() {
 
         async loadRoles() {
             try {
-                const response = await fetch('/api/roles');
+                const response = await fetch('/api/admin/roles');
                 if (!response.ok) throw new Error('Failed to load roles');
                 this.roles = await response.json();
             } catch (error) {
@@ -76,7 +76,7 @@ function userManagement() {
 
         async createUser() {
             try {
-                const response = await fetch('/api/users', {
+                const response = await fetch('/api/admin/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ function userManagement() {
 
         async updateUser() {
             try {
-                const response = await fetch(`/api/users/${this.currentUser.id}`, {
+                const response = await fetch(`/api/admin/users/${this.currentUser.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -120,7 +120,7 @@ function userManagement() {
             if (!confirm('确定要删除这个用户吗？')) return;
 
             try {
-                const response = await fetch(`/api/users/${id}`, {
+                const response = await fetch(`/api/admin/users/${id}`, {
                     method: 'DELETE'
                 });
 

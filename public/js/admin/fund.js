@@ -1,13 +1,4 @@
 function fundManagement() {
-    window.Alpine = window.Alpine || {};
-    if (!Alpine.store('notification')) {
-        Alpine.store('notification', {
-            show: (message, type) => {
-                console.error(message);
-            },
-            after: () => {}
-        });
-    }
     return {
         marketIndices: [],
         funds: [],
@@ -28,7 +19,7 @@ function fundManagement() {
 
         async loadMarketData() {
             try {
-                const response = await fetch('/api/fund/market');
+                const response = await fetch('/api/admin/fund/market');
                 if (!response.ok) throw new Error('加载市场数据失败');
                 const data = await response.json();
                 if (data.indices && Array.isArray(data.indices)) {
@@ -42,7 +33,7 @@ function fundManagement() {
 
         async loadFunds() {
             try {
-                const response = await fetch(`/api/fund/list?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/admin/fund/list?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) throw new Error('加载基金列表失败');
                 const data = await response.json();
                 if (data.funds && Array.isArray(data.funds)) {
@@ -61,7 +52,7 @@ function fundManagement() {
             
             this.isSyncing = true;
             try {
-                const response = await fetch('/api/fund/sync', {
+                const response = await fetch('/api/admin/fund/sync', {
                     method: 'POST'
                 });
 

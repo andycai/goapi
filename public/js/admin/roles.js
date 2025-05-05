@@ -20,7 +20,7 @@ function roleManagement() {
 
         async loadRoles() {
             try {
-                const response = await fetch('/api/roles');
+                const response = await fetch('/api/admin/roles');
                 if (!response.ok) throw new Error('Failed to load roles');
                 this.roles = await response.json();
             } catch (error) {
@@ -31,7 +31,7 @@ function roleManagement() {
 
         async loadPermissions() {
             try {
-                const response = await fetch('/api/permissions');
+                const response = await fetch('/api/admin/permissions');
                 if (!response.ok) throw new Error('Failed to load permissions');
                 this.permissions = await response.json();
             } catch (error) {
@@ -70,7 +70,7 @@ function roleManagement() {
 
         async createRole() {
             try {
-                const response = await fetch('/api/roles', {
+                const response = await fetch('/api/admin/roles', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -91,7 +91,7 @@ function roleManagement() {
 
         async updateRole() {
             try {
-                const response = await fetch(`/api/roles/${this.currentRole.id}`, {
+                const response = await fetch(`/api/admin/roles/${this.currentRole.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -114,7 +114,7 @@ function roleManagement() {
             if (!confirm('确定要删除这个角色吗？')) return;
 
             try {
-                const response = await fetch(`/api/roles/${id}`, {
+                const response = await fetch(`/api/admin/roles/${id}`, {
                     method: 'DELETE'
                 });
 

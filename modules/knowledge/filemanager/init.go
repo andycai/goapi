@@ -2,9 +2,10 @@ package filemanager
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityFileManager = 5002 // 功能-文件管理
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type filemanagerModule struct {
 }
 
 func init() {
-	core.RegisterModule(&filemanagerModule{}, enum.ModulePriorityFileManager)
+	core.RegisterModule(&filemanagerModule{}, ModulePriorityFileManager)
 }
 
 func (m *filemanagerModule) Awake(a *core.App) error {
@@ -45,15 +46,15 @@ func (m *filemanagerModule) AddAuthRouters() error {
 	})
 
 	// api routes
-	app.RouterApi.Get("/filemanager/list", app.HasPermission("filemanager:view"), listFilesHandler)
-	app.RouterApi.Post("/filemanager/upload", app.HasPermission("filemanager:upload"), uploadFileHandler)
-	app.RouterApi.Post("/filemanager/create", app.HasPermission("filemanager:create"), createHandler)
-	app.RouterApi.Post("/filemanager/delete", app.HasPermission("filemanager:delete"), deleteHandler)
-	app.RouterApi.Post("/filemanager/rename", app.HasPermission("filemanager:rename"), renameHandler)
-	app.RouterApi.Post("/filemanager/move", app.HasPermission("filemanager:move"), moveHandler)
-	app.RouterApi.Post("/filemanager/copy", app.HasPermission("filemanager:copy"), copyHandler)
-	app.RouterApi.Get("/filemanager/download", app.HasPermission("filemanager:download"), downloadHandler)
-	app.RouterApi.Get("/filemanager/info", app.HasPermission("filemanager:info"), infoHandler)
+	app.RouterAdminApi.Get("/filemanager/list", app.HasPermission("filemanager:view"), listFilesHandler)
+	app.RouterAdminApi.Post("/filemanager/upload", app.HasPermission("filemanager:upload"), uploadFileHandler)
+	app.RouterAdminApi.Post("/filemanager/create", app.HasPermission("filemanager:create"), createHandler)
+	app.RouterAdminApi.Post("/filemanager/delete", app.HasPermission("filemanager:delete"), deleteHandler)
+	app.RouterAdminApi.Post("/filemanager/rename", app.HasPermission("filemanager:rename"), renameHandler)
+	app.RouterAdminApi.Post("/filemanager/move", app.HasPermission("filemanager:move"), moveHandler)
+	app.RouterAdminApi.Post("/filemanager/copy", app.HasPermission("filemanager:copy"), copyHandler)
+	app.RouterAdminApi.Get("/filemanager/download", app.HasPermission("filemanager:download"), downloadHandler)
+	app.RouterAdminApi.Get("/filemanager/info", app.HasPermission("filemanager:info"), infoHandler)
 
 	return nil
 }

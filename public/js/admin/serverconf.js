@@ -110,7 +110,7 @@ function serverConfig() {
 
         async loadServerList() {
             try {
-                const response = await fetch('/api/game/serverlist');
+                const response = await fetch('/api/admin/game/serverlist');
                 if (!response.ok) throw new Error('加载失败');
                 this.serverList = await response.json();
             } catch (error) {
@@ -121,7 +121,7 @@ function serverConfig() {
 
         async loadLastServer() {
             try {
-                const response = await fetch('/api/game/lastserver');
+                const response = await fetch('/api/admin/game/lastserver');
                 if (!response.ok) throw new Error('加载失败');
                 this.lastServer = await response.json();
             } catch (error) {
@@ -132,7 +132,7 @@ function serverConfig() {
 
         async loadServerInfo() {
             try {
-                const response = await fetch('/api/game/serverinfo');
+                const response = await fetch('/api/admin/game/serverinfo');
                 if (!response.ok) throw new Error('加载失败');
                 const data = await response.json();
                 this.parseServerInfoFromAPI(data);
@@ -144,7 +144,7 @@ function serverConfig() {
 
         async loadNoticeList() {
             try {
-                const response = await fetch('/api/game/noticelist');
+                const response = await fetch('/api/admin/game/noticelist');
                 if (!response.ok) throw new Error('加载失败');
                 this.noticeList = await response.json();
             } catch (error) {
@@ -155,7 +155,7 @@ function serverConfig() {
 
         async loadNoticeNum() {
             try {
-                const response = await fetch('/api/game/noticenum');
+                const response = await fetch('/api/admin/game/noticenum');
                 if (!response.ok) throw new Error('加载失败');
                 this.noticeNum = await response.json();
             } catch (error) {
@@ -169,7 +169,7 @@ function serverConfig() {
                 const data = this.prepareServerInfoForAPI();
                 console.log('Saving server info:', data);
 
-                const response = await fetch('/api/game/serverinfo', {
+                const response = await fetch('/api/admin/game/serverinfo', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -235,7 +235,7 @@ function serverConfig() {
 
         async saveServerList() {
             try {
-                const response = await fetch('/api/game/serverlist', {
+                const response = await fetch('/api/admin/game/serverlist', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ function serverConfig() {
 
         async saveLastServer() {
             try {
-                const response = await fetch('/api/game/lastserver', {
+                const response = await fetch('/api/admin/game/lastserver', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -269,7 +269,7 @@ function serverConfig() {
 
         async saveNoticeList() {
             try {
-                const response = await fetch('/api/game/noticelist', {
+                const response = await fetch('/api/admin/game/noticelist', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -286,7 +286,7 @@ function serverConfig() {
 
         async saveNoticeNum() {
             try {
-                const response = await fetch('/api/game/noticenum', {
+                const response = await fetch('/api/admin/game/noticenum', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

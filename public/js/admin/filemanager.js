@@ -26,7 +26,7 @@ function filemanagerManagement() {
 
         async fetchItems() {
             try {
-                const response = await fetch(`/api/filemanager/list?path=${encodeURIComponent(this.currentPath)}`);
+                const response = await fetch(`/api/admin/filemanager/list?path=${encodeURIComponent(this.currentPath)}`);
                 if (!response.ok) throw new Error('获取文件列表失败');
                 this.items = await response.json();
             } catch (error) {
@@ -56,7 +56,7 @@ function filemanagerManagement() {
                     formData.append('files', file);
                 });
 
-                const response = await fetch('/api/filemanager/upload', {
+                const response = await fetch('/api/admin/filemanager/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -82,7 +82,7 @@ function filemanagerManagement() {
 
         async submitFolder() {
             try {
-                const response = await fetch('/api/filemanager/mkdir', {
+                const response = await fetch('/api/admin/filemanager/mkdir', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ function filemanagerManagement() {
 
         async submitRename() {
             try {
-                const response = await fetch('/api/filemanager/rename', {
+                const response = await fetch('/api/admin/filemanager/rename', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ function filemanagerManagement() {
             if (!confirm(`确定要删除${item.is_dir ? '文件夹' : '文件'} "${item.name}" 吗？`)) return;
 
             try {
-                const response = await fetch('/api/filemanager/delete', {
+                const response = await fetch('/api/admin/filemanager/delete', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ function filemanagerManagement() {
 
         async downloadFile(item) {
             try {
-                const response = await fetch(`/api/filemanager/download?path=${encodeURIComponent(item.path)}`);
+                const response = await fetch(`/api/admin/filemanager/download?path=${encodeURIComponent(item.path)}`);
                 if (!response.ok) throw new Error('下载失败');
 
                 const blob = await response.blob();

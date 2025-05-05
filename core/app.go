@@ -15,7 +15,7 @@ type App struct {
 	Config          *Config
 	RouterPublic    fiber.Router
 	RouterPublicApi fiber.Router
-	RouterApi       fiber.Router
+	RouterAdminApi  fiber.Router
 	RouterAdmin     fiber.Router
 }
 
@@ -47,8 +47,8 @@ func (a *App) Start(dbs []*gorm.DB, fiberApp *fiber.App) {
 	InitPublicRouters()
 
 	// 初始化API路由
-	a.RouterApi = fiberApp.Group("/api")
-	a.RouterApi.Use(AuthMiddleware)
+	a.RouterAdminApi = fiberApp.Group("/api/admin")
+	a.RouterAdminApi.Use(AuthMiddleware)
 
 	// 初始化管理员路由
 	a.RouterAdmin = fiberApp.Group("/admin")

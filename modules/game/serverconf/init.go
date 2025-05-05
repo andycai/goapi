@@ -2,9 +2,10 @@ package serverconf
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityServerConf = 9904 // 游戏-服务器配置
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type serverconfModule struct {
 }
 
 func init() {
-	core.RegisterModule(&serverconfModule{}, enum.ModulePriorityServerConf)
+	core.RegisterModule(&serverconfModule{}, ModulePriorityServerConf)
 }
 
 func (m *serverconfModule) Awake(a *core.App) error {
@@ -55,11 +56,11 @@ func (m *serverconfModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Post("/game/serverlist", app.HasPermission("serverconf:update"), updateServerListHandler)
-	app.RouterApi.Post("/game/lastserver", app.HasPermission("serverconf:update"), updateLastServerHandler)
-	app.RouterApi.Post("/game/serverinfo", app.HasPermission("serverconf:update"), updateServerInfoHandler)
-	app.RouterApi.Post("/game/noticelist", app.HasPermission("serverconf:update"), updateNoticeListHandler)
-	app.RouterApi.Post("/game/noticenum", app.HasPermission("serverconf:update"), updateNoticeNumHandler)
+	app.RouterAdminApi.Post("/game/serverlist", app.HasPermission("serverconf:update"), updateServerListHandler)
+	app.RouterAdminApi.Post("/game/lastserver", app.HasPermission("serverconf:update"), updateLastServerHandler)
+	app.RouterAdminApi.Post("/game/serverinfo", app.HasPermission("serverconf:update"), updateServerInfoHandler)
+	app.RouterAdminApi.Post("/game/noticelist", app.HasPermission("serverconf:update"), updateNoticeListHandler)
+	app.RouterAdminApi.Post("/game/noticenum", app.HasPermission("serverconf:update"), updateNoticeNumHandler)
 
 	return nil
 }

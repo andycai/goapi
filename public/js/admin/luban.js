@@ -42,7 +42,7 @@ function lubanManagement() {
 
         async fetchProjects() {
             try {
-                const response = await fetch('/api/luban/projects');
+                const response = await fetch('/api/admin/luban/projects');
                 if (!response.ok) throw new Error('获取项目列表失败');
                 this.projects = await response.json();
             } catch (error) {
@@ -71,7 +71,7 @@ function lubanManagement() {
 
         async submitProject() {
             try {
-                const url = this.editMode ? `/api/luban/projects/${this.form.id}` : '/api/luban/projects';
+                const url = this.editMode ? `/api/admin/luban/projects/${this.form.id}` : '/api/admin/luban/projects';
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 const formData = { ...this.form };
@@ -104,7 +104,7 @@ function lubanManagement() {
             if (!confirm('确定要删除这个项目吗？')) return;
 
             try {
-                const response = await fetch(`/api/luban/projects/${id}`, {
+                const response = await fetch(`/api/admin/luban/projects/${id}`, {
                     method: 'DELETE',
                 });
 
@@ -125,7 +125,7 @@ function lubanManagement() {
 
         async fetchProjectTables(projectId) {
             try {
-                const response = await fetch(`/api/luban/tables?project_id=${projectId}`);
+                const response = await fetch(`/api/admin/luban/tables?project_id=${projectId}`);
                 if (!response.ok) throw new Error('获取配置表列表失败');
                 this.currentProjectTables = await response.json();
             } catch (error) {
@@ -158,8 +158,8 @@ function lubanManagement() {
         async submitTable() {
             try {
                 const url = this.editMode 
-                    ? `/api/luban/tables/${this.tableForm.id}` 
-                    : '/api/luban/tables';
+                    ? `/api/admin/luban/tables/${this.tableForm.id}` 
+                    : '/api/admin/luban/tables';
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 const formData = { ...this.tableForm };
@@ -192,7 +192,7 @@ function lubanManagement() {
             if (!confirm('确定要删除这个配置表吗？')) return;
 
             try {
-                const response = await fetch(`/api/luban/tables/${id}`, {
+                const response = await fetch(`/api/admin/luban/tables/${id}`, {
                     method: 'DELETE',
                 });
 
@@ -218,7 +218,7 @@ function lubanManagement() {
 
         async submitExport() {
             try {
-                const response = await fetch('/api/luban/export', {
+                const response = await fetch('/api/admin/luban/export', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -246,7 +246,7 @@ function lubanManagement() {
 
             const pollProgress = async () => {
                 try {
-                    const response = await fetch(`/api/luban/exports/progress/${exportId}`);
+                    const response = await fetch(`/api/admin/luban/exports/progress/${exportId}`);
                     if (!response.ok) throw new Error('获取导出进度失败');
                     
                     this.exportProgress = await response.json();

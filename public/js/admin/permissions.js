@@ -17,7 +17,7 @@ function permissionManagement() {
         },
         async fetchPermissions() {
             try {
-                const response = await fetch('/api/permissions');
+                const response = await fetch('/api/admin/permissions');
                 if (!response.ok) throw new Error('获取权限列表失败');
                 this.permissions = await response.json();
             } catch (error) {
@@ -62,7 +62,7 @@ function permissionManagement() {
             this.loading = true;
 
             try {
-                const url = this.editMode ? `/api/permissions/${this.currentPermission.id}` : '/api/permissions';
+                const url = this.editMode ? `/api/admin/permissions/${this.currentPermission.id}` : '/api/admin/permissions';
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 const response = await fetch(url, {
@@ -94,7 +94,7 @@ function permissionManagement() {
             if (!confirm('确定要删除这个权限吗？')) return;
 
             try {
-                const response = await fetch(`/api/permissions/${id}`, {
+                const response = await fetch(`/api/admin/permissions/${id}`, {
                     method: 'DELETE'
                 });
 

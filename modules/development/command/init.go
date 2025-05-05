@@ -2,9 +2,10 @@ package command
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityCommand = 4001 // 功能-命令行
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type commandModule struct {
 }
 
 func init() {
-	core.RegisterModule(&commandModule{}, enum.ModulePriorityCommand)
+	core.RegisterModule(&commandModule{}, ModulePriorityCommand)
 }
 
 func (m *commandModule) Awake(a *core.App) error {
@@ -52,10 +53,10 @@ func (m *commandModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	app.RouterApi.Get("/command/list", app.HasPermission("command:view"), getCommandsHandler)
-	app.RouterApi.Post("/command", app.HasPermission("command:manage"), createCommandHandler)
-	app.RouterApi.Post("/command/:id/execute", app.HasPermission("command:manage"), executeCommandHandler)
-	app.RouterApi.Get("/command/:id/executions", app.HasPermission("command:view"), getCommandExecutionsHandler)
+	app.RouterAdminApi.Get("/command/list", app.HasPermission("command:view"), getCommandsHandler)
+	app.RouterAdminApi.Post("/command", app.HasPermission("command:manage"), createCommandHandler)
+	app.RouterAdminApi.Post("/command/:id/execute", app.HasPermission("command:manage"), executeCommandHandler)
+	app.RouterAdminApi.Get("/command/:id/executions", app.HasPermission("command:view"), getCommandExecutionsHandler)
 
 	return nil
 }

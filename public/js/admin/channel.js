@@ -29,7 +29,7 @@ function channelManagement() {
 
         async loadChannels() {
             try {
-                const response = await fetch(`/api/channel/list?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/admin/channel/list?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) {
                     throw new Error('Failed to load channels');
                 }
@@ -70,7 +70,7 @@ function channelManagement() {
 
         async createChannel() {
             try {
-                const response = await fetch('/api/channel', {
+                const response = await fetch('/api/admin/channel', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ function channelManagement() {
 
         async updateChannel() {
             try {
-                const response = await fetch(`/api/channel/${this.currentChannel.id}`, {
+                const response = await fetch(`/api/admin/channel/${this.currentChannel.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ function channelManagement() {
             }
 
             try {
-                const response = await fetch(`/api/channel/${id}`, {
+                const response = await fetch(`/api/admin/channel/${id}`, {
                     method: 'DELETE'
                 });
 

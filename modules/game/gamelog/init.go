@@ -2,9 +2,10 @@ package gamelog
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityGameLog = 9902 // 游戏-游戏日志
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type gamelogModule struct {
 }
 
 func init() {
-	core.RegisterModule(&gamelogModule{}, enum.ModulePriorityGameLog)
+	core.RegisterModule(&gamelogModule{}, ModulePriorityGameLog)
 }
 
 func (m *gamelogModule) Awake(a *core.App) error {
@@ -45,9 +46,9 @@ func (m *gamelogModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/gamelog", app.HasPermission("gamelog:view"), listLogsHandler)
-	app.RouterApi.Delete("/gamelog/before", app.HasPermission("gamelog:delete"), deleteLogsBeforeHandler)
-	app.RouterApi.Delete("/gamelog/:id", app.HasPermission("gamelog:view"), deleteLogHandler)
+	app.RouterAdminApi.Get("/gamelog", app.HasPermission("gamelog:view"), listLogsHandler)
+	app.RouterAdminApi.Delete("/gamelog/before", app.HasPermission("gamelog:delete"), deleteLogsBeforeHandler)
+	app.RouterAdminApi.Delete("/gamelog/:id", app.HasPermission("gamelog:view"), deleteLogHandler)
 
 	return nil
 }

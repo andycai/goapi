@@ -1,13 +1,4 @@
 function reposyncManagement() {
-    window.Alpine = window.Alpine || {};
-    if (!Alpine.store('notification')) {
-        Alpine.store('notification', {
-            show: (message, type) => {
-                console.error(message);
-            },
-            after: () => {}
-        });
-    }
     return {
         config: {
             repo_type1: 'svn',
@@ -38,7 +29,7 @@ function reposyncManagement() {
 
         async loadConfig() {
             try {
-                const response = await fetch('/api/reposync/config');
+                const response = await fetch('/api/admin/reposync/config');
                 if (!response.ok) throw new Error('加载配置失败');
                 const data = await response.json();
                 if (data) {
@@ -51,7 +42,7 @@ function reposyncManagement() {
 
         async saveConfig() {
             try {
-                const response = await fetch('/api/reposync/config', {
+                const response = await fetch('/api/admin/reposync/config', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -72,7 +63,7 @@ function reposyncManagement() {
 
         async checkoutRepos() {
             try {
-                const response = await fetch('/api/reposync/checkout', {
+                const response = await fetch('/api/admin/reposync/checkout', {
                     method: 'POST'
                 });
 
@@ -90,7 +81,7 @@ function reposyncManagement() {
 
         async loadCommits() {
             try {
-                const response = await fetch(`/api/reposync/commits?page=${this.currentPage}&pageSize=${this.pageSize}`);
+                const response = await fetch(`/api/admin/reposync/commits?page=${this.currentPage}&pageSize=${this.pageSize}`);
                 if (!response.ok) throw new Error('加载提交记录失败');
                 const data = await response.json();
                 this.commits = data.commits;
@@ -144,7 +135,7 @@ function reposyncManagement() {
                     return a.localeCompare(b);
                 });
 
-                const response = await fetch('/api/reposync/sync', {
+                const response = await fetch('/api/admin/reposync/sync', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -166,7 +157,7 @@ function reposyncManagement() {
 
         async syncCommit(revision) {
             try {
-                const response = await fetch('/api/reposync/sync', {
+                const response = await fetch('/api/admin/reposync/sync', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -228,7 +219,7 @@ function reposyncManagement() {
 
         async refreshCommits() {
             try {
-                const response = await fetch('/api/reposync/refresh', {
+                const response = await fetch('/api/admin/reposync/refresh', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -254,7 +245,7 @@ function reposyncManagement() {
             }
 
             try {
-                const response = await fetch('/api/reposync/clear', {
+                const response = await fetch('/api/admin/reposync/clear', {
                     method: 'POST'
                 });
 

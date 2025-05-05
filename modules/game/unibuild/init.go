@@ -2,8 +2,9 @@ package unibuild
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 )
+
+const ModulePriorityUnibuild = 9911 // 游戏-游戏构建
 
 var app *core.App
 
@@ -12,7 +13,7 @@ type uniBuildModule struct {
 }
 
 func init() {
-	core.RegisterModule(&uniBuildModule{}, enum.ModulePriorityUnibuild)
+	core.RegisterModule(&uniBuildModule{}, ModulePriorityUnibuild)
 }
 
 func (m *uniBuildModule) Awake(a *core.App) error {

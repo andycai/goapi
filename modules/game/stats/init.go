@@ -2,9 +2,10 @@ package stats
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityStats = 9903 // 游戏-游戏统计
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type statsModule struct {
 }
 
 func init() {
-	core.RegisterModule(&statsModule{}, enum.ModulePriorityStats)
+	core.RegisterModule(&statsModule{}, ModulePriorityStats)
 }
 
 func (m *statsModule) Awake(a *core.App) error {
@@ -39,10 +40,10 @@ func (m *statsModule) AddPublicRouters() error {
 
 func (m *statsModule) AddAuthRouters() error {
 
-	app.RouterApi.Get("/stats", app.HasPermission("stats:view"), listStatsHandler)
-	app.RouterApi.Delete("/stats/before", app.HasPermission("stats:delete"), deleteStatsBeforeHandler)
-	app.RouterApi.Get("/stats/details", app.HasPermission("stats:view"), getStatDetailsHandler)
-	app.RouterApi.Delete("/stats/:id", app.HasPermission("stats:delete"), deleteStatHandler)
+	app.RouterAdminApi.Get("/stats", app.HasPermission("stats:view"), listStatsHandler)
+	app.RouterAdminApi.Delete("/stats/before", app.HasPermission("stats:delete"), deleteStatsBeforeHandler)
+	app.RouterAdminApi.Get("/stats/details", app.HasPermission("stats:view"), getStatDetailsHandler)
+	app.RouterAdminApi.Delete("/stats/:id", app.HasPermission("stats:delete"), deleteStatHandler)
 
 	// admin
 	app.RouterAdmin.Get("/stats", app.HasPermission("stats:view"), func(c *fiber.Ctx) error {

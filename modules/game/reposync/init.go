@@ -2,9 +2,10 @@ package reposync
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityRepoSync = 9906 // 游戏-仓库同步
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type reposyncModule struct {
 }
 
 func init() {
-	core.RegisterModule(&reposyncModule{}, enum.ModulePriorityRepoSync)
+	core.RegisterModule(&reposyncModule{}, ModulePriorityRepoSync)
 }
 
 func (m *reposyncModule) Awake(a *core.App) error {
@@ -54,13 +55,13 @@ func (m *reposyncModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	app.RouterApi.Post("/reposync/config", app.HasPermission("reposync:config"), saveConfigHandler)
-	app.RouterApi.Get("/reposync/config", app.HasPermission("reposync:config"), getConfigHandler)
-	app.RouterApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkoutHandler)
-	app.RouterApi.Get("/reposync/commits", app.HasPermission("reposync:view"), listCommitsHandler)
-	app.RouterApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommitsHandler)
-	app.RouterApi.Post("/reposync/refresh", app.HasPermission("reposync:view"), refreshCommitsHandler)
-	app.RouterApi.Post("/reposync/clear", app.HasPermission("reposync:config"), clearSyncDataHandler)
+	app.RouterAdminApi.Post("/reposync/config", app.HasPermission("reposync:config"), saveConfigHandler)
+	app.RouterAdminApi.Get("/reposync/config", app.HasPermission("reposync:config"), getConfigHandler)
+	app.RouterAdminApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkoutHandler)
+	app.RouterAdminApi.Get("/reposync/commits", app.HasPermission("reposync:view"), listCommitsHandler)
+	app.RouterAdminApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommitsHandler)
+	app.RouterAdminApi.Post("/reposync/refresh", app.HasPermission("reposync:view"), refreshCommitsHandler)
+	app.RouterAdminApi.Post("/reposync/clear", app.HasPermission("reposync:config"), clearSyncDataHandler)
 
 	return nil
 }

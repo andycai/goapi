@@ -20,7 +20,7 @@ function parameterManagement() {
         },
         async fetchParameters() {
             try {
-                let url = `/api/parameters?page=${this.currentPage}&limit=${this.pageSize}`;
+                let url = `/api/admin/parameters?page=${this.currentPage}&limit=${this.pageSize}`;
                 if (this.searchKeyword) {
                     url += `&search=${encodeURIComponent(this.searchKeyword)}`;
                 }
@@ -77,7 +77,7 @@ function parameterManagement() {
             
             // 加载参数数据
             this.loading = true;
-            fetch(`/api/parameters/${parameter.id}`)
+            fetch(`/api/admin/parameters/${parameter.id}`)
                 .then(response => {
                     if (!response.ok) throw new Error('加载参数数据失败');
                     return response.json();
@@ -209,7 +209,7 @@ function parameterManagement() {
                     })
                 };
                 
-                const url = this.editMode ? `/api/parameters/${this.currentParameter.id}` : '/api/parameters';
+                const url = this.editMode ? `/api/admin/parameters/${this.currentParameter.id}` : '/api/admin/parameters';
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 const response = await fetch(url, {
@@ -242,7 +242,7 @@ function parameterManagement() {
             if (!confirm('确定要删除这个参数吗？此操作不可恢复。')) return;
             
             try {
-                const response = await fetch(`/api/parameters/${id}`, {
+                const response = await fetch(`/api/admin/parameters/${id}`, {
                     method: 'DELETE'
                 });
                 

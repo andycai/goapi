@@ -45,10 +45,10 @@ func (m *userModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/users", app.HasPermission("user:view"), listUsersHandler)
-	app.RouterApi.Post("/users", app.HasPermission("user:create"), createUserHandler)
-	app.RouterApi.Put("/users/:id", app.HasPermission("user:update"), updateUserHandler)
-	app.RouterApi.Delete("/users/:id", app.HasPermission("user:delete"), deleteUserHandler)
+	app.RouterAdminApi.Get("/users", app.HasPermission("user:view"), listUsersHandler)
+	app.RouterAdminApi.Post("/users", app.HasPermission("user:create"), createUserHandler)
+	app.RouterAdminApi.Put("/users/:id", app.HasPermission("user:update"), updateUserHandler)
+	app.RouterAdminApi.Delete("/users/:id", app.HasPermission("user:delete"), deleteUserHandler)
 
 	return nil
 }

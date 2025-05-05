@@ -27,12 +27,26 @@ document.addEventListener('alpine:init', () => {
     });
 });
 
+// 显示普通消息
 function ShowMessage(message) {
     Alpine.store('notification').show(message, 'success');
 }
 
+// 显示错误消息
 function ShowError(message) {
     Alpine.store('notification').show(message, 'error');
+}
+
+// 格式化日期
+function FormatDate(timestamp) {
+    if (!timestamp) return '';
+    return new Date(timestamp).toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 
 function adminLayoutManagement() {
@@ -96,7 +110,7 @@ function adminLayoutManagement() {
                 }
             } catch (error) {
                 console.error('Failed to load menus:', error);
-                Alpine.store('notification').show('加载菜单失败', 'error');
+                ShowError('加载菜单失败');
             }
         },
         initializeTabs() {
@@ -232,7 +246,7 @@ function adminLayoutManagement() {
                 window.location.href = path;
             } catch (error) {
                 console.error('Navigation error:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             } finally {
                 this.loading = false;
             }
@@ -363,7 +377,7 @@ function adminLayoutManagement() {
                 window.location.href = path;
             } catch (error) {
                 console.error('Navigation error:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             } finally {
                 this.loading = false;
             }

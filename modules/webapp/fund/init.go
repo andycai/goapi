@@ -2,9 +2,10 @@ package fund
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityFund = 5100 // 功能-基金管理
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type fundModule struct {
 }
 
 func init() {
-	core.RegisterModule(&fundModule{}, enum.ModulePriorityFund)
+	core.RegisterModule(&fundModule{}, ModulePriorityFund)
 }
 
 func (m *fundModule) Awake(a *core.App) error {
@@ -54,11 +55,11 @@ func (m *fundModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	app.RouterApi.Post("/fund/config", app.HasPermission("fund:config"), saveConfigHandler)
-	app.RouterApi.Get("/fund/config", app.HasPermission("fund:config"), getConfigHandler)
-	app.RouterApi.Post("/fund/sync", app.HasPermission("fund:sync"), syncDataHandler)
-	app.RouterApi.Get("/fund/list", app.HasPermission("fund:view"), listFundsHandler)
-	app.RouterApi.Get("/fund/market", app.HasPermission("fund:view"), getMarketDataHandler) // 保持原有路径
+	app.RouterAdminApi.Post("/fund/config", app.HasPermission("fund:config"), saveConfigHandler)
+	app.RouterAdminApi.Get("/fund/config", app.HasPermission("fund:config"), getConfigHandler)
+	app.RouterAdminApi.Post("/fund/sync", app.HasPermission("fund:sync"), syncDataHandler)
+	app.RouterAdminApi.Get("/fund/list", app.HasPermission("fund:view"), listFundsHandler)
+	app.RouterAdminApi.Get("/fund/market", app.HasPermission("fund:view"), getMarketDataHandler) // 保持原有路径
 
 	return nil
 }

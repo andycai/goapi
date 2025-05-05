@@ -56,11 +56,11 @@ func (m *menuModule) AddAuthRouters() error {
 	})
 
 	// api
-	app.RouterApi.Get("/menus", app.HasPermission("menu:view"), listMenusHandler)
-	app.RouterApi.Get("/menus/tree", app.HasPermission("menu:view"), getMenuTreeHandler)
-	app.RouterApi.Post("/menus", app.HasPermission("menu:create"), createMenuHandler)
-	app.RouterApi.Put("/menus/:id", app.HasPermission("menu:update"), updateMenuHandler)
-	app.RouterApi.Delete("/menus/:id", app.HasPermission("menu:delete"), deleteMenuHandler)
+	app.RouterAdminApi.Get("/menus", app.HasPermission("menu:view"), listMenusHandler)
+	app.RouterAdminApi.Get("/menus/tree", app.HasPermission("menu:view"), getMenuTreeHandler)
+	app.RouterAdminApi.Post("/menus", app.HasPermission("menu:create"), createMenuHandler)
+	app.RouterAdminApi.Put("/menus/:id", app.HasPermission("menu:update"), updateMenuHandler)
+	app.RouterAdminApi.Delete("/menus/:id", app.HasPermission("menu:delete"), deleteMenuHandler)
 
 	return nil
 }

@@ -34,7 +34,7 @@ function noteManagement() {
         // 加载分类列表
         async loadCategories() {
             try {
-                const response = await fetch('/api/notes/categories');
+                const response = await fetch('/api/admin/notes/categories');
                 if (!response.ok) throw new Error('加载分类失败');
                 this.categories = await response.json();
                 // 初始化展开状态并确保ID是数字类型
@@ -52,7 +52,7 @@ function noteManagement() {
         // 加载笔记列表
         async loadNotes() {
             try {
-                const response = await fetch('/api/notes/tree');
+                const response = await fetch('/api/admin/notes/tree');
                 if (!response.ok) throw new Error('加载笔记失败');
                 this.notes = await response.json();
                 // 确保ID是数字类型
@@ -72,7 +72,7 @@ function noteManagement() {
         // 加载角色列表
         async loadRoles() {
             try {
-                const response = await fetch('/api/roles');
+                const response = await fetch('/api/admin/roles');
                 if (!response.ok) throw new Error('加载角色失败');
                 this.roles = await response.json();
             } catch (error) {
@@ -96,7 +96,7 @@ function noteManagement() {
         // 选择笔记
         async selectNote(note) {
             try {
-                const response = await fetch(`/api/notes/${note.id}`);
+                const response = await fetch(`/api/admin/notes/${note.id}`);
                 if (!response.ok) throw new Error('加载笔记详情失败');
                 this.selectedNote = await response.json();
             } catch (error) {
@@ -137,7 +137,7 @@ function noteManagement() {
         async saveNote() {
             if (this.selectedNote) {
                 try {
-                    const response = await fetch(`/api/notes/${this.selectedNote.id}`, {
+                    const response = await fetch(`/api/admin/notes/${this.selectedNote.id}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ function noteManagement() {
         // 提交笔记
         submitNote() {
             const isEdit = !!this.noteForm.id;
-            const url = isEdit ? `/api/notes/${this.noteForm.id}` : '/api/notes';
+            const url = isEdit ? `/api/admin/notes/${this.noteForm.id}` : '/api/admin/notes';
             const method = isEdit ? 'PUT' : 'POST';
 
             fetch(url, {
@@ -214,7 +214,7 @@ function noteManagement() {
             if (!confirm('确定要删除这个笔记吗？')) return;
 
             try {
-                const response = await fetch(`/api/notes/${note.id}`, {
+                const response = await fetch(`/api/admin/notes/${note.id}`, {
                     method: 'DELETE',
                 });
 
@@ -261,7 +261,7 @@ function noteManagement() {
         // 保存分类
         async saveCategory() {
             try {
-                const url = this.categoryForm.id ? `/api/notes/categories/${this.categoryForm.id}` : '/api/notes/categories';
+                const url = this.categoryForm.id ? `/api/admin/notes/categories/${this.categoryForm.id}` : '/api/admin/notes/categories';
                 const method = this.categoryForm.id ? 'PUT' : 'POST';
 
                 const response = await fetch(url, {
@@ -294,7 +294,7 @@ function noteManagement() {
             if (!confirm('确定要删除这个分类吗？')) return;
 
             try {
-                const response = await fetch(`/api/notes/categories/${category.id}`, {
+                const response = await fetch(`/api/admin/notes/categories/${category.id}`, {
                     method: 'DELETE',
                 });
 

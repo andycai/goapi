@@ -24,7 +24,7 @@ function serverGroupManagement() {
 
         async loadServerGroups() {
             try {
-                const response = await fetch(`/api/server-groups?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/admin/server-groups?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) {
                     throw new Error('Failed to load server groups');
                 }
@@ -34,13 +34,13 @@ function serverGroupManagement() {
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
                 console.error('Error loading server groups:', error);
-                alert('加载服务器组列表失败');
+                ShowError('加载服务器组列表失败');
             }
         },
 
         async createServerGroup() {
             try {
-                const response = await fetch('/api/server-groups', {
+                const response = await fetch('/api/admin/server-groups', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -54,16 +54,16 @@ function serverGroupManagement() {
 
                 this.resetServerGroupForm();
                 this.loadServerGroups();
-                alert('创建服务器组成功');
+                ShowMessage('创建服务器组成功');
             } catch (error) {
                 console.error('Error creating server group:', error);
-                alert('创建服务器组失败');
+                ShowError('创建服务器组失败');
             }
         },
 
         async updateServerGroup() {
             try {
-                const response = await fetch(`/api/server-groups/${this.editingServerGroup.id}`, {
+                const response = await fetch(`/api/admin/server-groups/${this.editingServerGroup.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -77,10 +77,10 @@ function serverGroupManagement() {
 
                 this.showEditModal = false;
                 this.loadServerGroups();
-                alert('更新服务器组成功');
+                ShowMessage('更新服务器组成功');
             } catch (error) {
                 console.error('Error updating server group:', error);
-                alert('更新服务器组失败');
+                ShowError('更新服务器组失败');
             }
         },
 
@@ -90,7 +90,7 @@ function serverGroupManagement() {
             }
 
             try {
-                const response = await fetch(`/api/server-groups/${id}`, {
+                const response = await fetch(`/api/admin/server-groups/${id}`, {
                     method: 'DELETE'
                 });
 
@@ -99,16 +99,16 @@ function serverGroupManagement() {
                 }
 
                 this.loadServerGroups();
-                alert('删除服务器组成功');
+                ShowMessage('删除服务器组成功');
             } catch (error) {
                 console.error('Error deleting server group:', error);
-                alert('删除服务器组失败');
+                ShowError('删除服务器组失败');
             }
         },
 
         async loadGroupServers(groupId) {
             try {
-                const response = await fetch(`/api/server-groups/${groupId}/servers`);
+                const response = await fetch(`/api/admin/server-groups/${groupId}/servers`);
                 if (!response.ok) {
                     throw new Error('Failed to load group servers');
                 }
@@ -116,13 +116,13 @@ function serverGroupManagement() {
                 this.groupServers = data.data;
             } catch (error) {
                 console.error('Error loading group servers:', error);
-                alert('加载服务器组中的服务器失败');
+                ShowError('加载服务器组中的服务器失败');
             }
         },
 
         async loadAvailableServers() {
             try {
-                const response = await fetch('/api/physical-servers');
+                const response = await fetch('/api/admin/physical-servers');
                 if (!response.ok) {
                     throw new Error('Failed to load available servers');
                 }
@@ -130,13 +130,13 @@ function serverGroupManagement() {
                 this.availableServers = data.data;
             } catch (error) {
                 console.error('Error loading available servers:', error);
-                alert('加载可用服务器列表失败');
+                ShowError('加载可用服务器列表失败');
             }
         },
 
         async addServerToGroup(groupId, serverId) {
             try {
-                const response = await fetch(`/api/server-groups/${groupId}/servers/${serverId}`, {
+                const response = await fetch(`/api/admin/server-groups/${groupId}/servers/${serverId}`, {
                     method: 'POST'
                 });
 
@@ -146,10 +146,10 @@ function serverGroupManagement() {
 
                 this.loadGroupServers(groupId);
                 this.loadAvailableServers();
-                alert('添加服务器成功');
+                ShowMessage('添加服务器成功');
             } catch (error) {
                 console.error('Error adding server to group:', error);
-                alert('添加服务器失败');
+                ShowError('添加服务器失败');
             }
         },
 
@@ -159,7 +159,7 @@ function serverGroupManagement() {
             }
 
             try {
-                const response = await fetch(`/api/server-groups/${groupId}/servers/${serverId}`, {
+                const response = await fetch(`/api/admin/server-groups/${groupId}/servers/${serverId}`, {
                     method: 'DELETE'
                 });
 
@@ -168,10 +168,10 @@ function serverGroupManagement() {
                 }
 
                 this.loadGroupServers(groupId);
-                alert('移除服务器成功');
+                ShowMessage('移除服务器成功');
             } catch (error) {
                 console.error('Error removing server from group:', error);
-                alert('移除服务器失败');
+                ShowError('移除服务器失败');
             }
         },
 

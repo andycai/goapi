@@ -55,7 +55,7 @@ func (m *dictModule) AddAuthRouters() error {
 	})
 
 	// API路由
-	dictTypeGroup := app.RouterApi.Group("/dict/type")
+	dictTypeGroup := app.RouterAdminApi.Group("/dict/type")
 	{
 		dictTypeGroup.Get("/list", app.HasPermission("dict:view"), listDictTypeHandler)
 		dictTypeGroup.Post("/add", app.HasPermission("dict:add"), addDictTypeHandler)
@@ -63,7 +63,7 @@ func (m *dictModule) AddAuthRouters() error {
 		dictTypeGroup.Post("/delete", app.HasPermission("dict:delete"), deleteDictTypeHandler)
 	}
 
-	dictDataGroup := app.RouterApi.Group("/dict/data")
+	dictDataGroup := app.RouterAdminApi.Group("/dict/data")
 	{
 		dictDataGroup.Get("/list", app.HasPermission("dict:view"), listDictDataHandler)
 		dictDataGroup.Post("/add", app.HasPermission("dict:add"), addDictDataHandler)

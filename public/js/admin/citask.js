@@ -47,7 +47,7 @@ function taskManagement() {
         },
         async fetchTasks() {
             try {
-                const response = await fetch('/api/citask');
+                const response = await fetch('/api/admin/citask');
                 if (!response.ok) throw new Error('获取任务列表失败');
                 this.tasks = await response.json();
             } catch (error) {
@@ -83,7 +83,7 @@ function taskManagement() {
         },
         async submitTask() {
             try {
-                const url = this.editMode ? `/api/citask/${this.form.id}` : '/api/citask';
+                const url = this.editMode ? `/api/admin/citask/${this.form.id}` : '/api/admin/citask';
                 const method = this.editMode ? 'PUT' : 'POST';
                 
                 // Create a copy of the form data and remove id field for new tasks
@@ -117,7 +117,7 @@ function taskManagement() {
             if (!confirm('确定要删除这个任务吗？')) return;
 
             try {
-                const response = await fetch(`/api/citask/${id}`, {
+                const response = await fetch(`/api/admin/citask/${id}`, {
                     method: 'DELETE',
                 });
 
@@ -132,7 +132,7 @@ function taskManagement() {
         },
         async runTask(task) {
             try {
-                const response = await fetch(`/api/citask/run/${task.id}`, {
+                const response = await fetch(`/api/admin/citask/run/${task.id}`, {
                     method: 'POST'
                 });
                 if (!response.ok) throw new Error('启动任务失败');
@@ -160,7 +160,7 @@ function taskManagement() {
             if (!this.currentTaskLog) return;
             
             try {
-                const response = await fetch(`/api/citask/stop/${this.currentTaskLog.id}`, {
+                const response = await fetch(`/api/admin/citask/stop/${this.currentTaskLog.id}`, {
                     method: 'POST'
                 });
                 if (!response.ok) throw new Error('停止任务失败');
@@ -175,7 +175,7 @@ function taskManagement() {
         },
         async viewLogs(task) {
             try {
-                const response = await fetch(`/api/citask/logs/${task.id}`);
+                const response = await fetch(`/api/admin/citask/logs/${task.id}`);
                 if (!response.ok) throw new Error('获取任务日志失败');
                 this.taskLogs = await response.json();
                 this.currentPage = 1;
@@ -196,7 +196,7 @@ function taskManagement() {
             // 开始新的轮询
             this.progressInterval = setInterval(async () => {
                 try {
-                    const response = await fetch(`/api/citask/progress/${logId}`);
+                    const response = await fetch(`/api/admin/citask/progress/${logId}`);
                     if (!response.ok) throw new Error('获取进度失败');
                     const progress = await response.json();
                     
@@ -341,7 +341,7 @@ function taskManagement() {
         // 获取正在执行的任务
         async fetchRunningTasks() {
             try {
-                const response = await fetch('/api/citask/running');
+                const response = await fetch('/api/admin/citask/running');
                 if (!response.ok) throw new Error('获取正在执行的任务失败');
                 const tasks = await response.json();
                 const data = tasks.data == null ? [] : tasks.data;
@@ -371,7 +371,7 @@ function taskManagement() {
         async viewLog(log) {
             try {
                 const logId = log.id;
-                const response = await fetch(`/api/citask/progress/${logId}`);
+                const response = await fetch(`/api/admin/citask/progress/${logId}`);
                 if (response.ok) {
                     const progress = await response.json();
 
@@ -415,7 +415,7 @@ function taskManagement() {
         async getNextRunTime(cronExpr) {
             if (!cronExpr) return null;
             try {
-                const response = await fetch('/api/citask/next-run?expr=' + encodeURIComponent(cronExpr));
+                const response = await fetch('/api/admin/citask/next-run?expr=' + encodeURIComponent(cronExpr));
                 const data = await response.json();
                 if (data.code === 0 && data.data) {
                     return data.data.next_run_text;
@@ -434,7 +434,7 @@ function taskManagement() {
                 return;
             }
             try {
-                const response = await fetch(`/api/citask/search?keyword=${encodeURIComponent(this.searchKeyword)}`);
+                const response = await fetch(`/api/admin/citask/search?keyword=${encodeURIComponent(this.searchKeyword)}`);
                 if (response.ok) {
                     this.searchResults = await response.json();
                     this.selectedIndex = -1;
@@ -459,7 +459,7 @@ function taskManagement() {
         },
         async loadTasks() {
             try {
-                const response = await fetch('/api/citask/tasks');
+                const response = await fetch('/api/admin/citask/tasks');
                 if (response.ok) {
                     this.tasks = await response.json();
                 }

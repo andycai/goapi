@@ -6,19 +6,19 @@ function deleteFile(path, event) {
         return;
     }
 
-    fetch('/admin/browse/' + encodeURIComponent(path), {
+    fetch('/api/admin/browse/' + encodeURIComponent(path), {
         method: 'DELETE'
     })
         .then(response => {
             if (response.ok) {
                 window.location.reload();
             } else {
-                alert('删除失败: ' + response.statusText);
+                ShowError('删除失败: ' + response.statusText);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('删除失败: ' + error.message);
+            ShowError('删除失败: ' + error.message);
         });
 }
 
@@ -30,20 +30,20 @@ function uploadToFTP(path, type, event) {
         return;
     }
 
-    fetch('/admin/ftp/upload?file=' + encodeURIComponent(path) + '&type=' + type, {
+    fetch('/api/admin/ftp/upload?file=' + encodeURIComponent(path) + '&type=' + type, {
         method: 'POST'
     })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('上传成功');
+                ShowMessage('上传成功');
             } else {
-                alert('上传失败: ' + data.error);
+                ShowError('上传失败: ' + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('上传失败: ' + error.message);
+            ShowError('上传失败: ' + error.message);
         });
 }
 
@@ -54,20 +54,20 @@ function handleFileClick(filePath) {
     if (loadingIndicator) loadingIndicator.classList.remove('hidden');
     
     // 首先获取文件大小
-    fetch(`/api/browse/file?path=${encodeURIComponent(filePath)}&metadata=true`)
+    fetch(`/api/admin/browse/file?path=${encodeURIComponent(filePath)}&metadata=true`)
         .then(response => response.json())
         .then(metadata => {
             if (metadata.success && metadata.data.size > 20 * 1024 * 1024) {
                 // 文件超过5MB，提示下载
                 if (confirm('文件较大(超过20MB)，建议直接下载而不是预览。\n\n是否要下载文件？')) {
-                    window.location.href = `/api/browse/file?path=${encodeURIComponent(filePath)}&download=true`;
+                    window.location.href = `/api/admin/browse/file?path=${encodeURIComponent(filePath)}&download=true`;
                 }
                 if (loadingIndicator) loadingIndicator.classList.add('hidden');
                 return;
             }
             
             // 获取文件内容
-            return fetch(`/api/browse/file?path=${encodeURIComponent(filePath)}`)
+            return fetch(`/api/admin/browse/file?path=${encodeURIComponent(filePath)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (loadingIndicator) loadingIndicator.classList.add('hidden');
@@ -80,13 +80,13 @@ function handleFileClick(filePath) {
                             window.location.href = data.data.downloadUrl;
                         }
                     } else {
-                        showError('获取文件内容失败');
+                        ShowError('获取文件内容失败');
                     }
                 });
         })
         .catch(error => {
             console.error('Error:', error);
-            showError('获取文件内容失败');
+            ShowError('获取文件内容失败');
         });
 }
 
@@ -160,17 +160,17 @@ function showTextContent(content, filePath) {
 }
 
 // 显示错误信息
-function showError(message) {
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-    toast.textContent = message;
+// function showError(message) {
+//     const toast = document.createElement('div');
+//     toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+//     toast.textContent = message;
     
-    document.body.appendChild(toast);
+//     document.body.appendChild(toast);
     
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
+//     setTimeout(() => {
+//         toast.remove();
+//     }, 3000);
+// }
 
 // 初始化文件点击事件
 document.addEventListener('DOMContentLoaded', function() {

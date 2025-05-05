@@ -32,7 +32,7 @@ function gitManagement() {
 
         async loadRepositories() {
             try {
-                const response = await fetch('/api/git/repositories');
+                const response = await fetch('/api/admin/git/repositories');
                 if (!response.ok) throw new Error('Failed to load repositories');
                 this.repositories = await response.json();
             } catch (error) {
@@ -62,7 +62,7 @@ function gitManagement() {
         async submitClone(e) {
             e.preventDefault();
             try {
-                const response = await fetch('/api/git/clone', {
+                const response = await fetch('/api/admin/git/clone', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(this.cloneForm)
@@ -80,7 +80,7 @@ function gitManagement() {
 
         async pullChanges(repo) {
             try {
-                const response = await fetch(`/api/git/pull`, {
+                const response = await fetch(`/api/admin/git/pull`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path: repo.path })
@@ -96,7 +96,7 @@ function gitManagement() {
 
         async pushChanges(repo) {
             try {
-                const response = await fetch(`/api/git/push`, {
+                const response = await fetch(`/api/admin/git/push`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path: repo.path })
@@ -112,7 +112,7 @@ function gitManagement() {
 
         async viewStatus(repo) {
             try {
-                const response = await fetch(`/api/git/status?path=${encodeURIComponent(repo.path)}`);
+                const response = await fetch(`/api/admin/git/status?path=${encodeURIComponent(repo.path)}`);
                 if (!response.ok) throw new Error('Failed to get status');
                 const status = await response.text();
                 this.detailsTitle = '仓库状态';
@@ -126,7 +126,7 @@ function gitManagement() {
 
         async viewLog(repo) {
             try {
-                const response = await fetch(`/api/git/log?path=${encodeURIComponent(repo.path)}`);
+                const response = await fetch(`/api/admin/git/log?path=${encodeURIComponent(repo.path)}`);
                 if (!response.ok) throw new Error('Failed to get log');
                 const log = await response.text();
                 this.detailsTitle = '提交日志';
@@ -146,7 +146,7 @@ function gitManagement() {
         async submitCommit(e) {
             e.preventDefault();
             try {
-                const response = await fetch('/api/git/commit', {
+                const response = await fetch('/api/admin/git/commit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -168,7 +168,7 @@ function gitManagement() {
         async manageBranches(repo) {
             this.selectedRepo = repo;
             try {
-                const response = await fetch(`/api/git/branches?path=${encodeURIComponent(repo.path)}`);
+                const response = await fetch(`/api/admin/git/branches?path=${encodeURIComponent(repo.path)}`);
                 if (!response.ok) throw new Error('Failed to get branches');
                 this.branches = await response.json();
                 this.branchForm.selected = repo.branch;
@@ -185,7 +185,7 @@ function gitManagement() {
                 return;
             }
             try {
-                const response = await fetch('/api/git/branch/create', {
+                const response = await fetch('/api/admin/git/branch/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -205,7 +205,7 @@ function gitManagement() {
 
         async checkoutBranch() {
             try {
-                const response = await fetch('/api/git/branch/checkout', {
+                const response = await fetch('/api/admin/git/branch/checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -224,7 +224,7 @@ function gitManagement() {
 
         async mergeBranch() {
             try {
-                const response = await fetch('/api/git/branch/merge', {
+                const response = await fetch('/api/admin/git/branch/merge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -248,7 +248,7 @@ function gitManagement() {
 
         async stashChanges() {
             try {
-                const response = await fetch('/api/git/stash/save', {
+                const response = await fetch('/api/admin/git/stash/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path: this.selectedRepo.path })
@@ -264,7 +264,7 @@ function gitManagement() {
 
         async popStash() {
             try {
-                const response = await fetch('/api/git/stash/pop', {
+                const response = await fetch('/api/admin/git/stash/pop', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path: this.selectedRepo.path })

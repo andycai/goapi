@@ -12,7 +12,7 @@ function imagemanagerManagement() {
 
         async fetchImages() {
             try {
-                const response = await fetch('/api/imagemanager/list');
+                const response = await fetch('/api/admin/imagemanager/list');
                 if (!response.ok) throw new Error('获取图片列表失败');
                 this.images = await response.json();
             } catch (error) {
@@ -51,7 +51,7 @@ function imagemanagerManagement() {
                     formData.append('images', image.file);
                 });
 
-                const response = await fetch('/api/imagemanager/upload', {
+                const response = await fetch('/api/admin/imagemanager/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -74,7 +74,7 @@ function imagemanagerManagement() {
             if (!confirm(`确定要删除图片 "${image.name}" 吗？`)) return;
 
             try {
-                const response = await fetch(`/api/imagemanager/delete/${image.id}`, {
+                const response = await fetch(`/api/admin/imagemanager/delete/${image.id}`, {
                     method: 'DELETE'
                 });
 

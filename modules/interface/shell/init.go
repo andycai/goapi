@@ -2,8 +2,9 @@ package shell
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 )
+
+const ModulePriorityShell = 9001 // 接口-shell脚本
 
 var app *core.App
 
@@ -12,7 +13,7 @@ type shellModule struct {
 }
 
 func init() {
-	core.RegisterModule(&shellModule{}, enum.ModulePriorityShell)
+	core.RegisterModule(&shellModule{}, ModulePriorityShell)
 }
 
 func (m *shellModule) Awake(a *core.App) error {

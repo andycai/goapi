@@ -1,13 +1,4 @@
 function commandManagement() {
-    window.Alpine = window.Alpine || {};
-    if (!Alpine.store('notification')) {
-        Alpine.store('notification', {
-            show: (message, type) => {
-                console.error(message);
-            },
-            after: () => {}
-        });
-    }
     return {
         command: {
             name: '',
@@ -27,14 +18,14 @@ function commandManagement() {
 
         async loadCommands() {
             try {
-                const response = await fetch(`/api/commands?page=${this.currentPage}&limit=${this.pageSize}`);
+                const response = await fetch(`/api/admin/commands?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) throw new Error('加载命令列表失败');
                 const data = await response.json();
                 this.commands = data.commands;
                 this.totalRecords = data.total;
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -46,12 +37,12 @@ function commandManagement() {
 
         async createCommand() {
             if (!this.command.name || !this.command.script) {
-                Alpine.store('notification').show('命令名称和脚本不能为空', 'error');
+                ShowError('命令名称和脚本不能为空');
                 return;
             }
 
             try {
-                const response = await fetch('/api/commands', {
+                const response = await fetch('/api/admin/commands', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -64,17 +55,17 @@ function commandManagement() {
                     throw new Error(error.error || '创建命令失败');
                 }
 
-                Alpine.store('notification').show('命令创建成功', 'success');
+                ShowMessage('命令创建成功');
                 this.command = { name: '', script: '' };
                 await this.loadCommands();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
         async executeCommand(id) {
             try {
-                const response = await fetch(`/api/commands/${id}/execute`, {
+                const response = await fetch(`/api/admin/commands/${id}/execute`, {
                     method: 'POST'
                 });
 
@@ -83,22 +74,22 @@ function commandManagement() {
                     throw new Error(error.error || '执行命令失败');
                 }
 
-                Alpine.store('notification').show('命令执行成功', 'success');
+                ShowMessage('命令执行成功');
                 await this.loadCommands();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
         async viewExecutions(id) {
             try {
-                const response = await fetch(`/api/commands/${id}/executions`);
+                const response = await fetch(`/api/admin/commands/${id}/executions`);
                 if (!response.ok) throw new Error('获取执行记录失败');
                 const data = await response.json();
                 this.executions = data;
                 this.showExecutionModal = true;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 

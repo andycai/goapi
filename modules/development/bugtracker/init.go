@@ -2,9 +2,10 @@ package bugtracker
 
 import (
 	"github.com/andycai/goapi/core"
-	"github.com/andycai/goapi/enum"
 	"github.com/gofiber/fiber/v2"
 )
+
+const ModulePriorityBugTracker = 4003 // 功能-Bug 跟踪
 
 var app *core.App
 
@@ -13,7 +14,7 @@ type bugtrackerModule struct {
 }
 
 func init() {
-	core.RegisterModule(&bugtrackerModule{}, enum.ModulePriorityBugTracker)
+	core.RegisterModule(&bugtrackerModule{}, ModulePriorityBugTracker)
 }
 
 func (m *bugtrackerModule) Awake(a *core.App) error {
@@ -43,26 +44,26 @@ func (m *bugtrackerModule) AddAuthRouters() error {
 	})
 
 	// Project routes
-	app.RouterApi.Get("/bugtracker/projects", app.HasPermission("bugtracker:project:view"), listProjectsHandler)
-	app.RouterApi.Post("/bugtracker/projects", app.HasPermission("bugtracker:project:create"), createProjectHandler)
-	app.RouterApi.Put("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:update"), updateProjectHandler)
-	app.RouterApi.Get("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:view"), getProjectHandler)
+	app.RouterAdminApi.Get("/bugtracker/projects", app.HasPermission("bugtracker:project:view"), listProjectsHandler)
+	app.RouterAdminApi.Post("/bugtracker/projects", app.HasPermission("bugtracker:project:create"), createProjectHandler)
+	app.RouterAdminApi.Put("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:update"), updateProjectHandler)
+	app.RouterAdminApi.Get("/bugtracker/projects/:id", app.HasPermission("bugtracker:project:view"), getProjectHandler)
 
 	// Iteration routes
-	app.RouterApi.Get("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:view"), listIterationsHandler)
-	app.RouterApi.Post("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:create"), createIterationHandler)
-	app.RouterApi.Put("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:update"), updateIterationHandler)
-	app.RouterApi.Get("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:view"), getIterationHandler)
+	app.RouterAdminApi.Get("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:view"), listIterationsHandler)
+	app.RouterAdminApi.Post("/bugtracker/iterations", app.HasPermission("bugtracker:iteration:create"), createIterationHandler)
+	app.RouterAdminApi.Put("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:update"), updateIterationHandler)
+	app.RouterAdminApi.Get("/bugtracker/iterations/:id", app.HasPermission("bugtracker:iteration:view"), getIterationHandler)
 
 	// Issue routes
-	app.RouterApi.Get("/bugtracker/issues", app.HasPermission("bugtracker:issue:view"), listIssuesHandler)
-	app.RouterApi.Post("/bugtracker/issues", app.HasPermission("bugtracker:issue:create"), createIssueHandler)
-	app.RouterApi.Put("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:update"), updateIssueHandler)
-	app.RouterApi.Get("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:view"), getIssueHandler)
+	app.RouterAdminApi.Get("/bugtracker/issues", app.HasPermission("bugtracker:issue:view"), listIssuesHandler)
+	app.RouterAdminApi.Post("/bugtracker/issues", app.HasPermission("bugtracker:issue:create"), createIssueHandler)
+	app.RouterAdminApi.Put("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:update"), updateIssueHandler)
+	app.RouterAdminApi.Get("/bugtracker/issues/:id", app.HasPermission("bugtracker:issue:view"), getIssueHandler)
 
 	// Comment routes
-	app.RouterApi.Get("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:view"), listCommentsHandler)
-	app.RouterApi.Post("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:create"), createCommentHandler)
+	app.RouterAdminApi.Get("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:view"), listCommentsHandler)
+	app.RouterAdminApi.Post("/bugtracker/issues/:id/comments", app.HasPermission("bugtracker:comment:create"), createCommentHandler)
 
 	return nil
 }

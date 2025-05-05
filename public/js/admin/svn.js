@@ -22,7 +22,7 @@ function svnManagement() {
         },
         async fetchRepositories() {
             try {
-                const response = await fetch('/api/svn/status');
+                const response = await fetch('/api/admin/svn/status');
                 if (!response.ok) throw new Error('获取仓库列表失败');
                 const data = await response.json();
                 this.repositories = data.repositories;
@@ -41,7 +41,7 @@ function svnManagement() {
         },
         async submitCheckout() {
             try {
-                const response = await fetch('/api/svn/checkout', {
+                const response = await fetch('/api/admin/svn/checkout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ function svnManagement() {
         },
         async updateRepository(repo) {
             try {
-                const response = await fetch('/api/svn/update', {
+                const response = await fetch('/api/admin/svn/update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ function svnManagement() {
         },
         async viewStatus(repo) {
             try {
-                const response = await fetch(`/api/svn/status?path=${encodeURIComponent(repo.path)}`);
+                const response = await fetch(`/api/admin/svn/status?path=${encodeURIComponent(repo.path)}`);
                 if (!response.ok) {
                     const error = await response.json();
                     throw new Error(error.error || '获取状态失败');
@@ -100,7 +100,7 @@ function svnManagement() {
         },
         async viewLog(repo) {
             try {
-                const response = await fetch(`/api/svn/log?path=${encodeURIComponent(repo.path)}&limit=10`);
+                const response = await fetch(`/api/admin/svn/log?path=${encodeURIComponent(repo.path)}&limit=10`);
                 if (!response.ok) {
                     const error = await response.json();
                     throw new Error(error.error || '获取日志失败');
@@ -121,7 +121,7 @@ function svnManagement() {
         },
         async submitCommit() {
             try {
-                const response = await fetch('/api/svn/commit', {
+                const response = await fetch('/api/admin/svn/commit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ function svnManagement() {
             }
 
             try {
-                const response = await fetch('/api/svn/revert', {
+                const response = await fetch('/api/admin/svn/revert', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

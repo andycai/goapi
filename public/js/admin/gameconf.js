@@ -39,7 +39,7 @@ function gameconfManagement() {
         // 加载项目列表
         async loadProjects() {
             try {
-                const response = await fetch('/api/gameconf/projects');
+                const response = await fetch('/api/admin/gameconf/projects');
                 if (!response.ok) throw new Error('加载项目列表失败');
                 this.projects = await response.json();
             } catch (error) {
@@ -74,8 +74,8 @@ function gameconfManagement() {
         async saveProject() {
             try {
                 const url = this.editingProject
-                    ? `/api/gameconf/projects/${this.projectForm.id}`
-                    : '/api/gameconf/projects';
+                    ? `/api/admin/gameconf/projects/${this.projectForm.id}`
+                    : '/api/admin/gameconf/projects';
                 const method = this.editingProject ? 'PUT' : 'POST';
 
                 const formData = { ...this.projectForm };
@@ -113,7 +113,7 @@ function gameconfManagement() {
             }
 
             try {
-                const response = await fetch(`/api/gameconf/projects/${project.id}`, {
+                const response = await fetch(`/api/admin/gameconf/projects/${project.id}`, {
                     method: 'DELETE'
                 });
 
@@ -141,7 +141,7 @@ function gameconfManagement() {
             if (!this.currentProject) return;
 
             try {
-                const response = await fetch(`/api/gameconf/tables?project_id=${this.currentProject.id}`);
+                const response = await fetch(`/api/admin/gameconf/tables?project_id=${this.currentProject.id}`);
                 if (!response.ok) throw new Error('加载配置表列表失败');
                 this.tables = await response.json();
             } catch (error) {
@@ -178,8 +178,8 @@ function gameconfManagement() {
                 this.tableForm.project_id = this.currentProject.id;
 
                 const url = this.editingTable
-                    ? `/api/gameconf/tables/${this.tableForm.id}`
-                    : '/api/gameconf/tables';
+                    ? `/api/admin/gameconf/tables/${this.tableForm.id}`
+                    : '/api/admin/gameconf/tables';
                 const method = this.editingTable ? 'PUT' : 'POST';
 
                 const formData = { ...this.tableForm };
@@ -217,7 +217,7 @@ function gameconfManagement() {
             }
 
             try {
-                const response = await fetch(`/api/gameconf/tables/${table.id}`, {
+                const response = await fetch(`/api/admin/gameconf/tables/${table.id}`, {
                     method: 'DELETE'
                 });
 
@@ -237,7 +237,7 @@ function gameconfManagement() {
         // 验证配置表
         async validateTable(table) {
             try {
-                const response = await fetch(`/api/gameconf/tables/${table.id}/validate`, {
+                const response = await fetch(`/api/admin/gameconf/tables/${table.id}/validate`, {
                     method: 'POST'
                 });
 
@@ -266,7 +266,7 @@ function gameconfManagement() {
                     table_id: this.currentTable.id
                 };
 
-                const response = await fetch('/api/gameconf/exports', {
+                const response = await fetch('/api/admin/gameconf/exports', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(exportData)
@@ -283,7 +283,7 @@ function gameconfManagement() {
 
                 // 如果导出成功，自动下载文件
                 if (result.status === 'success') {
-                    window.location.href = `/api/gameconf/exports/${result.id}/download`;
+                    window.location.href = `/api/admin/gameconf/exports/${result.id}/download`;
                 }
             } catch (error) {
                 console.error('创建导出记录失败:', error);
