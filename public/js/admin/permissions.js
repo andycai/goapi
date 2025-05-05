@@ -2,94 +2,115 @@
 function permissionManagement() {
     return {
         permissions: [],
-        showCreateModal: false,
-        showEditModal: false,
-        editMode: false,
-        currentPermission: null,
-        form: {
+        showPanel: false,
+        isEditing: false,
+        panelTitle: '创建权限',
+        currentPermission: {
+            id: 0,
             name: '',
             code: '',
             description: ''
         },
         loading: false,
+        // Pagination
+        currentPage: 1,
+        pageSize: 10,
+        totalRecords: 0,
+        totalPages: 0,
+
         init() {
-            this.fetchPermissions();
+            this.loadPermissions();
         },
-        async fetchPermissions() {
+
+        async loadPermissions() {
             try {
-                const response = await fetch('/api/admin/permissions');
+                this.loading = true;
+                const response = await fetch(`/api/admin/permissions?page=${this.currentPage}&pageSize=${this.pageSize}`);
                 if (!response.ok) throw new Error('获取权限列表失败');
-                this.permissions = await response.json();
-            } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
-            }
-        },
-        createPermission() {
-            this.editMode = false;
-            this.currentPermission = null;
-            this.form = {
-                name: '',
-                code: '',
-                description: ''
-            };
-            this.showCreateModal = true;
-            this.showEditModal = false;
-        },
-        editPermission(permission) {
-            this.editMode = true;
-            this.currentPermission = permission;
-            this.form = {
-                name: permission.name,
-                code: permission.code,
-                description: permission.description
-            };
-            this.showEditModal = true;
-            this.showCreateModal = false;
-        },
-        closeModal() {
-            this.showCreateModal = false;
-            this.showEditModal = false;
-            this.editMode = false;
-            this.currentPermission = null;
-            this.form = {
-                name: '',
-                code: '',
-                description: ''
-            };
-        },
-        async submitForm() {
-            if (this.loading) return;
-            this.loading = true;
-
-            try {
-                const url = this.editMode ? `/api/admin/permissions/${this.currentPermission.id}` : '/api/admin/permissions';
-                const method = this.editMode ? 'PUT' : 'POST';
                 
-                const response = await fetch(url, {
-                    method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.form)
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || '操作失败');
-                }
-
-                Alpine.store('notification').show(
-                    this.editMode ? '权限更新成功' : '权限创建成功',
-                    'success'
-                );
-                this.closeModal();
-                this.fetchPermissions();
+                const data = await response.json();
+                this.permissions = data.items;
+                this.totalRecords = data.total;
+                this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                console.error('Error loading permissions:', error);
+                ShowError('加载权限失败');
             } finally {
                 this.loading = false;
             }
         },
+
+        openCreatePanel() {
+            this.currentPermission = {
+                id: 0,
+                name: '',
+                code: '',
+                description: ''
+            };
+            this.isEditing = false;
+            this.panelTitle = '创建权限';
+            this.showPanel = true;
+        },
+
+        editPermission(permission) {
+            this.currentPermission = { ...permission };
+            this.isEditing = true;
+            this.panelTitle = '编辑权限';
+            this.showPanel = true;
+        },
+
+        closePanel() {
+            this.showPanel = false;
+        },
+
+        async createPermission() {
+            try {
+                this.loading = true;
+                const response = await fetch('/api/admin/permissions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.currentPermission)
+                });
+
+                if (!response.ok) throw new Error('创建权限失败');
+                
+                await this.loadPermissions();
+                this.closePanel();
+                ShowMessage('权限创建成功');
+            } catch (error) {
+                console.error('Error creating permission:', error);
+                ShowError('创建权限失败');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async updatePermission() {
+            try {
+                this.loading = true;
+                const response = await fetch(`/api/admin/permissions/${this.currentPermission.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.currentPermission)
+                });
+
+                if (!response.ok) throw new Error('更新权限失败');
+                
+                await this.loadPermissions();
+                this.closePanel();
+                ShowMessage('权限更新成功');
+            } catch (error) {
+                console.error('Error updating permission:', error);
+                ShowError('更新权限失败');
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async deletePermission(id) {
             if (!confirm('确定要删除这个权限吗？')) return;
 
@@ -98,17 +119,22 @@ function permissionManagement() {
                     method: 'DELETE'
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || '删除失败');
-                }
-
-                Alpine.store('notification').show('权限删除成功', 'success');
-                this.fetchPermissions();
+                if (!response.ok) throw new Error('删除权限失败');
+                
+                await this.loadPermissions();
+                ShowMessage('权限删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                console.error('Error deleting permission:', error);
+                ShowError('删除权限失败');
             }
         },
+
+        changePage(page) {
+            if (page < 1 || page > this.totalPages) return;
+            this.currentPage = page;
+            this.loadPermissions();
+        },
+
         formatDate(date) {
             if (!date) return '';
             return new Date(date).toLocaleString('zh-CN', {
