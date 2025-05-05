@@ -1,16 +1,16 @@
 function serverGroupManagement() {
     return {
         serverGroups: [],
-        serverGroup: {
-            name: ''
-        },
-        editingServerGroup: {
+        currentServerGroup: {
             id: 0,
-            name: ''
+            name: '',
+            status: 1
         },
         groupServers: [],
         availableServers: [],
-        showEditModal: false,
+        showPanel: false,
+        isEditing: false,
+        panelTitle: '',
         showManageServersModal: false,
         showAddServerModal: false,
         currentPage: 1,
@@ -38,6 +38,22 @@ function serverGroupManagement() {
             }
         },
 
+        openCreatePanel() {
+            this.isEditing = false;
+            this.panelTitle = '创建服务器组';
+            this.currentServerGroup = {
+                id: 0,
+                name: '',
+                status: 1
+            };
+            this.showPanel = true;
+        },
+
+        closePanel() {
+            this.showPanel = false;
+            this.isEditing = false;
+        },
+
         async createServerGroup() {
             try {
                 const response = await fetch('/api/admin/server_groups', {
@@ -45,14 +61,14 @@ function serverGroupManagement() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.serverGroup)
+                    body: JSON.stringify(this.currentServerGroup)
                 });
 
                 if (!response.ok) {
                     throw new Error('Failed to create server group');
                 }
 
-                this.resetServerGroupForm();
+                this.closePanel();
                 this.loadServerGroups();
                 ShowMessage('创建服务器组成功');
             } catch (error) {
@@ -63,19 +79,19 @@ function serverGroupManagement() {
 
         async updateServerGroup() {
             try {
-                const response = await fetch(`/api/admin/server_groups/${this.editingServerGroup.id}`, {
+                const response = await fetch(`/api/admin/server_groups/${this.currentServerGroup.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.editingServerGroup)
+                    body: JSON.stringify(this.currentServerGroup)
                 });
 
                 if (!response.ok) {
                     throw new Error('Failed to update server group');
                 }
 
-                this.showEditModal = false;
+                this.closePanel();
                 this.loadServerGroups();
                 ShowMessage('更新服务器组成功');
             } catch (error) {
@@ -104,6 +120,13 @@ function serverGroupManagement() {
                 console.error('Error deleting server group:', error);
                 ShowError('删除服务器组失败');
             }
+        },
+
+        editServerGroup(group) {
+            this.isEditing = true;
+            this.panelTitle = '编辑服务器组';
+            this.currentServerGroup = { ...group };
+            this.showPanel = true;
         },
 
         async loadGroupServers(groupId) {
@@ -175,13 +198,8 @@ function serverGroupManagement() {
             }
         },
 
-        editServerGroup(group) {
-            this.editingServerGroup = { ...group };
-            this.showEditModal = true;
-        },
-
         manageServers(group) {
-            this.editingServerGroup = { ...group };
+            this.currentServerGroup = { ...group };
             this.showManageServersModal = true;
             this.loadGroupServers(group.id);
         },
@@ -199,12 +217,6 @@ function serverGroupManagement() {
             this.loadServerGroups();
         },
 
-        resetServerGroupForm() {
-            this.serverGroup = {
-                name: ''
-            };
-        },
-
         formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleString('zh-CN', {
@@ -217,7 +229,7 @@ function serverGroupManagement() {
             });
         },
 
-        getStatusText(status) {
+        getServerStatusText(status) {
             switch (status) {
                 case 0:
                     return '维护中';
