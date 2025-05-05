@@ -310,10 +310,16 @@ func GetServerGroupServers(groupId uint) ([]*ServerGroupServer, error) {
 	return servers, nil
 }
 
-func AddServerToGroup(groupId, serverId uint) error {
+func AddServerToGroup(groupId uint, server *PhysicalServer) error {
 	serverGroupServer := &ServerGroupServer{
-		GroupID:  groupId,
-		ServerID: serverId,
+		GroupID:          groupId,
+		ServerID:         server.ServerID,
+		Name:             server.Name,
+		ServerStatus:     server.ServerStatus,
+		Available:        server.Available,
+		MergeID:          server.MergeID,
+		PhysicalServerID: server.ID,
+		PhysicalServer:   *server,
 	}
 	return app.DB.Create(serverGroupServer).Error
 }

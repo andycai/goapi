@@ -114,16 +114,39 @@ func UpdateServerGroupWithServers(id uint, data map[string]interface{}) error {
 }
 
 // ServerGroupServer Service operations
-func AddServerToGroupWithValidation(groupID uint, server *ServerGroupServer) error {
+// func AddServerToGroupWithValidation(groupID uint, server *ServerGroupServer) error {
+// 	// 验证物理服务器是否存在
+// 	if _, err := GetPhysicalServerByID(server.PhysicalServerID); err != nil {
+// 		return errors.New("物理服务器不存在")
+// 	}
+
+// 	// 验证服务器是否已经在分组中
+// 	var count int64
+// 	if err := app.DB.Model(&ServerGroupServer{}).
+// 		Where("group_id = ? AND physical_server_id = ?", groupID, server.PhysicalServerID).
+// 		Count(&count).Error; err != nil {
+// 		return err
+// 	}
+
+// 	if count > 0 {
+// 		return errors.New("服务器已存在于该分组中")
+// 	}
+
+// 	return AddServerToGroup(groupID, server.PhysicalServerID)
+// }
+
+// ServerGroupServer Service operations
+func AddServerToGroupWithValidation(groupID uint, physicalServerId uint) error {
 	// 验证物理服务器是否存在
-	if _, err := GetPhysicalServerByID(server.PhysicalServerID); err != nil {
+	physicalServer, err := GetPhysicalServerByID(physicalServerId)
+	if err != nil {
 		return errors.New("物理服务器不存在")
 	}
 
 	// 验证服务器是否已经在分组中
 	var count int64
 	if err := app.DB.Model(&ServerGroupServer{}).
-		Where("group_id = ? AND physical_server_id = ?", groupID, server.PhysicalServerID).
+		Where("group_id = ? AND physical_server_id = ?", groupID, physicalServerId).
 		Count(&count).Error; err != nil {
 		return err
 	}
@@ -132,7 +155,7 @@ func AddServerToGroupWithValidation(groupID uint, server *ServerGroupServer) err
 		return errors.New("服务器已存在于该分组中")
 	}
 
-	return AddServerToGroup(groupID, server.PhysicalServerID)
+	return AddServerToGroup(groupID, physicalServer)
 }
 
 // Announcement Service operations

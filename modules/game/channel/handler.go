@@ -302,7 +302,7 @@ func addServerToGroupHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := AddServerToGroup(uint(groupId), uint(serverId)); err != nil {
+	if err := AddServerToGroupWithValidation(uint(groupId), uint(serverId)); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "添加服务器到分组失败: " + err.Error(),
 		})
