@@ -26,6 +26,15 @@ document.addEventListener('alpine:init', () => {
         }
     });
 });
+
+function ShowMessage(message) {
+    Alpine.store('notification').show(message, 'success');
+}
+
+function ShowError(message) {
+    Alpine.store('notification').show(message, 'error');
+}
+
 function adminLayoutManagement() {
     return {
         user: JSON.parse(localStorage.getItem('user') || '{}'),
@@ -361,3 +370,4 @@ function adminLayoutManagement() {
         }
     }
 }
+
