@@ -11,8 +11,7 @@ function serverGroupManagement() {
         showPanel: false,
         isEditing: false,
         panelTitle: '',
-        showManageServersModal: false,
-        showAddServerModal: false,
+        showManageServersPanel: false,
         currentPage: 1,
         pageSize: 10,
         totalRecords: 0,
@@ -47,10 +46,12 @@ function serverGroupManagement() {
                 status: 1
             };
             this.showPanel = true;
+            this.showManageServersPanel = false;
         },
 
         closePanel() {
             this.showPanel = false;
+            this.showManageServersPanel = false;
             this.isEditing = false;
         },
 
@@ -127,6 +128,7 @@ function serverGroupManagement() {
             this.panelTitle = '编辑服务器组';
             this.currentServerGroup = { ...group };
             this.showPanel = true;
+            this.showManageServersPanel = false;
         },
 
         async loadGroupServers(groupId) {
@@ -150,7 +152,7 @@ function serverGroupManagement() {
                     throw new Error('Failed to load available servers');
                 }
                 const data = await response.json();
-                this.availableServers = data.data;
+                this.availableServers = data.servers;
             } catch (error) {
                 console.error('Error loading available servers:', error);
                 ShowError('加载可用服务器列表失败');
@@ -200,12 +202,9 @@ function serverGroupManagement() {
 
         manageServers(group) {
             this.currentServerGroup = { ...group };
-            this.showManageServersModal = true;
+            this.showManageServersPanel = true;
+            this.showPanel = false;
             this.loadGroupServers(group.id);
-        },
-
-        showAddServer() {
-            this.showAddServerModal = true;
             this.loadAvailableServers();
         },
 

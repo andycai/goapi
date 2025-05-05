@@ -302,17 +302,24 @@ func DeleteServerGroup(id uint) error {
 }
 
 // ServerGroupServer DAO operations
-func AddServerToGroup(groupID uint, server *ServerGroupServer) error {
-	server.GroupID = groupID
-	return app.DB.Create(server).Error
+func GetServerGroupServers(groupId uint) ([]*ServerGroupServer, error) {
+	var servers []*ServerGroupServer
+	if err := app.DB.Where("group_id = ?", groupId).Find(&servers).Error; err != nil {
+		return nil, err
+	}
+	return servers, nil
 }
 
-func UpdateServerInGroup(id uint, data map[string]interface{}) error {
-	return app.DB.Model(&ServerGroupServer{}).Where("id = ?", id).Updates(data).Error
+func AddServerToGroup(groupId, serverId uint) error {
+	serverGroupServer := &ServerGroupServer{
+		GroupID:  groupId,
+		ServerID: serverId,
+	}
+	return app.DB.Create(serverGroupServer).Error
 }
 
-func RemoveServerFromGroup(id uint) error {
-	return app.DB.Delete(&ServerGroupServer{}, id).Error
+func RemoveServerFromGroup(groupId, serverId uint) error {
+	return app.DB.Where("group_id = ? AND server_id = ?", groupId, serverId).Delete(&ServerGroupServer{}).Error
 }
 
 // Announcement DAO operations

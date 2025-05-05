@@ -132,7 +132,7 @@ func AddServerToGroupWithValidation(groupID uint, server *ServerGroupServer) err
 		return errors.New("服务器已存在于该分组中")
 	}
 
-	return AddServerToGroup(groupID, server)
+	return AddServerToGroup(groupID, server.PhysicalServerID)
 }
 
 // Announcement Service operations

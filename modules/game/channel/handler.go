@@ -267,6 +267,78 @@ func deleteServerGroupHandler(c *fiber.Ctx) error {
 	})
 }
 
+func getServerGroupServersHandler(c *fiber.Ctx) error {
+	groupId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的分组ID",
+		})
+	}
+
+	servers, err := GetServerGroupServers(uint(groupId))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "获取服务器分组中的服务器失败: " + err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"data": servers,
+	})
+}
+
+func addServerToGroupHandler(c *fiber.Ctx) error {
+	groupId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的分组ID",
+		})
+	}
+
+	serverId, err := strconv.Atoi(c.Params("serverId"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的服务器ID",
+		})
+	}
+
+	if err := AddServerToGroup(uint(groupId), uint(serverId)); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "添加服务器到分组失败: " + err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "添加成功",
+	})
+}
+
+func removeServerFromGroupHandler(c *fiber.Ctx) error {
+	groupId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的分组ID",
+		})
+	}
+
+	serverId, err := strconv.Atoi(c.Params("serverId"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "无效的服务器ID",
+		})
+	}
+
+	if err := RemoveServerFromGroup(uint(groupId), uint(serverId)); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "从分组中移除服务器失败: " + err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "移除成功",
+	})
+}
+
 // Announcement Handlers
 func getAnnouncementsHandler(c *fiber.Ctx) error {
 	limit, err := strconv.Atoi(c.Query("limit", "10"))
