@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/andycai/goapi/models"
+	"github.com/andycai/goapi/modules/system/menu"
 	"gorm.io/gorm"
 )
 
@@ -39,37 +40,14 @@ func initMenus() error {
 
 	// 开始事务
 	return app.DB.Transaction(func(tx *gorm.DB) error {
-		// 查找系统管理菜单
-		var systemMenu models.Menu
-		if err := tx.Where("name = ?", "系统管理").First(&systemMenu).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				// 如果系统管理菜单不存在，创建一个
-				systemMenu = models.Menu{
-					ParentID:   0,
-					Name:       "系统管理",
-					Path:       "/admin/system",
-					Icon:       "setting",
-					Sort:       900,
-					Permission: "",
-					IsShow:     true,
-					CreatedAt:  time.Now(),
-					UpdatedAt:  time.Now(),
-				}
-				if err := tx.Create(&systemMenu).Error; err != nil {
-					return err
-				}
-			} else {
-				return err
-			}
-		}
-
 		// 创建字典管理菜单
 		dictMenu := models.Menu{
-			ParentID:   systemMenu.ID,
+			MenuID:     1006,
+			ParentID:   menu.MenuIdSystem,
 			Name:       "字典管理",
 			Path:       "/admin/dict",
 			Icon:       "book",
-			Sort:       910,
+			Sort:       6,
 			Permission: "dict:view",
 			IsShow:     true,
 			CreatedAt:  time.Now(),
