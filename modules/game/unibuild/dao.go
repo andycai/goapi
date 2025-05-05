@@ -30,7 +30,7 @@ func initData() error {
 func initMenus() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("unibuild:menu") {
-		log.Println("Unity构建模块菜单已初始化，跳过")
+		log.Println("[Unity构建模块]菜单数据已初始化，跳过")
 		return nil
 	}
 
@@ -71,7 +71,7 @@ func initMenus() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("unibuild:permission") {
-		log.Println("构建任务模块数据库已初始化，跳过")
+		log.Println("[构建任务模块]权限数据已初始化，跳过")
 		return nil
 	}
 

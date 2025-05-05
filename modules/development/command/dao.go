@@ -34,7 +34,7 @@ func initData() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("command:permission") {
-		log.Println("命令模块数据库已初始化，跳过")
+		log.Println("[命令模块]权限数据已初始化，跳过")
 		return nil
 	}
 
@@ -79,7 +79,7 @@ func initPermissions() error {
 func initMenus() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("command:menu") {
-		log.Println("命令模块菜单已初始化，跳过")
+		log.Println("[命令模块]菜单数据已初始化，跳过")
 		return nil
 	}
 

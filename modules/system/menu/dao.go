@@ -124,7 +124,7 @@ func initMenus() error {
 		}
 
 		// 标记模块已初始化
-		if err := app.DB.Create(&models.ModuleInit{
+		if err := tx.Create(&models.ModuleInit{
 			Module:      "menu:menu",
 			Initialized: 1,
 			CreatedAt:   now,

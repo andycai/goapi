@@ -97,7 +97,7 @@ func initMenus() error {
 				UpdatedAt:  now,
 			},
 		}
-		if err := app.DB.CreateInBatches(parentMenus, len(parentMenus)).Error; err != nil {
+		if err := tx.CreateInBatches(parentMenus, len(parentMenus)).Error; err != nil {
 			return err
 		}
 

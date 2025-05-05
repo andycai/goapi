@@ -34,7 +34,7 @@ func initData() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("unitool:permission") {
-		log.Println("Unity工具模块数据库已初始化，跳过")
+		log.Println("[Unity工具模块]权限数据已初始化，跳过")
 		return nil
 	}
 
@@ -79,7 +79,7 @@ func initPermissions() error {
 func initMenus() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("unitool:menu") {
-		log.Println("Unity工具模块菜单已初始化，跳过")
+		log.Println("[Unity工具模块]菜单数据已初始化，跳过")
 		return nil
 	}
 

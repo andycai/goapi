@@ -36,7 +36,7 @@ func initData() error {
 func initMenus() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("gameconf:menu") {
-		log.Println("游戏配置模块菜单已初始化，跳过")
+		log.Println("[游戏配置模块]菜单数据已初始化，跳过")
 		return nil
 	}
 
@@ -77,7 +77,7 @@ func initMenus() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("gameconf:permission") {
-		log.Println("游戏配置模块数据库已初始化，跳过")
+		log.Println("[游戏配置模块]权限数据已初始化，跳过")
 		return nil
 	}
 
