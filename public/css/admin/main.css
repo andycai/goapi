@@ -39,11 +39,11 @@
 }
 
 .slide-panel.slide-in {
-    animation: slideIn 0.5s ease-in-out forwards;
+    animation: slideIn 0.3s ease-in-out forwards;
 }
 
 .slide-panel.slide-out {
-    animation: slideOut 0.3s ease-in-out forwards;
+    animation: slideOut 0.2s ease-in-out forwards;
 }
 
 /* 滚动条样式 */
