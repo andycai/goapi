@@ -53,6 +53,7 @@ require (
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/spf13/cast v1.8.0 // indirect
 	github.com/swaggo/fiber-swagger v1.3.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
