@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/andycai/goapi/enum"
 	"github.com/andycai/goapi/models"
 	"gorm.io/gorm"
 )
@@ -29,7 +30,44 @@ func initData() error {
 }
 
 func initMenus() error {
-	return nil
+	// 检查是否已初始化
+	if app.IsInitializedModule("role:menu") {
+		log.Println("角色模块菜单已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建角色管理菜单
+		roleMenu := models.Menu{
+			MenuID:     1002,
+			ParentID:   enum.MenuIdSystem,
+			Name:       "角色管理",
+			Path:       "/admin/roles",
+			Icon:       "role",
+			Sort:       2,
+			Permission: "role:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&roleMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "role:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func initPermissions() error {

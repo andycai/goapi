@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/andycai/goapi/enum"
 	"github.com/andycai/goapi/models"
-	"github.com/andycai/goapi/modules/system/menu"
 	"gorm.io/gorm"
 )
 
@@ -43,7 +43,7 @@ func initMenus() error {
 		// 创建字典管理菜单
 		dictMenu := models.Menu{
 			MenuID:     1006,
-			ParentID:   menu.MenuIdSystem,
+			ParentID:   enum.MenuIdSystem,
 			Name:       "字典管理",
 			Path:       "/admin/dict",
 			Icon:       "book",

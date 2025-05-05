@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/andycai/goapi/enum"
 	"github.com/andycai/goapi/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -35,7 +36,44 @@ func initData() error {
 }
 
 func initMenus() error {
-	return nil
+	// 检查是否已初始化
+	if app.IsInitializedModule("user:menu") {
+		log.Println("用户模块菜单已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建用户管理菜单
+		userMenu := models.Menu{
+			MenuID:     1001,
+			ParentID:   enum.MenuIdSystem,
+			Name:       "用户管理",
+			Path:       "/admin/users",
+			Icon:       "user",
+			Sort:       1,
+			Permission: "user:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&userMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "user:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func initUser() error {
