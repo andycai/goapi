@@ -3,109 +3,113 @@ function roleManagement() {
     return {
         roles: [],
         permissions: [],
-        showCreateModal: false,
-        showEditModal: false,
-        editMode: false,
-        currentRole: null,
-        form: {
+        currentRole: {
+            id: null,
             name: '',
             description: '',
             permissions: []
         },
-        loading: false,
+        showPanel: false,
+        isEditing: false,
+        panelTitle: '创建角色',
+
         init() {
-            this.fetchRoles();
-            this.fetchPermissions();
+            this.loadRoles();
+            this.loadPermissions();
         },
-        async fetchRoles() {
+
+        async loadRoles() {
             try {
                 const response = await fetch('/api/roles');
-                if (!response.ok) throw new Error('获取角色列表失败');
+                if (!response.ok) throw new Error('Failed to load roles');
                 this.roles = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                console.error('Error loading roles:', error);
+                ShowError('加载角色列表失败');
             }
         },
-        async fetchPermissions() {
+
+        async loadPermissions() {
             try {
                 const response = await fetch('/api/permissions');
-                if (!response.ok) throw new Error('获取权限列表失败');
+                if (!response.ok) throw new Error('Failed to load permissions');
                 this.permissions = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                console.error('Error loading permissions:', error);
+                ShowError('加载权限列表失败');
             }
         },
-        createRole() {
-            this.editMode = false;
-            this.currentRole = null;
-            this.form = {
+
+        openCreatePanel() {
+            this.currentRole = {
+                id: null,
                 name: '',
                 description: '',
                 permissions: []
             };
-            this.showCreateModal = true;
-            this.showEditModal = false;
+            this.isEditing = false;
+            this.panelTitle = '创建角色';
+            this.showPanel = true;
         },
+
         editRole(role) {
-            this.editMode = true;
-            this.currentRole = role;
-            this.form = {
+            this.currentRole = {
+                id: role.id,
                 name: role.name,
                 description: role.description,
-                permissions: role.permissions.map(p => parseInt(p.id))
+                permissions: role.permissions.map(p => p.id)
             };
-            this.showEditModal = true;
-            this.showCreateModal = false;
+            this.isEditing = true;
+            this.panelTitle = '编辑角色';
+            this.showPanel = true;
         },
-        closeModal() {
-            this.showCreateModal = false;
-            this.showEditModal = false;
-            this.editMode = false;
-            this.currentRole = null;
-            this.form = {
-                name: '',
-                description: '',
-                permissions: []
-            };
-        },
-        async submitForm() {
-            if (this.loading) return;
-            this.loading = true;
 
+        closePanel() {
+            this.showPanel = false;
+        },
+
+        async createRole() {
             try {
-                const url = this.editMode ? `/api/roles/${this.currentRole.id}` : '/api/roles';
-                const method = this.editMode ? 'PUT' : 'POST';
-                // 确保权限 ID 都是整数
-                const formData = {
-                    ...this.form,
-                    permissions: this.form.permissions.map(id => parseInt(id))
-                };
-                
-                const response = await fetch(url, {
-                    method,
+                const response = await fetch('/api/roles', {
+                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(this.currentRole)
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || '操作失败');
-                }
-
-                Alpine.store('notification').show(
-                    this.editMode ? '角色更新成功' : '角色创建成功',
-                    'success'
-                );
-                this.closeModal();
-                this.fetchRoles();
+                if (!response.ok) throw new Error('Failed to create role');
+                
+                await this.loadRoles();
+                this.closePanel();
+                ShowMessage('角色创建成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
-            } finally {
-                this.loading = false;
+                console.error('Error creating role:', error);
+                ShowError('创建角色失败');
             }
         },
+
+        async updateRole() {
+            try {
+                const response = await fetch(`/api/roles/${this.currentRole.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.currentRole)
+                });
+
+                if (!response.ok) throw new Error('Failed to update role');
+                
+                await this.loadRoles();
+                this.closePanel();
+                ShowMessage('角色更新成功');
+            } catch (error) {
+                console.error('Error updating role:', error);
+                ShowError('更新角色失败');
+            }
+        },
+
         async deleteRole(id) {
             if (!confirm('确定要删除这个角色吗？')) return;
 
@@ -114,17 +118,16 @@ function roleManagement() {
                     method: 'DELETE'
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || '删除失败');
-                }
-
-                Alpine.store('notification').show('角色删除成功', 'success');
-                this.fetchRoles();
+                if (!response.ok) throw new Error('Failed to delete role');
+                
+                await this.loadRoles();
+                ShowMessage('角色删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                console.error('Error deleting role:', error);
+                ShowError('删除角色失败');
             }
         },
+
         formatDate(date) {
             if (!date) return '';
             return new Date(date).toLocaleString('zh-CN', {
