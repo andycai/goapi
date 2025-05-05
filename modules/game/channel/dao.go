@@ -47,7 +47,7 @@ func initMenus() error {
 		channelMenu := models.Menu{
 			MenuID:     3002,
 			ParentID:   enum.MenuIdGame,
-			Name:       "文件浏览",
+			Name:       "渠道管理",
 			Path:       "/admin/channel",
 			Icon:       "channel",
 			Sort:       2,

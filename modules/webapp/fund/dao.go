@@ -88,7 +88,7 @@ func initMenus() error {
 func initPermissions() error {
 	// 检查是否已初始化
 	if app.IsInitializedModule("fund:permission") {
-		log.Println("基金模块权限已初始化，跳过")
+		log.Println("[基金模块]权限数据已初始化，跳过")
 		return nil
 	}
 

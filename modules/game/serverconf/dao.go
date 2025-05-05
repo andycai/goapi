@@ -40,7 +40,7 @@ func initMenus() error {
 		serverConfigMenu := models.Menu{
 			MenuID:     3007,
 			ParentID:   enum.MenuIdGame,
-			Name:       "游戏日志",
+			Name:       "服务器配置",
 			Path:       "/admin/serverconf",
 			Icon:       "serverconf",
 			Sort:       7,
