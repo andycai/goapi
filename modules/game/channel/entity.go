@@ -26,13 +26,13 @@ type Channel struct {
 // PhysicalServer represents a physical game server
 type PhysicalServer struct {
 	gorm.Model
-	ServerID     string `gorm:"type:varchar(50);not null;comment:服务器ID" json:"serverId"`
+	ServerID     uint   `gorm:"not null;comment:服务器ID" json:"serverId"`
 	Name         string `gorm:"type:varchar(100);not null;comment:服务器名称" json:"name"`
-	ServerStatus string `gorm:"type:varchar(20);not null;comment:服务器状态" json:"serverStatus"`
-	Available    string `gorm:"type:varchar(20);not null;comment:是否可用" json:"available"`
-	MergeID      string `gorm:"type:varchar(50);comment:合服ID" json:"mergeId"`
-	Online       string `gorm:"type:varchar(50);comment:在线人数" json:"online"`
-	ServerPort   string `gorm:"type:varchar(20);not null;comment:服务器端口" json:"serverPort"`
+	ServerStatus uint   `gorm:"not null;comment:服务器状态" json:"serverStatus"`
+	Available    bool   `gorm:"not null;comment:是否可用" json:"available"`
+	MergeID      uint   `gorm:"comment:合服ID" json:"mergeId"`
+	Online       uint   `gorm:"comment:在线人数" json:"online"`
+	ServerPort   uint   `gorm:"not null;comment:服务器端口" json:"serverPort"`
 	ServerIP     string `gorm:"type:varchar(50);not null;comment:服务器IP" json:"serverIp"`
 }
 
@@ -47,11 +47,11 @@ type ServerGroup struct {
 type ServerGroupServer struct {
 	gorm.Model
 	GroupID          uint           `gorm:"not null;comment:分组ID" json:"groupId"`
-	ServerID         string         `gorm:"type:varchar(50);not null;comment:服务器ID" json:"serverId"`
+	ServerID         uint           `gorm:"not null;comment:服务器ID" json:"serverId"`
 	Name             string         `gorm:"type:varchar(100);not null;comment:服务器名称" json:"name"`
-	ServerStatus     string         `gorm:"type:varchar(20);not null;comment:服务器状态" json:"serverStatus"`
-	Available        string         `gorm:"type:varchar(20);not null;comment:是否可用" json:"available"`
-	MergeID          string         `gorm:"type:varchar(50);comment:合服ID" json:"mergeId"`
+	ServerStatus     uint           `gorm:"not null;comment:服务器状态" json:"serverStatus"`
+	Available        bool           `gorm:"not null;comment:是否可用" json:"available"`
+	MergeID          uint           `gorm:"comment:合服ID" json:"mergeId"`
 	PhysicalServerID uint           `gorm:"not null;comment:物理服务器ID" json:"physicalServerId"`
 	PhysicalServer   PhysicalServer `gorm:"foreignKey:PhysicalServerID" json:"physicalServer"`
 }

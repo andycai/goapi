@@ -3,6 +3,49 @@
     display: none !important;
 }
 
+/* 滑动面板动画 */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.slide-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 33.333333%;
+    height: 100%;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 50;
+}
+
+.slide-panel.dark {
+    background-color: #1F2937;
+}
+
+.slide-panel.slide-in {
+    animation: slideIn 0.5s ease-in-out forwards;
+}
+
+.slide-panel.slide-out {
+    animation: slideOut 0.3s ease-in-out forwards;
+}
+
 /* 滚动条样式 */
 ::-webkit-scrollbar {
     width: 8px;

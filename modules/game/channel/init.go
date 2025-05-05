@@ -52,10 +52,10 @@ func (m *channelModule) AddAuthRouters() error {
 	})
 
 	app.RouterAdmin.Get("/server", app.HasPermission("server:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/server", fiber.Map{
+		return c.Render("admin/physical_server", fiber.Map{
 			"Title": "服务器管理",
 			"Scripts": []string{
-				"/static/js/admin/server.js",
+				"/static/js/admin/physical_server.js",
 			},
 		}, "admin/layout")
 	})
@@ -77,10 +77,10 @@ func (m *channelModule) AddAuthRouters() error {
 	app.RouterApi.Delete("/channel/:id", app.HasPermission("channel:manage"), deleteChannelHandler)
 
 	// 物理服务器相关
-	app.RouterApi.Get("/server/list", app.HasPermission("server:view"), getPhysicalServersHandler)
-	app.RouterApi.Post("/server", app.HasPermission("server:manage"), createPhysicalServerHandler)
-	app.RouterApi.Put("/server/:id", app.HasPermission("server:manage"), updatePhysicalServerHandler)
-	app.RouterApi.Delete("/server/:id", app.HasPermission("server:manage"), deletePhysicalServerHandler)
+	app.RouterApi.Get("/physical_servers", app.HasPermission("server:view"), getPhysicalServersHandler)
+	app.RouterApi.Post("/physical_servers", app.HasPermission("server:manage"), createPhysicalServerHandler)
+	app.RouterApi.Put("/physical_servers/:id", app.HasPermission("server:manage"), updatePhysicalServerHandler)
+	app.RouterApi.Delete("/physical_servers/:id", app.HasPermission("server:manage"), deletePhysicalServerHandler)
 
 	// 服务器分组相关
 	app.RouterApi.Get("/server/group/list", app.HasPermission("server:view"), getServerGroupsHandler)

@@ -78,8 +78,8 @@
 
     <!-- Right Side Panel -->
     <div x-show="showPanel" 
-         :class="{'translate-x-0': showPanel, 'translate-x-full': !showPanel}"
-         class="fixed inset-y-0 right-0 w-1/3 bg-white dark:bg-gray-800 shadow-lg overflow-y-auto z-50 transform translate-x-full transition-all duration-500 ease-in-out"
+         :class="{'slide-in': showPanel, 'slide-out': !showPanel}"
+         class="slide-panel dark:bg-gray-800"
          @click.away="closePanel">
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
