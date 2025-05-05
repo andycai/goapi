@@ -99,10 +99,10 @@ func (m *channelModule) AddAuthRouters() error {
 	app.RouterAdminApi.Delete("/server_groups/:id", app.HasPermission("server:manage"), deleteServerGroupHandler)
 
 	// 公告相关
-	app.RouterAdminApi.Get("/announcement/list", app.HasPermission("announcement:view"), getAnnouncementsHandler)
-	app.RouterAdminApi.Post("/announcement", app.HasPermission("announcement:manage"), createAnnouncementHandler)
-	app.RouterAdminApi.Put("/announcement/:id", app.HasPermission("announcement:manage"), updateAnnouncementHandler)
-	app.RouterAdminApi.Delete("/announcement/:id", app.HasPermission("announcement:manage"), deleteAnnouncementHandler)
+	app.RouterAdminApi.Get("/announcements", app.HasPermission("announcement:view"), getAnnouncementsHandler)
+	app.RouterAdminApi.Post("/announcements", app.HasPermission("announcement:manage"), createAnnouncementHandler)
+	app.RouterAdminApi.Put("/announcements/:id", app.HasPermission("announcement:manage"), updateAnnouncementHandler)
+	app.RouterAdminApi.Delete("/announcements/:id", app.HasPermission("announcement:manage"), deleteAnnouncementHandler)
 
 	return nil
 }
