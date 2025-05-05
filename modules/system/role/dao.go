@@ -12,10 +12,7 @@ import (
 // 所有数据库操作都在 service 层完成
 
 func autoMigrate() error {
-	return app.DB.AutoMigrate(
-		&models.Role{},
-		&models.RolePermission{},
-	)
+	return nil
 }
 
 // 初始化数据

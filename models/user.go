@@ -2,41 +2,46 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // User 用户表
 type User struct {
-	ID            uint      `json:"id" gorm:"primaryKey"`
-	Username      string    `json:"username" gorm:"uniqueIndex;size:50"`
-	Password      string    `json:"-" gorm:"size:100"` // 密码不返回给前端
-	Nickname      string    `json:"nickname" gorm:"size:50"`
-	RoleID        uint      `json:"role_id"`
-	Role          Role      `json:"role" gorm:"foreignKey:RoleID"`
-	Status        int       `json:"status" gorm:"default:1"` // 1:启用 0:禁用
-	LastLogin     time.Time `json:"last_login"`
-	HasChangedPwd bool      `json:"has_changed_pwd" gorm:"default:false"` // 是否已修改初始密码
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID            uint           `gorm:"primaryKey" json:"id"`
+	Username      string         `gorm:"uniqueIndex;size:50" json:"username"`
+	Password      string         `gorm:"size:100" json:"-"` // 密码不返回给前端
+	Nickname      string         `gorm:"size:50" json:"nickname"`
+	RoleID        uint           `json:"role_id"`
+	Role          Role           `gorm:"foreignKey:RoleID" json:"role"`
+	Status        int            `gorm:"default:1" json:"status"` // 1:启用 0:禁用
+	LastLogin     time.Time      `json:"last_login"`
+	HasChangedPwd bool           `gorm:"default:false" json:"has_changed_pwd"` // 是否已修改初始密码
+	CreatedAt     time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt     time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // Role 角色表
 type Role struct {
-	ID          uint         `json:"id" gorm:"primaryKey"`
-	Name        string       `json:"name" gorm:"uniqueIndex;size:50"`
-	Description string       `json:"description"`
-	Permissions []Permission `json:"permissions" gorm:"many2many:role_permissions;"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
+	ID          uint           `gorm:"primaryKey" json:"id"`
+	Name        string         `gorm:"uniqueIndex;size:50" json:"name"`
+	Description string         `gorm:"type:text" json:"description"`
+	Permissions []Permission   `gorm:"many2many:role_permissions;" json:"permissions"`
+	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // Permission 权限表
 type Permission struct {
-	ID          uint      `json:"id" gorm:"primaryKey"`
-	Name        string    `json:"name" gorm:"uniqueIndex;size:50"`
-	Code        string    `json:"code" gorm:"uniqueIndex;size:50"` // 权限编码
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          uint           `gorm:"primaryKey" json:"id"`
+	Name        string         `gorm:"uniqueIndex;size:50" json:"name"`
+	Code        string         `gorm:"uniqueIndex;size:50" json:"code"` // 权限编码
+	Description string         `gorm:"type:text" json:"description"`
+	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // RolePermission 角色-权限关联表
@@ -47,9 +52,10 @@ type RolePermission struct {
 
 // ModuleInit 模块是否初始化的数据库表
 type ModuleInit struct {
-	ID          uint      `json:"id" gorm:"primaryKey"`
-	Module      string    `json:"module" gorm:"size:50;index"`
-	Initialized uint8     `json:"initialized" gorm:"type:tinyint(1);default:0"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          uint           `gorm:"primaryKey" json:"id"`
+	Module      string         `gorm:"size:50;index" json:"module"`
+	Initialized uint8          `gorm:"type:tinyint(1);default:0" json:"initialized" `
+	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }
