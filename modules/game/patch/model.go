@@ -1,4 +1,4 @@
-package models
+package patch
 
 import "time"
 
@@ -16,4 +16,9 @@ type PatchRecord struct {
 	Description string    `gorm:"type:text" json:"description"`
 	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt   time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   time.Time `gorm:""`
+}
+
+func (PatchRecord) TableName() string {
+	return "patch_records"
 }

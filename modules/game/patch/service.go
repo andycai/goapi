@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/andycai/goapi/core/utility/path"
-	"github.com/andycai/goapi/models"
 )
 
 var config *PatchConfig
@@ -94,7 +93,7 @@ func getConfig() *PatchConfig {
 }
 
 // GeneratePatch 生成补丁包
-func GeneratePatch(oldVersion, newVersion, description, branch, platform string) (*models.PatchRecord, error) {
+func GeneratePatch(oldVersion, newVersion, description, branch, platform string) (*PatchRecord, error) {
 	if config == nil {
 		return nil, errors.New("配置为空")
 	}
@@ -124,7 +123,7 @@ func GeneratePatch(oldVersion, newVersion, description, branch, platform string)
 	}
 
 	// 创建补丁记录
-	record := &models.PatchRecord{
+	record := &PatchRecord{
 		OldVersion:  oldVersion,
 		NewVersion:  newVersion,
 		Version:     fmt.Sprintf("%s_%s", oldVersion, newVersion),
@@ -322,18 +321,18 @@ func createPatchZip(changes []FileChange, outputZip string, newDir, branch, plat
 }
 
 // GetPatchRecords 获取补丁记录列表
-func GetPatchRecords(limit, page int) ([]models.PatchRecord, int, error) {
-	var records []models.PatchRecord
+func GetPatchRecords(limit, page int) ([]PatchRecord, int, error) {
+	var records []PatchRecord
 	var totalCount int64
 
 	// 获取总记录数
-	if err := app.DB.Model(&models.PatchRecord{}).Count(&totalCount).Error; err != nil {
+	if err := app.DB.Model(&PatchRecord{}).Count(&totalCount).Error; err != nil {
 		return nil, 0, err
 	}
 
 	// 分页查询
 	offset := (page - 1) * limit
-	if err := app.DB.Model(&models.PatchRecord{}).Order("created_at desc").Offset(offset).Limit(limit).Find(&records).Error; err != nil {
+	if err := app.DB.Model(&PatchRecord{}).Order("created_at desc").Offset(offset).Limit(limit).Find(&records).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -343,7 +342,7 @@ func GetPatchRecords(limit, page int) ([]models.PatchRecord, int, error) {
 // ApplyPatch 应用补丁包
 func ApplyPatch(recordID uint) error {
 	// 获取补丁记录
-	var record models.PatchRecord
+	var record PatchRecord
 	if err := app.DB.First(&record, recordID).Error; err != nil {
 		return err
 	}
@@ -368,9 +367,7 @@ func ApplyPatch(recordID uint) error {
 		// 处理路径，移除branch/platform前缀
 		filePath := file.Name
 		prefix := fmt.Sprintf("%s/%s/", record.Branch, record.Platform)
-		if strings.HasPrefix(filePath, prefix) {
-			filePath = strings.TrimPrefix(filePath, prefix)
-		}
+		filePath = strings.TrimPrefix(filePath, prefix)
 
 		// 构建目标文件路径
 		targetPath := filepath.Join(targetDir, filePath)

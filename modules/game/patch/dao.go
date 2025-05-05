@@ -13,7 +13,7 @@ import (
 
 func autoMigrate() error {
 	return app.DB.AutoMigrate(
-		&models.PatchRecord{},
+		&PatchRecord{},
 	)
 }
 

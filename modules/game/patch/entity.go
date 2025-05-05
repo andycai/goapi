@@ -14,8 +14,8 @@ type PatchConfig struct {
 	ConfigPath         string `json:"config_path"`         // 配置文件路径
 }
 
-// PatchRecord 补丁记录
-type PatchRecord struct {
+// PatchRecordResp 补丁记录
+type PatchRecordResp struct {
 	ID          uint      `json:"id" gorm:"primaryKey"`
 	OldVersion  string    `json:"old_version"` // 旧版本号
 	NewVersion  string    `json:"new_version"` // 新版本号
