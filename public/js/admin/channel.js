@@ -1,7 +1,7 @@
 function channelManagement() {
     return {
         channels: [],
-        channel: {
+        currentChannel: {
             name: '',
             serverList: '',
             cdnVersion: '',
@@ -15,22 +15,9 @@ function channelManagement() {
             noticeUrl: '',
             noticeNumUrl: ''
         },
-        editingChannel: {
-            id: 0,
-            name: '',
-            serverList: '',
-            cdnVersion: '',
-            cdnUrl: '',
-            cdnUrl2: '',
-            openPatch: '',
-            loginApi: '',
-            loginUrl: '',
-            pkgVersion: '',
-            serverListUrl: '',
-            noticeUrl: '',
-            noticeNumUrl: ''
-        },
-        showEditModal: false,
+        showPanel: false,
+        isEditing: false,
+        panelTitle: '',
         currentPage: 1,
         pageSize: 10,
         totalRecords: 0,
@@ -56,6 +43,31 @@ function channelManagement() {
             }
         },
 
+        openCreatePanel() {
+            this.isEditing = false;
+            this.panelTitle = '创建渠道';
+            this.currentChannel = {
+                name: '',
+                serverList: '',
+                cdnVersion: '',
+                cdnUrl: '',
+                cdnUrl2: '',
+                openPatch: '',
+                loginApi: '',
+                loginUrl: '',
+                pkgVersion: '',
+                serverListUrl: '',
+                noticeUrl: '',
+                noticeNumUrl: ''
+            };
+            this.showPanel = true;
+        },
+
+        closePanel() {
+            this.showPanel = false;
+            this.isEditing = false;
+        },
+
         async createChannel() {
             try {
                 const response = await fetch('/api/channel', {
@@ -63,14 +75,14 @@ function channelManagement() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.channel)
+                    body: JSON.stringify(this.currentChannel)
                 });
 
                 if (!response.ok) {
                     throw new Error('Failed to create channel');
                 }
 
-                this.resetChannelForm();
+                this.closePanel();
                 this.loadChannels();
                 alert('创建渠道成功');
             } catch (error) {
@@ -81,19 +93,19 @@ function channelManagement() {
 
         async updateChannel() {
             try {
-                const response = await fetch(`/api/channel/${this.editingChannel.id}`, {
+                const response = await fetch(`/api/channel/${this.currentChannel.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.editingChannel)
+                    body: JSON.stringify(this.currentChannel)
                 });
 
                 if (!response.ok) {
                     throw new Error('Failed to update channel');
                 }
 
-                this.showEditModal = false;
+                this.closePanel();
                 this.loadChannels();
                 alert('更新渠道成功');
             } catch (error) {
@@ -125,8 +137,10 @@ function channelManagement() {
         },
 
         editChannel(channel) {
-            this.editingChannel = { ...channel };
-            this.showEditModal = true;
+            this.isEditing = true;
+            this.panelTitle = '编辑渠道';
+            this.currentChannel = { ...channel };
+            this.showPanel = true;
         },
 
         changePage(page) {
@@ -135,23 +149,6 @@ function channelManagement() {
             }
             this.currentPage = page;
             this.loadChannels();
-        },
-
-        resetChannelForm() {
-            this.channel = {
-                name: '',
-                serverList: '',
-                cdnVersion: '',
-                cdnUrl: '',
-                cdnUrl2: '',
-                openPatch: '',
-                loginApi: '',
-                loginUrl: '',
-                pkgVersion: '',
-                serverListUrl: '',
-                noticeUrl: '',
-                noticeNumUrl: ''
-            };
         },
 
         formatDate(dateString) {
