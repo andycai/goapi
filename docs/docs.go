@@ -17,7 +17,7 @@ const docTemplate = `{
         },
         "license": {
             "name": "MIT",
-            "url": "https://github.com/andycai/unitool/blob/main/LICENSE"
+            "url": "https://github.com/andycai/goapi/blob/main/LICENSE"
         },
         "version": "{{.Version}}"
     },
