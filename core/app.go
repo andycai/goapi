@@ -3,6 +3,7 @@ package core
 import (
 	"time"
 
+	"github.com/andycai/goapi/core/event"
 	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -17,6 +18,7 @@ type App struct {
 	RouterPublicApi fiber.Router
 	RouterAdminApi  fiber.Router
 	RouterAdmin     fiber.Router
+	Bus             *event.EventBus
 }
 
 func NewApp() *App {
@@ -28,6 +30,7 @@ func (a *App) Start(dbs []*gorm.DB, fiberApp *fiber.App) {
 	a.DBs = dbs
 	a.DB = dbs[0]
 	a.FiberApp = fiberApp
+	a.Bus = event.NewEventBus()
 
 	sqlDb, _ := a.DB.DB()
 	expiry := time.Duration(a.Config.Auth.TokenExpire) * time.Second
