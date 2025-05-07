@@ -31,6 +31,8 @@ func (m *adminlogModule) Start() error {
 		return err
 	}
 
+	subscribeEvents(app.Bus)
+
 	return nil
 }
 

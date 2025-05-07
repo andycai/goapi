@@ -46,7 +46,7 @@ func initMenus() error {
 			ParentID:   enum.MenuIdSystem,
 			Name:       "字典管理",
 			Path:       "/admin/dict",
-			Icon:       "book",
+			Icon:       "dict",
 			Sort:       6,
 			Permission: "dict:view",
 			IsShow:     true,

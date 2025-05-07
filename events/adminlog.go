@@ -1,7 +1,7 @@
-package adminlog
+package events
 
 // 操作日志事件
-type AddOperationLogEvent struct {
+type EventAddOperationLog struct {
 	UserID     uint
 	Username   string
 	IP         string

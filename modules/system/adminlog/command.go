@@ -4,15 +4,16 @@ import (
 	"context"
 
 	"github.com/andycai/goapi/core/event"
+	"github.com/andycai/goapi/events"
 	"github.com/andycai/goapi/models"
 )
 
-func init() {
-	event.Subscribe(app.Bus, event.EventHandler[AddOperationLogEvent](commandAddLog))
+func subscribeEvents(bus *event.EventBus) {
+	event.Subscribe(bus, event.EventHandler[events.EventAddOperationLog](commandAddLog))
 }
 
 // commandAddLog 写入操作日志命令
-func commandAddLog(ctx context.Context, event AddOperationLogEvent) error {
+func commandAddLog(ctx context.Context, event events.EventAddOperationLog) error {
 	log := models.AdminLog{
 		UserID:     event.UserID,
 		Username:   event.Username,
