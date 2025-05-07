@@ -3,7 +3,7 @@ package core
 import (
 	"time"
 
-	"github.com/andycai/goapi/core/event"
+	"github.com/andycai/goapi/lib/event"
 	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"

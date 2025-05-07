@@ -3,8 +3,8 @@ package adminlog
 import (
 	"context"
 
-	"github.com/andycai/goapi/core/event"
 	"github.com/andycai/goapi/events"
+	"github.com/andycai/goapi/lib/event"
 	"github.com/andycai/goapi/models"
 )
 

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+
+	"github.com/andycai/goapi/lib/work"
 )
 
 // Event 定义了事件的基础接口，所有事件都应可被断言为 interface{}
@@ -19,12 +21,14 @@ type EventHandler[T Event] func(ctx context.Context, event T) error
 type EventBus struct {
 	handlers map[reflect.Type][]any // 存储事件类型到其处理函数列表的映射
 	mu       sync.RWMutex           // 用于并发安全的读写锁
+	workPool *work.WorkPool         // 用于异步执行事件处理
 }
 
 // NewEventBus 创建一个新的 EventBus 实例
 func NewEventBus() *EventBus {
 	return &EventBus{
 		handlers: make(map[reflect.Type][]any),
+		workPool: work.NewWorkPool(30, 100),
 	}
 }
 
@@ -74,12 +78,11 @@ func Publish[T Event](bus *EventBus, ctx context.Context, event T) {
 			if handler, typeOk := h.(EventHandler[T]); typeOk {
 				// 异步执行，避免阻塞 Publish 调用
 				// 实际项目中可能需要一个 goroutine 池来管理
-				go func(ctx context.Context, e T, hdl EventHandler[T]) {
-					if err := hdl(ctx, e); err != nil {
-						// 处理错误，例如日志记录
-						fmt.Printf("Error executing handler for event %s: %v\n", reflect.TypeOf(e), err)
-					}
-				}(ctx, event, handler)
+				bus.workPool.PostWork("eventbus", &eventWorker[T]{
+					ctx:     ctx,
+					event:   event,
+					handler: handler,
+				})
 			} else {
 				// 这通常不应该发生，如果 Subscribe 逻辑正确的话
 				fmt.Printf("Error: Handler for event type %s has incorrect type. Expected EventHandler[%s], got %T\n",
@@ -88,6 +91,20 @@ func Publish[T Event](bus *EventBus, ctx context.Context, event T) {
 		}
 	} else {
 		fmt.Printf("No handlers subscribed for event type %s\n", eventType)
+	}
+}
+
+// eventWorker 实现了 work.PoolWorker 接口
+type eventWorker[T Event] struct {
+	ctx     context.Context
+	event   T
+	handler EventHandler[T]
+}
+
+func (w *eventWorker[T]) DoWork(workRoutine int) {
+	if err := w.handler(w.ctx, w.event); err != nil {
+		// 处理错误，例如日志记录
+		fmt.Printf("Error executing handler for event %s: %v\n", reflect.TypeOf(w.event), err)
 	}
 }
 
