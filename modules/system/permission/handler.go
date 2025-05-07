@@ -54,6 +54,24 @@ func listPermissionsHandler(c *fiber.Ctx) error {
 	})
 }
 
+func listAllPermissionsHandler(c *fiber.Ctx) error {
+	// 获取总记录数
+	var total int64
+	if err := app.DB.Model(&models.Permission{}).Count(&total).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "获取权限总数失败"})
+	}
+
+	var permissions []models.Permission
+	if err := app.DB.Find(&permissions).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "获取权限列表失败"})
+	}
+
+	return c.JSON(fiber.Map{
+		"items": permissions,
+		"total": total,
+	})
+}
+
 // createPermissionHandler 创建权限
 func createPermissionHandler(c *fiber.Ctx) error {
 	var req CreatePermissionRequest

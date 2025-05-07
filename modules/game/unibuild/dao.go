@@ -80,23 +80,23 @@ func initPermissions() error {
 		// 创建构建任务相关权限
 		permissions := []models.Permission{
 			{
-				Name:        "构建任务列表",
+				Name:        "Unity构建列表",
 				Code:        "unibuild:view",
-				Description: "查看构建任务列表",
+				Description: "查看Unity构建任务列表",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "创建构建任务",
+				Name:        "创建Unity构建",
 				Code:        "unibuild:create",
-				Description: "创建新的构建任务",
+				Description: "创建新的Unity构建任务",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
 			{
-				Name:        "执行构建任务",
+				Name:        "执行Unity构建",
 				Code:        "unibuild:execute",
-				Description: "执行构建任务",
+				Description: "执行Unity构建任务",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},

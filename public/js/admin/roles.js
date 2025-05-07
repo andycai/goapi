@@ -31,9 +31,10 @@ function roleManagement() {
 
         async loadPermissions() {
             try {
-                const response = await fetch('/api/admin/permissions');
+                const response = await fetch('/api/admin/permissions/all');
                 if (!response.ok) throw new Error('Failed to load permissions');
-                this.permissions = await response.json();
+                data = await response.json();
+                this.permissions = data.items;
             } catch (error) {
                 console.error('Error loading permissions:', error);
                 ShowError('加载权限列表失败');
@@ -57,7 +58,7 @@ function roleManagement() {
                 id: role.id,
                 name: role.name,
                 description: role.description,
-                permissions: role.permissions.map(p => p.id)
+                permissions: role.permissions.map(p => parseInt(p.id))
             };
             this.isEditing = true;
             this.panelTitle = '编辑角色';
@@ -70,12 +71,16 @@ function roleManagement() {
 
         async createRole() {
             try {
+                const formData = {
+                    ...this.currentRole,
+                    permissions: this.currentRole.permissions.map(id => parseInt(id))
+                };
                 const response = await fetch('/api/admin/roles', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.currentRole)
+                    body: JSON.stringify(formData)
                 });
 
                 if (!response.ok) throw new Error('Failed to create role');
@@ -91,12 +96,16 @@ function roleManagement() {
 
         async updateRole() {
             try {
+                const formData = {
+                    ...this.currentRole,
+                    permissions: this.currentRole.permissions.map(id => parseInt(id))
+                };
                 const response = await fetch(`/api/admin/roles/${this.currentRole.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.currentRole)
+                    body: JSON.stringify(formData)
                 });
 
                 if (!response.ok) throw new Error('Failed to update role');

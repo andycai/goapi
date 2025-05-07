@@ -173,6 +173,62 @@ func initUser() error {
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			},
+			{
+				Name:        "角色列表",
+				Code:        "role:view",
+				Description: "查看角色列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "创建角色",
+				Code:        "role:create",
+				Description: "创建新角色",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "更新角色",
+				Code:        "role:update",
+				Description: "更新角色信息",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除角色",
+				Code:        "role:delete",
+				Description: "删除角色",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "权限列表",
+				Code:        "permission:view",
+				Description: "查看权限列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "创建权限",
+				Code:        "permission:create",
+				Description: "创建新权限",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "更新权限",
+				Code:        "permission:update",
+				Description: "更新权限信息",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除权限",
+				Code:        "permission:delete",
+				Description: "删除权限",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
 		}
 
 		if err := tx.Create(&permissions).Error; err != nil {

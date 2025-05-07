@@ -71,60 +71,61 @@ func initMenus() error {
 }
 
 func initPermissions() error {
-	// 检查是否已初始化
-	if app.IsInitializedModule("role:permission") {
-		log.Println("[角色模块]权限数据已初始化，跳过")
-		return nil
-	}
+	return nil
+	// // 检查是否已初始化
+	// if app.IsInitializedModule("role:permission") {
+	// 	log.Println("[角色模块]权限数据已初始化，跳过")
+	// 	return nil
+	// }
 
-	// 开始事务
-	return app.DB.Transaction(func(tx *gorm.DB) error {
-		// 创建角色相关权限
-		permissions := []models.Permission{
-			{
-				Name:        "角色列表",
-				Code:        "role:view",
-				Description: "查看角色列表",
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			},
-			{
-				Name:        "创建角色",
-				Code:        "role:create",
-				Description: "创建新角色",
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			},
-			{
-				Name:        "更新角色",
-				Code:        "role:update",
-				Description: "更新角色信息",
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			},
-			{
-				Name:        "删除角色",
-				Code:        "role:delete",
-				Description: "删除角色",
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			},
-		}
+	// // 开始事务
+	// return app.DB.Transaction(func(tx *gorm.DB) error {
+	// 	// 创建角色相关权限
+	// 	permissions := []models.Permission{
+	// 		{
+	// 			Name:        "角色列表",
+	// 			Code:        "role:view",
+	// 			Description: "查看角色列表",
+	// 			CreatedAt:   time.Now(),
+	// 			UpdatedAt:   time.Now(),
+	// 		},
+	// 		{
+	// 			Name:        "创建角色",
+	// 			Code:        "role:create",
+	// 			Description: "创建新角色",
+	// 			CreatedAt:   time.Now(),
+	// 			UpdatedAt:   time.Now(),
+	// 		},
+	// 		{
+	// 			Name:        "更新角色",
+	// 			Code:        "role:update",
+	// 			Description: "更新角色信息",
+	// 			CreatedAt:   time.Now(),
+	// 			UpdatedAt:   time.Now(),
+	// 		},
+	// 		{
+	// 			Name:        "删除角色",
+	// 			Code:        "role:delete",
+	// 			Description: "删除角色",
+	// 			CreatedAt:   time.Now(),
+	// 			UpdatedAt:   time.Now(),
+	// 		},
+	// 	}
 
-		if err := tx.Create(&permissions).Error; err != nil {
-			return err
-		}
+	// 	if err := tx.Create(&permissions).Error; err != nil {
+	// 		return err
+	// 	}
 
-		// 标记模块已初始化
-		if err := tx.Create(&models.ModuleInit{
-			Module:      "role:permission",
-			Initialized: 1,
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
-		}).Error; err != nil {
-			return err
-		}
+	// 	// 标记模块已初始化
+	// 	if err := tx.Create(&models.ModuleInit{
+	// 		Module:      "role:permission",
+	// 		Initialized: 1,
+	// 		CreatedAt:   time.Now(),
+	// 		UpdatedAt:   time.Now(),
+	// 	}).Error; err != nil {
+	// 		return err
+	// 	}
 
-		return nil
-	})
+	// 	return nil
+	// })
 }
