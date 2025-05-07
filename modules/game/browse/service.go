@@ -1,6 +1,8 @@
 package browse
 
 import (
+	"context"
+
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
@@ -13,6 +15,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andycai/goapi/events"
+	"github.com/andycai/goapi/lib/event"
 	"github.com/andycai/goapi/modules/system/adminlog"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jlaffaye/ftp"
@@ -308,7 +312,18 @@ func handleBrowseFile(c *fiber.Ctx, path string) error {
 		}
 
 		// 记录操作日志
-		adminlog.WriteLog(c, "view", "browse", 0, fmt.Sprintf("查看文件：%s", path))
+		// adminlog.WriteLog(c, "view", "browse", 0, fmt.Sprintf("查看文件：%s", path))
+		cur := app.CurrentUser(c)
+		event.Publish(app.Bus, context.Background(), events.EventAddOperationLog{
+			UserID:     cur.ID,
+			Username:   cur.Username,
+			IP:         c.IP(),
+			UserAgent:  c.Get("User-Agent"),
+			Action:     "view",
+			Resource:   "browse",
+			ResourceID: 0,
+			Details:    fmt.Sprintf("查看文件：%s", path),
+		})
 
 		rootPath := "/admin/browse"
 
