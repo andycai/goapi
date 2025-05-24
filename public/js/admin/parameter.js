@@ -6,7 +6,7 @@ function parameterManagement() {
         pageSize: 10,
         totalPages: 0,
         searchKeyword: '',
-        showModal: false,
+        showPanel: false,
         editMode: false,
         currentParameter: null,
         loading: false,
@@ -69,7 +69,7 @@ function parameterManagement() {
                 parameters: []
             };
             this.addField(); // 添加一个空字段
-            this.showModal = true;
+            this.showPanel = true;
         },
         editParameter(parameter) {
             this.editMode = true;
@@ -102,7 +102,7 @@ function parameterManagement() {
                         this.addField(); // 如果没有字段，添加一个空字段
                     }
                     
-                    this.showModal = true;
+                    this.showPanel = true;
                 })
                 .catch(error => {
                     Alpine.store('notification').show(error.message, 'error');
@@ -111,8 +111,8 @@ function parameterManagement() {
                     this.loading = false;
                 });
         },
-        closeModal() {
-            this.showModal = false;
+        closePanel() {
+            this.showPanel = false;
             this.editMode = false;
             this.currentParameter = null;
             this.form = {
@@ -230,7 +230,7 @@ function parameterManagement() {
                     'success'
                 );
                 
-                this.closeModal();
+                this.closePanel();
                 this.fetchParameters();
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
