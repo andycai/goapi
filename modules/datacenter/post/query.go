@@ -11,12 +11,12 @@ func QueryPostList(page, limit int, status string) ([]PostResponse, int64, error
 	response := make([]PostResponse, 0, len(posts))
 	for _, post := range posts {
 		postResp := PostResponse{
-			ID:        int64(post.ID),
+			ID:        post.ID,
 			Title:     post.Title,
 			Content:   post.Content,
 			Slug:      post.Slug,
 			Status:    post.Status,
-			AuthorID:  int64(post.AuthorID),
+			AuthorID:  post.AuthorID,
 			CreatedAt: post.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt: post.UpdatedAt.Format("2006-01-02 15:04:05"),
 		}
@@ -34,12 +34,12 @@ func QueryPostByID(id uint) (*PostResponse, error) {
 	}
 
 	response := &PostResponse{
-		ID:        int64(post.ID),
+		ID:        post.ID,
 		Title:     post.Title,
 		Content:   post.Content,
 		Slug:      post.Slug,
 		Status:    post.Status,
-		AuthorID:  int64(post.AuthorID),
+		AuthorID:  post.AuthorID,
 		CreatedAt: post.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: post.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
@@ -55,12 +55,12 @@ func QueryPostBySlug(slug string) (*PostResponse, error) {
 	}
 
 	response := &PostResponse{
-		ID:        int64(post.ID),
+		ID:        post.ID,
 		Title:     post.Title,
 		Content:   post.Content,
 		Slug:      post.Slug,
 		Status:    post.Status,
-		AuthorID:  int64(post.AuthorID),
+		AuthorID:  post.AuthorID,
 		CreatedAt: post.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: post.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
@@ -79,12 +79,12 @@ func QuerySearchPosts(query string, page, limit int) ([]PostResponse, int64, err
 	response := make([]PostResponse, 0, len(posts))
 	for _, post := range posts {
 		postResp := PostResponse{
-			ID:        int64(post.ID),
+			ID:        post.ID,
 			Title:     post.Title,
 			Content:   post.Content,
 			Slug:      post.Slug,
 			Status:    post.Status,
-			AuthorID:  int64(post.AuthorID),
+			AuthorID:  post.AuthorID,
 			CreatedAt: post.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt: post.UpdatedAt.Format("2006-01-02 15:04:05"),
 		}
