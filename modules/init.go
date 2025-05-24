@@ -3,7 +3,9 @@ package modules
 // 新增的模块必须在这里进行导入，不然模块 init 方法不会执行
 import (
 	_ "github.com/andycai/goapi/modules/datacenter/dict"      // 字典
+	_ "github.com/andycai/goapi/modules/datacenter/page"      // 静态页面
 	_ "github.com/andycai/goapi/modules/datacenter/parameter" // 参数配置
+	_ "github.com/andycai/goapi/modules/datacenter/post"      // 博客文章
 	_ "github.com/andycai/goapi/modules/development/citask"   // 构建任务
 	_ "github.com/andycai/goapi/modules/game/browse"          // 浏览文件
 	_ "github.com/andycai/goapi/modules/game/channel"         // 渠道
@@ -16,8 +18,6 @@ import (
 	_ "github.com/andycai/goapi/modules/interface/shell"      // 命令脚本执行
 	_ "github.com/andycai/goapi/modules/knowledge/note"       // 笔记
 	_ "github.com/andycai/goapi/modules/login"                // 登录
-	_ "github.com/andycai/goapi/modules/page"                 // 静态页面
-	_ "github.com/andycai/goapi/modules/post"                 // 博客文章
 	_ "github.com/andycai/goapi/modules/system/adminlog"      // 后台操作日志
 	_ "github.com/andycai/goapi/modules/system/menu"          // 菜单
 	_ "github.com/andycai/goapi/modules/system/permission"    // 权限
