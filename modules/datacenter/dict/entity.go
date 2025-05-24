@@ -1,6 +1,15 @@
 package dict
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrDictTypeNotFound      = errors.New("字典类型不存在")
+	ErrDictTypeAlreadyExists = errors.New("字典类型已存在")
+	ErrDictDataNotFound      = errors.New("字典数据不存在")
+)
 
 // DictType 字典类型
 type DictType struct {

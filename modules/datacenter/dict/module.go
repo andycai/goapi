@@ -32,9 +32,6 @@ func (m *dictModule) Start() error {
 		return err
 	}
 
-	// 初始化服务
-	initService()
-
 	return nil
 }
 

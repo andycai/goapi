@@ -22,7 +22,7 @@ func listDictTypeHandler(c *fiber.Ctx) error {
 		page = 1
 	}
 
-	dictTypes, total, err := getDictTypeList(page, limit)
+	dictTypes, total, err := QueryDictTypeList(page, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取字典类型列表失败: " + err.Error(),
@@ -51,7 +51,7 @@ func addDictTypeHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := addDictType(dictType); err != nil {
+	if err := CommandAddDictType(dictType); err != nil {
 		if err == ErrDictTypeAlreadyExists {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": err.Error(),
@@ -84,7 +84,7 @@ func editDictTypeHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := updateDictType(dictType); err != nil {
+	if err := CommandUpdateDictType(dictType); err != nil {
 		if err == ErrDictTypeNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": err.Error(),
@@ -124,7 +124,7 @@ func deleteDictTypeHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := deleteDictType(req.ID); err != nil {
+	if err := CommandDeleteDictType(req.ID); err != nil {
 		if err == ErrDictTypeNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": err.Error(),
@@ -163,7 +163,7 @@ func listDictDataHandler(c *fiber.Ctx) error {
 	}
 
 	// 首先检查字典类型是否存在
-	_, err = getDictTypeByType(typeCode)
+	_, err = QueryDictTypeByType(typeCode)
 	if err != nil {
 		if err == ErrDictTypeNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -175,7 +175,7 @@ func listDictDataHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	dictData, total, err := getDictDataList(typeCode, page, limit)
+	dictData, total, err := QueryDictDataList(typeCode, page, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取字典数据列表失败: " + err.Error(),
@@ -204,7 +204,7 @@ func addDictDataHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := addDictData(dictData); err != nil {
+	if err := CommandAddDictData(dictData); err != nil {
 		if err == ErrDictTypeNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": err.Error(),
@@ -237,7 +237,7 @@ func editDictDataHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := updateDictData(dictData); err != nil {
+	if err := CommandUpdateDictData(dictData); err != nil {
 		if err == ErrDictDataNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": err.Error(),
@@ -272,7 +272,7 @@ func deleteDictDataHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := deleteDictData(req.ID); err != nil {
+	if err := CommandDeleteDictData(req.ID); err != nil {
 		if err == ErrDictDataNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": err.Error(),

@@ -8,18 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	ErrDictTypeNotFound      = errors.New("字典类型不存在")
-	ErrDictTypeAlreadyExists = errors.New("字典类型已存在")
-	ErrDictDataNotFound      = errors.New("字典数据不存在")
-)
-
-// 初始化服务
-func initService() {
-	// 暂无需要初始化的服务逻辑
-}
-
-// 字典类型服务
+// 字典类型数据库操作
 
 // 获取字典类型列表
 func getDictTypeList(page, limit int) ([]models.DictType, int64, error) {
@@ -123,7 +112,7 @@ func deleteDictType(id int64) error {
 	return app.DB.Delete(&dictType).Error
 }
 
-// 字典数据服务
+// 字典数据数据库操作
 
 // 根据字典类型获取字典数据列表
 func getDictDataList(typeCode string, page, limit int) ([]models.DictData, int64, error) {

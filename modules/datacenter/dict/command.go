@@ -1,25 +1,35 @@
 package dict
 
 import (
-	"time"
-
 	"github.com/andycai/goapi/models"
 )
 
-// 添加字典类型
-func CommandAddType(dictType *models.DictType) error {
-	// 检查类型是否已存在
-	var count int64
-	if err := app.DB.Model(&models.DictType{}).Where("type = ?", dictType.Type).Count(&count).Error; err != nil {
-		return err
-	}
+// CommandAddDictType adds a new dictionary type
+func CommandAddDictType(dictType *models.DictType) error {
+	return addDictType(dictType)
+}
 
-	if count > 0 {
-		return ErrDictTypeAlreadyExists
-	}
+// CommandUpdateDictType updates an existing dictionary type
+func CommandUpdateDictType(dictType *models.DictType) error {
+	return updateDictType(dictType)
+}
 
-	dictType.CreatedAt = time.Now()
-	dictType.UpdatedAt = time.Now()
+// CommandDeleteDictType deletes a dictionary type
+func CommandDeleteDictType(id int64) error {
+	return deleteDictType(id)
+}
 
-	return app.DB.Create(dictType).Error
+// CommandAddDictData adds a new dictionary data
+func CommandAddDictData(dictData *models.DictData) error {
+	return addDictData(dictData)
+}
+
+// CommandUpdateDictData updates an existing dictionary data
+func CommandUpdateDictData(dictData *models.DictData) error {
+	return updateDictData(dictData)
+}
+
+// CommandDeleteDictData deletes a dictionary data
+func CommandDeleteDictData(id int64) error {
+	return deleteDictData(id)
 }
