@@ -22,6 +22,18 @@ type Post struct {
 	UpdatedAt time.Time `json:"updated_at"` // 更新时间
 }
 
+// PostResponse represents the response structure for post data
+type PostResponse struct {
+	ID        int64  `json:"id"`         // ID
+	Title     string `json:"title"`      // 标题
+	Content   string `json:"content"`    // 内容
+	Slug      string `json:"slug"`       // 别名
+	Status    string `json:"status"`     // 状态：draft, published
+	AuthorID  int64  `json:"author_id"`  // 作者ID
+	CreatedAt string `json:"created_at"` // 创建时间
+	UpdatedAt string `json:"updated_at"` // 更新时间
+}
+
 // PostCreate represents the data needed to create a new post
 type PostCreate struct {
 	Title    string `json:"title" validate:"required"`

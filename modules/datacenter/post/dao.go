@@ -36,7 +36,7 @@ func getPostList(page, limit int, status string) ([]models.Post, int64, error) {
 }
 
 // 根据ID获取文章
-func getPostByID(id int64) (models.Post, error) {
+func getPostByID(id uint) (models.Post, error) {
 	var post models.Post
 	if err := app.DB.First(&post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

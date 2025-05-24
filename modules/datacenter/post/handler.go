@@ -86,9 +86,17 @@ func addPostHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	// 获取新创建的文章详情
+	postResp, err := QueryPostByID(post.ID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "获取文章详情失败: " + err.Error(),
+		})
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "添加文章成功",
-		"id":      post.ID,
+		"post":    postResp,
 	})
 }
 
@@ -124,8 +132,17 @@ func editPostHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	// 获取更新后的文章详情
+	postResp, err := QueryPostByID(post.ID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "获取文章详情失败: " + err.Error(),
+		})
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "更新文章成功",
+		"post":    postResp,
 	})
 }
 
