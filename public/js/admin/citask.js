@@ -4,11 +4,11 @@ function taskManagement() {
         taskLogs: [],
         currentTask: null,
         currentTaskLog: null,
-        showTaskModal: false,
-        showLogsModal: false,
-        showLogDetailModal: false,
-        showProgressModal: false,
-        showRunningTasksModal: false,
+        showTaskPanel: false,
+        showLogsPanel: false,
+        showLogDetailPanel: false,
+        showProgressPanel: false,
+        showRunningTasksPanel: false,
         editMode: false,
         progressInterval: null,
         runningTasks: [],
@@ -39,12 +39,23 @@ function taskManagement() {
         userScrolled: false,
         autoScroll: true,
         scrollingToBottom: false,
+        panelTitle: '新建任务',
+
+        // 计算属性
+        get paginatedLogs() {
+            const startIndex = (this.currentPage - 1) * this.pageSize;
+            const endIndex = startIndex + this.pageSize;
+            return this.taskLogs.slice(startIndex, endIndex);
+        },
+
+        // 初始化方法
         init() {
             this.userScrolled = false;
             this.autoScroll = true;
             this.fetchTasks();
             this.startRunningTasksPolling();
         },
+
         async fetchTasks() {
             try {
                 const response = await fetch('/api/admin/citask');
@@ -56,6 +67,7 @@ function taskManagement() {
         },
         createTask() {
             this.editMode = false;
+            this.panelTitle = '新建任务';
             this.form = {
                 id: '',
                 name: '',
@@ -71,15 +83,16 @@ function taskManagement() {
                 enable_cron: 0,
                 cron_expr: ''
             };
-            this.showTaskModal = true;
+            this.showTaskPanel = true;
         },
         editTask(task) {
             this.editMode = true;
+            this.panelTitle = '编辑任务';
             this.form = {
                 ...task,
                 enable_cron: parseInt(task.enable_cron) || 0
             };
-            this.showTaskModal = true;
+            this.showTaskPanel = true;
         },
         async submitTask() {
             try {
@@ -106,7 +119,7 @@ function taskManagement() {
                 }
 
                 await this.fetchTasks();
-                this.showTaskModal = false;
+                this.showTaskPanel = false;
                 ShowMessage(this.editMode ? '任务更新成功' : '任务创建成功');
             } catch (error) {
                 console.error('保存任务失败:', error);
@@ -138,15 +151,12 @@ function taskManagement() {
                 if (!response.ok) throw new Error('启动任务失败');
                 const taskLog = await response.json();
                 
-                // 显示进度模态框
                 this.currentTask = task;
                 this.currentTaskLog = taskLog;
-                this.showProgressModal = true;
+                this.showProgressPanel = true;
                 
-                // 开始轮询进度
                 this.startProgressPolling(taskLog.id);
                 
-                // 自动滚动到底部
                 this.$nextTick(() => {
                     this.scrollOutputToBottom();
                 });
@@ -180,14 +190,14 @@ function taskManagement() {
                 this.taskLogs = await response.json();
                 this.currentPage = 1;
                 this.updatePaginatedLogs();
-                this.showLogsModal = true;
+                this.showLogsPanel = true;
             } catch (error) {
                 ShowError(error.message);
             }
         },
         viewLogDetail(log) {
             this.currentTaskLog = log;
-            this.showLogDetailModal = true;
+            this.showLogDetailPanel = true;
         },
         startProgressPolling(logId) {
             // 清除现有的轮询
@@ -226,13 +236,42 @@ function taskManagement() {
                 this.progressInterval = null;
             }
         },
-        closeProgress() {
+        closeTaskPanel() {
+            this.showTaskPanel = false;
+            this.form = {
+                id: '',
+                name: '',
+                description: '',
+                type: 'script',
+                script: '',
+                url: '',
+                method: 'GET',
+                headers: '',
+                body: '',
+                timeout: 300,
+                status: 'active',
+                enable_cron: 0,
+                cron_expr: ''
+            };
+        },
+        closeLogsPanel() {
+            this.showLogsPanel = false;
+            this.taskLogs = [];
+        },
+        closeLogDetailPanel() {
+            this.showLogDetailPanel = false;
+            this.currentTaskLog = null;
+        },
+        closeProgressPanel() {
             this.stopProgressPolling();
-            this.showProgressModal = false;
+            this.showProgressPanel = false;
             this.currentTask = null;
             this.currentTaskLog = null;
             this.autoScroll = true;
-            this.fetchTasks(); // 刷新任务列表
+            this.fetchTasks();
+        },
+        closeRunningTasksPanel() {
+            this.showRunningTasksPanel = false;
         },
         getProgressWidth() {
             if (!this.currentTaskLog) return '0%';
@@ -319,11 +358,6 @@ function taskManagement() {
         updatePaginatedLogs() {
             this.totalPages = Math.ceil(this.taskLogs.length / this.pageSize);
         },
-        get paginatedLogs() {
-            const startIndex = (this.currentPage - 1) * this.pageSize;
-            const endIndex = startIndex + this.pageSize;
-            return this.taskLogs.slice(startIndex, endIndex);
-        },
         // 开始轮询正在执行的任务
         startRunningTasksPolling() {
             this.fetchRunningTasks();
@@ -352,14 +386,14 @@ function taskManagement() {
         },
         // 显示正在执行的任务列表
         showRunningTasks() {
-            this.showRunningTasksModal = true;
+            this.showRunningTasksPanel = true;
             this.fetchRunningTasks();
         },
         // 查看任务进度
         viewTaskProgress(task) {
             this.currentTask = task;
-            this.showRunningTasksModal = false;
-            this.showProgressModal = true;
+            this.showRunningTasksPanel = false;
+            this.showProgressPanel = true;
             this.startProgressPolling(task.id);
         },
         // 在组件销毁时清理
@@ -379,7 +413,7 @@ function taskManagement() {
                     if (progress.status === 'running') {
                         this.currentTask = { id: logId };
                         this.currentTaskLog = progress;
-                        this.showProgressModal = true;
+                        this.showProgressPanel = true;
                         this.startProgressPolling(logId);
                         return;
                     }
