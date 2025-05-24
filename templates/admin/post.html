@@ -2,7 +2,7 @@
     <!-- 文章管理 -->
     <div class="flex justify-between items-center">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white">文章管理</h2>
-        <button @click="openAddModal(); $dispatch('open-post-modal')" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <button @click="openAddModal()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             添加文章
         </button>
     </div>
@@ -33,7 +33,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="formatDate(post.created_at)"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button @click="openEditModal(post); $dispatch('open-post-modal')" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                    <button @click="openEditModal(post)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
                                         编辑
                                     </button>
                                     <button @click="deletePost(post.id)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
@@ -77,61 +77,75 @@
         </div>
     </div>
 
-    <!-- 文章模态框 -->
-    <div id="postModal" x-data="{ 
-        open: false, 
-        title: () => $data.modalAction === 'add' ? '添加文章' : '编辑文章'
-    }" x-show="open" @click.away="open = false" @open-post-modal.window="open = true" class="fixed inset-0 z-10 overflow-y-auto" style="display: none;">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    <!-- 文章滑出面板 -->
+    <div x-show="showPanel" 
+         :class="{'slide-in': showPanel, 'slide-out': !showPanel}"
+         class="slide-panel dark:bg-gray-800"
+         @click.away="closePanel">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white" x-text="modalAction === 'add' ? '添加文章' : '编辑文章'"></h3>
+                <button @click="closePanel" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" x-text="title()"></h3>
-                            <div class="mt-4 space-y-4">
-                                <div>
-                                    <label for="postTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">标题</label>
-                                    <input type="text" x-model="form.title" id="postTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                </div>
-                                <div>
-                                    <label for="postContent" class="block text-sm font-medium text-gray-700 dark:text-gray-300">内容</label>
-                                    <textarea x-model="form.content" id="postContent" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"></textarea>
-                                </div>
-                                <div>
-                                    <label for="postSlug" class="block text-sm font-medium text-gray-700 dark:text-gray-300">别名</label>
-                                    <input type="text" x-model="form.slug" id="postSlug" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                    <div class="mt-1 text-sm text-gray-500">别名必须唯一</div>
-                                </div>
-                                <div>
-                                    <label for="postStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">状态</label>
-                                    <select x-model="form.status" id="postStatus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                        <option value="draft">草稿</option>
-                                        <option value="published">已发布</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="postAuthorId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">作者ID</label>
-                                    <input type="number" x-model="form.author_id" id="postAuthorId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                </div>
-                            </div>
-                        </div>
+            <form @submit.prevent="savePost">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">标题</label>
+                        <input type="text" x-model="form.title" 
+                               class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                               placeholder="输入文章标题" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">内容</label>
+                        <textarea x-model="form.content" rows="5"
+                                 class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                 placeholder="输入文章内容" required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">别名</label>
+                        <input type="text" x-model="form.slug" 
+                               class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                               placeholder="输入文章别名" required>
+                        <div class="mt-1 text-sm text-gray-500">别名必须唯一</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">状态</label>
+                        <select x-model="form.status" 
+                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400">
+                            <option value="draft">草稿</option>
+                            <option value="published">已发布</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">作者ID</label>
+                        <input type="number" x-model="form.author_id" 
+                               class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                               placeholder="输入作者ID" required>
                     </div>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button @click="savePost()" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        保存
-                    </button>
-                    <button @click="open = false" x-ref="close" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+
+                <!-- 面板底部按钮 -->
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" 
+                            @click="closePanel()"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200">
                         取消
                     </button>
+                    <button type="submit" 
+                            :disabled="loading"
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition-colors duration-200 flex items-center">
+                        <svg x-show="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        确定
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div> 

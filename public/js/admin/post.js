@@ -19,8 +19,11 @@ function postManagement() {
             status: 'draft',
             author_id: 0
         },
-        // 模态框状态
+        // 面板状态
+        showPanel: false,
         modalAction: 'add',
+        // 加载状态
+        loading: false,
 
         init() {
             this.loadPosts();
@@ -47,7 +50,7 @@ function postManagement() {
             await this.loadPosts();
         },
 
-        // 打开添加文章模态框
+        // 打开添加文章面板
         openAddModal() {
             this.form = {
                 id: 0,
@@ -58,9 +61,10 @@ function postManagement() {
                 author_id: 0
             };
             this.modalAction = 'add';
+            this.showPanel = true;
         },
 
-        // 打开编辑文章模态框
+        // 打开编辑文章面板
         openEditModal(post) {
             this.form = {
                 id: post.id,
@@ -71,10 +75,27 @@ function postManagement() {
                 author_id: post.author_id
             };
             this.modalAction = 'edit';
+            this.showPanel = true;
+        },
+
+        // 关闭文章面板
+        closePanel() {
+            this.showPanel = false;
+            this.form = {
+                id: 0,
+                title: '',
+                content: '',
+                slug: '',
+                status: 'draft',
+                author_id: 0
+            };
         },
 
         // 保存文章
         async savePost() {
+            if (this.loading) return;
+            this.loading = true;
+            
             try {
                 const url = this.modalAction === 'add' ? '/api/admin/post/add' : '/api/admin/post/edit';
                 
@@ -100,11 +121,11 @@ function postManagement() {
 
                 await this.loadPosts();
                 Alpine.store('notification').show(this.modalAction === 'add' ? '添加文章成功' : '更新文章成功', 'success');
-                
-                // 关闭模态框
-                document.querySelector('#postModal').querySelector('[x-ref="close"]').click();
+                this.closePanel();
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
+            } finally {
+                this.loading = false;
             }
         },
 
