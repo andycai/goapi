@@ -1,5 +1,11 @@
 package parameter
 
+import "errors"
+
+var (
+	ErrParameterNotFound = errors.New("参数不存在")
+)
+
 // ParameterField 参数字段
 type ParameterField struct {
 	Name  string      `json:"name"`  // 字段名称
