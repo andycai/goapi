@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white">笔记管理</h2>
         <div class="flex space-x-4">
-            <button @click="openCategoryModal()" 
+            <button @click="openCategoryPanel()" 
                     class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
                 新建分类
             </button>
@@ -158,131 +158,123 @@
         </div>
     </div>
 
-    <!-- 分类管理模态框 -->
-    <div x-show="showCategoryModal" 
-         class="fixed inset-0 z-50 overflow-y-auto"
-         x-cloak>
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900"></div>
+    <!-- 分类管理滑动面板 -->
+    <div x-show="showCategoryPanel" 
+         :class="{'slide-in': showCategoryPanel, 'slide-out': !showCategoryPanel}"
+         class="slide-panel dark:bg-gray-800"
+         @click.away="closeCategoryPanel">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">分类管理</h3>
+                <button @click="closeCategoryPanel" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">分类管理</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">分类名称</label>
-                            <input type="text" x-model="categoryForm.name"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">父分类</label>
-                            <select x-model.number="categoryForm.parent_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                <option :value="0">无</option>
-                                <template x-for="category in categories" :key="category.id">
-                                    <option :value="category.id" x-text="category.name"></option>
-                                </template>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">描述</label>
-                            <textarea x-model="categoryForm.description"
-                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
-                                     rows="3"></textarea>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" x-model="categoryForm.is_public" class="form-checkbox h-4 w-4 text-blue-600">
-                            <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">公开访问</label>
-                        </div>
-                    </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">分类名称</label>
+                    <input type="text" x-model="categoryForm.name"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button @click="saveCategory()" 
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        保存
-                    </button>
-                    <button @click="showCategoryModal = false" 
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-                        取消
-                    </button>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">父分类</label>
+                    <select x-model.number="categoryForm.parent_id"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <option :value="0">无</option>
+                        <template x-for="category in categories" :key="category.id">
+                            <option :value="category.id" x-text="category.name"></option>
+                        </template>
+                    </select>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">描述</label>
+                    <textarea x-model="categoryForm.description"
+                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                             rows="3"></textarea>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" x-model="categoryForm.is_public" class="form-checkbox h-4 w-4 text-blue-600">
+                    <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">公开访问</label>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button @click="closeCategoryPanel" 
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    取消
+                </button>
+                <button @click="saveCategory()" 
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    保存
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 笔记编辑模态框 -->
-    <div x-show="showNoteModal" 
-         class="fixed inset-0 z-50 overflow-y-auto"
-         x-cloak>
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900"></div>
+    <!-- 笔记编辑滑动面板 -->
+    <div x-show="showNotePanel" 
+         :class="{'slide-in': showNotePanel, 'slide-out': !showNotePanel}"
+         class="slide-panel dark:bg-gray-800"
+         @click.away="closeNotePanel">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white" x-text="panelTitle"></h3>
+                <button @click="closeNotePanel" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                            <span x-text="noteForm.id ? '编辑笔记' : '新建笔记'"></span>
-                        </h3>
-                        <div class="flex items-center space-x-4">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">标题</label>
+                    <input type="text" x-model="noteForm.title"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">分类</label>
+                    <select x-model.number="noteForm.category_id"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <template x-for="category in categories" :key="category.id">
+                            <option :value="category.id" x-text="category.name"></option>
+                        </template>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">父笔记</label>
+                    <select x-model.number="noteForm.parent_id"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                        <option :value="0">无</option>
+                        <template x-for="note in notes" :key="note.id">
+                            <option :value="note.id" x-text="note.title"></option>
+                        </template>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">访问角色</label>
+                    <div class="space-y-2 max-h-[200px] overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2">
+                        <template x-for="role in roles" :key="role.id">
                             <div class="flex items-center">
-                                <input type="checkbox" x-model="noteForm.is_public" class="form-checkbox h-4 w-4 text-blue-600">
-                                <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">公开访问</label>
+                                <input type="checkbox" 
+                                       :value="role.id"
+                                       x-model="noteForm.role_ids"
+                                       class="form-checkbox h-4 w-4 text-blue-600">
+                                <label class="ml-2 text-sm text-gray-700 dark:text-gray-300" x-text="role.name"></label>
                             </div>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">标题</label>
-                            <input type="text" x-model="noteForm.title"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">分类</label>
-                            <select x-model.number="noteForm.category_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                <template x-for="category in categories" :key="category.id">
-                                    <option :value="category.id" x-text="category.name"></option>
-                                </template>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">父笔记</label>
-                            <select x-model.number="noteForm.parent_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                <option :value="0">无</option>
-                                <template x-for="note in notes" :key="note.id">
-                                    <option :value="note.id" x-text="note.title"></option>
-                                </template>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">访问角色</label>
-                            <div class="space-y-2 max-h-[200px] overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-2">
-                                <template x-for="role in roles" :key="role.id">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" 
-                                               :value="role.id"
-                                               x-model="noteForm.role_ids"
-                                               class="form-checkbox h-4 w-4 text-blue-600">
-                                        <label class="ml-2 text-sm text-gray-700 dark:text-gray-300" x-text="role.name"></label>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button @click="submitNote()" 
-                            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        保存
-                    </button>
-                    <button @click="showNoteModal = false" 
-                            class="mt-3 inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-                        取消
-                    </button>
-                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button @click="closeNotePanel" 
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    取消
+                </button>
+                <button @click="submitNote()" 
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    保存
+                </button>
             </div>
         </div>
     </div>

@@ -4,9 +4,10 @@ function noteManagement() {
         notes: [],
         roles: [],
         selectedNote: null,
-        showCategoryModal: false,
-        showNoteModal: false,
+        showCategoryPanel: false,
+        showNotePanel: false,
         showPreview: true,
+        panelTitle: '新建笔记',
         categoryForm: {
             id: null,
             name: '',
@@ -105,6 +106,45 @@ function noteManagement() {
             }
         },
 
+        // 打开分类面板
+        openCategoryPanel() {
+            this.categoryForm = {
+                id: null,
+                name: '',
+                description: '',
+                parent_id: 0,
+                is_public: 0,
+                role_ids: []
+            };
+            this.showCategoryPanel = true;
+        },
+
+        // 编辑分类
+        editCategory(category) {
+            this.categoryForm = {
+                id: Number(category.id),
+                name: category.name,
+                description: category.description,
+                parent_id: Number(category.parent_id || 0),
+                is_public: category.is_public,
+                role_ids: category.roles?.map(role => Number(role.id)) || []
+            };
+            this.showCategoryPanel = true;
+        },
+
+        // 关闭分类面板
+        closeCategoryPanel() {
+            this.showCategoryPanel = false;
+            this.categoryForm = {
+                id: null,
+                name: '',
+                description: '',
+                parent_id: 0,
+                is_public: 0,
+                role_ids: []
+            };
+        },
+
         // 创建笔记
         createNote() {
             this.noteForm = {
@@ -116,7 +156,8 @@ function noteManagement() {
                 is_public: 0,
                 role_ids: []
             };
-            this.showNoteModal = true;
+            this.panelTitle = '新建笔记';
+            this.showNotePanel = true;
         },
 
         // 编辑笔记
@@ -130,7 +171,22 @@ function noteManagement() {
                 is_public: note.is_public,
                 role_ids: note.roles?.map(role => Number(role.id)) || []
             };
-            this.showNoteModal = true;
+            this.panelTitle = '编辑笔记';
+            this.showNotePanel = true;
+        },
+
+        // 关闭笔记面板
+        closeNotePanel() {
+            this.showNotePanel = false;
+            this.noteForm = {
+                id: null,
+                title: '',
+                content: '',
+                category_id: null,
+                parent_id: 0,
+                is_public: 0,
+                role_ids: []
+            };
         },
 
         // 保存笔记
@@ -190,7 +246,7 @@ function noteManagement() {
                 return response.json();
             })
             .then(data => {
-                this.showNoteModal = false;
+                this.showNotePanel = false;
                 this.loadNotes().then(() => {
                     // 创建或编辑笔记后，自动选中该笔记
                     if (data.id) {
@@ -232,32 +288,6 @@ function noteManagement() {
             }
         },
 
-        // 打开分类模态框，并重置表单
-        openCategoryModal() {
-            this.categoryForm = {
-                id: null,
-                name: '',
-                description: '',
-                parent_id: 0,
-                is_public: 0,
-                role_ids: []
-            };
-            this.showCategoryModal = true;
-        },
-
-        // 编辑分类
-        editCategory(category) {
-            this.categoryForm = {
-                id: Number(category.id),
-                name: category.name,
-                description: category.description,
-                parent_id: Number(category.parent_id || 0),
-                is_public: category.is_public,
-                role_ids: category.roles?.map(role => Number(role.id)) || []
-            };
-            this.showCategoryModal = true;
-        },
-
         // 保存分类
         async saveCategory() {
             try {
@@ -280,7 +310,7 @@ function noteManagement() {
 
                 if (!response.ok) throw new Error('保存分类失败');
 
-                this.showCategoryModal = false;
+                this.showCategoryPanel = false;
                 ShowMessage('保存成功');
                 await this.loadCategories();
             } catch (error) {
