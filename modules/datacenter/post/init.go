@@ -41,12 +41,12 @@ func initMenus() error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建文章管理菜单
 		postMenu := models.Menu{
-			MenuID:     1007,
+			MenuID:     1009,
 			ParentID:   enum.MenuIdSystem,
 			Name:       "文章管理",
 			Path:       "/admin/post",
 			Icon:       "post",
-			Sort:       7,
+			Sort:       9,
 			Permission: "post:view",
 			IsShow:     true,
 			CreatedAt:  time.Now(),
