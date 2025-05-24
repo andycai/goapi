@@ -16,6 +16,8 @@ import (
 	_ "github.com/andycai/goapi/modules/interface/shell"      // 命令脚本执行
 	_ "github.com/andycai/goapi/modules/knowledge/note"       // 笔记
 	_ "github.com/andycai/goapi/modules/login"                // 登录
+	_ "github.com/andycai/goapi/modules/page"                 // 静态页面
+	_ "github.com/andycai/goapi/modules/post"                 // 博客文章
 	_ "github.com/andycai/goapi/modules/system/adminlog"      // 后台操作日志
 	_ "github.com/andycai/goapi/modules/system/menu"          // 菜单
 	_ "github.com/andycai/goapi/modules/system/permission"    // 权限
