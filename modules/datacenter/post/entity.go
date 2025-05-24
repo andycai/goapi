@@ -1,7 +1,13 @@
 package post
 
 import (
+	"errors"
 	"time"
+)
+
+var (
+	ErrPostNotFound          = errors.New("文章不存在")
+	ErrPostSlugAlreadyExists = errors.New("文章别名已存在")
 )
 
 // Post represents a blog post entity
