@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/andycai/goapi/models"
-	"github.com/andycai/goapi/modules/datacenter/db"
 	"gorm.io/gorm"
 )
 
@@ -18,8 +17,7 @@ func QueryPostList(page, limit int, status string) ([]models.Post, int64, error)
 	var posts []models.Post
 	var total int64
 
-	database := db.GetDB()
-	db := database.Model(&models.Post{})
+	db := app.DB.Model(&models.Post{})
 	if status != "" {
 		db = db.Where("status = ?", status)
 	}
@@ -44,8 +42,7 @@ func QueryPostList(page, limit int, status string) ([]models.Post, int64, error)
 // 根据ID获取文章
 func QueryPostByID(id int64) (models.Post, error) {
 	var post models.Post
-	database := db.GetDB()
-	if err := database.First(&post, id).Error; err != nil {
+	if err := app.DB.First(&post, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return post, ErrPostNotFound
 		}
@@ -57,8 +54,7 @@ func QueryPostByID(id int64) (models.Post, error) {
 // 根据别名获取文章
 func QueryPostBySlug(slug string) (models.Post, error) {
 	var post models.Post
-	database := db.GetDB()
-	if err := database.Where("slug = ?", slug).First(&post).Error; err != nil {
+	if err := app.DB.Where("slug = ?", slug).First(&post).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return post, ErrPostNotFound
 		}
@@ -72,8 +68,7 @@ func QuerySearchPosts(query string, page, limit int) ([]models.Post, int64, erro
 	var posts []models.Post
 	var total int64
 
-	database := db.GetDB()
-	searchQuery := database.Model(&models.Post{}).
+	searchQuery := app.DB.Model(&models.Post{}).
 		Where("title LIKE ? OR content LIKE ?", "%"+query+"%", "%"+query+"%")
 
 	err := searchQuery.Count(&total).Error
