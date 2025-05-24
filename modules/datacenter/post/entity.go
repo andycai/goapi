@@ -1,6 +1,8 @@
 package post
 
-import "time"
+import (
+	"time"
+)
 
 // Post represents a blog post entity
 type Post struct {
