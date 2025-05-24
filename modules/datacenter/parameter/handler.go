@@ -68,9 +68,14 @@ func addParameterHandler(c *fiber.Ctx) error {
 	}
 
 	// 获取当前用户ID
-	userID := c.Locals("userID").(uint)
+	currentUser := app.CurrentUser(c)
+	if currentUser == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "未登录",
+		})
+	}
 
-	parameter, err := CommandCreateParameter(req, userID)
+	parameter, err := CommandCreateParameter(req, currentUser.ID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "添加参数失败: " + err.Error(),
@@ -100,9 +105,14 @@ func editParameterHandler(c *fiber.Ctx) error {
 	}
 
 	// 获取当前用户ID
-	userID := c.Locals("userID").(uint)
+	currentUser := app.CurrentUser(c)
+	if currentUser == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "未登录",
+		})
+	}
 
-	parameter, err := CommandUpdateParameter(uint(id), req, userID)
+	parameter, err := CommandUpdateParameter(uint(id), req, currentUser.ID)
 	if err != nil {
 		if err == ErrParameterNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
