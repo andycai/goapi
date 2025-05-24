@@ -1,6 +1,14 @@
 package page
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrPageNotFound          = errors.New("页面不存在")
+	ErrPageSlugAlreadyExists = errors.New("页面别名已存在")
+)
 
 // Page represents a static page entity
 type Page struct {
