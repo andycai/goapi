@@ -1,53 +1,131 @@
 package parameter
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const (
-	ModulePriorityParameter = 2001 // 数据中心-参数管理
-)
+// 数据访问层
 
-var app *core.App
-
-type parameterModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&models.Parameter{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&parameterModule{}, ModulePriorityParameter)
-}
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
 
-func (m *parameterModule) Awake(a *core.App) error {
-	app = a
-
-	// 数据迁移
-	return autoMigrate()
-}
-
-func (m *parameterModule) Start() error {
-	// 初始化数据
-	return initData()
-}
-
-func (m *parameterModule) AddAuthRouters() error {
-	// 管理页面
-	app.RouterAdmin.Get("/parameter", app.HasPermission("parameter:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/parameter", fiber.Map{
-			"Title": "参数管理",
-			"Scripts": []string{
-				"/static/js/admin/parameter.js",
-			},
-		}, "admin/layout")
-	})
-
-	// API路由
-	app.RouterAdminApi.Get("/parameters", app.HasPermission("parameter:view"), listParametersHandler)
-	app.RouterAdminApi.Get("/parameters/:id", app.HasPermission("parameter:view"), getParameterHandler)
-	app.RouterAdminApi.Post("/parameters", app.HasPermission("parameter:create"), createParameterHandler)
-	app.RouterAdminApi.Put("/parameters/:id", app.HasPermission("parameter:edit"), updateParameterHandler)
-	app.RouterAdminApi.Delete("/parameters/:id", app.HasPermission("parameter:delete"), deleteParameterHandler)
+	if err := initPermissions(); err != nil {
+		return err
+	}
 
 	return nil
+}
+
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("parameter:menu") {
+		log.Println("[参数配置模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建字典管理菜单
+		parameterMenu := models.Menu{
+			MenuID:     1007,
+			ParentID:   enum.MenuIdSystem,
+			Name:       "参数配置",
+			Path:       "/admin/parameter",
+			Icon:       "parameter",
+			Sort:       7,
+			Permission: "parameter:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&parameterMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "parameter:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("parameter:permission") {
+		log.Println("[参数管理模块]权限数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建参数管理相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "参数管理查看",
+				Code:        "parameter:view",
+				Description: "查看参数列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "参数管理创建",
+				Code:        "parameter:create",
+				Description: "创建新参数",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "参数管理编辑",
+				Code:        "parameter:edit",
+				Description: "编辑参数",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "参数管理删除",
+				Code:        "parameter:delete",
+				Description: "删除参数",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "parameter:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
