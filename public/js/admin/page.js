@@ -9,7 +9,7 @@ function pageManagement() {
         currentPage: 1,
         pageSize: 10,
         totalRecords: 0,
-        pages: 1,
+        totalPages: 1,
         // 表单数据
         form: {
             id: 0,
@@ -19,8 +19,11 @@ function pageManagement() {
             status: 'draft',
             author_id: 0
         },
-        // 模态框状态
-        modalAction: 'add',
+        // 面板状态
+        showPanel: false,
+        modalAction: '',
+        // 加载状态
+        loading: false,
 
         init() {
             this.loadPages();
@@ -34,7 +37,7 @@ function pageManagement() {
                 const data = await response.json();
                 this.pages = data.pages;
                 this.totalRecords = data.total;
-                this.pages = Math.ceil(this.totalRecords / this.pageSize);
+                this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
             }
@@ -42,12 +45,12 @@ function pageManagement() {
 
         // 切换页码
         async changePage(page) {
-            if (page < 1 || page > this.pages) return;
+            if (page < 1 || page > this.totalPages) return;
             this.currentPage = page;
             await this.loadPages();
         },
 
-        // 打开添加页面模态框
+        // 打开添加页面面板
         openAddModal() {
             this.form = {
                 id: 0,
@@ -58,9 +61,10 @@ function pageManagement() {
                 author_id: 0
             };
             this.modalAction = 'add';
+            this.showPanel = true;
         },
 
-        // 打开编辑页面模态框
+        // 打开编辑页面面板
         openEditModal(page) {
             this.form = {
                 id: page.id,
@@ -71,10 +75,27 @@ function pageManagement() {
                 author_id: page.author_id
             };
             this.modalAction = 'edit';
+            this.showPanel = true;
+        },
+
+        // 关闭页面面板
+        closePanel() {
+            this.showPanel = false;
+            this.form = {
+                id: 0,
+                title: '',
+                content: '',
+                slug: '',
+                status: 'draft',
+                author_id: 0
+            };
         },
 
         // 保存页面
         async savePage() {
+            if (this.loading) return;
+            this.loading = true;
+            
             try {
                 const url = this.modalAction === 'add' ? '/api/admin/page/add' : '/api/admin/page/edit';
                 
@@ -100,11 +121,11 @@ function pageManagement() {
 
                 await this.loadPages();
                 Alpine.store('notification').show(this.modalAction === 'add' ? '添加页面成功' : '更新页面成功', 'success');
-                
-                // 关闭模态框
-                document.querySelector('#pageModal').querySelector('[x-ref="close"]').click();
+                this.closePanel();
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
+            } finally {
+                this.loading = false;
             }
         },
 

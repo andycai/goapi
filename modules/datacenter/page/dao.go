@@ -36,7 +36,7 @@ func getPageList(page, limit int, status string) ([]models.Page, int64, error) {
 }
 
 // 根据ID获取页面
-func getPageByID(id int64) (models.Page, error) {
+func getPageByID(id uint) (models.Page, error) {
 	var page models.Page
 	if err := app.DB.First(&page, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

@@ -86,9 +86,17 @@ func addPageHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	// 获取新创建的页面详情
+	pageResp, err := QueryPageByID(page.ID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "获取页面详情失败: " + err.Error(),
+		})
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "添加页面成功",
-		"id":      page.ID,
+		"page":    pageResp,
 	})
 }
 
@@ -124,8 +132,17 @@ func editPageHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	// 获取更新后的页面详情
+	pageResp, err := QueryPageByID(page.ID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "获取页面详情失败: " + err.Error(),
+		})
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "更新页面成功",
+		"page":    pageResp,
 	})
 }
 
