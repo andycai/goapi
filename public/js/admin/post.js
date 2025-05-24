@@ -166,6 +166,65 @@ function postManagement() {
                 hour: '2-digit',
                 minute: '2-digit'
             });
-        }
+        },
+
+        // 处理Tab键缩进
+        handleTab(e) {
+            const textarea = e.target;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            
+            // 在当前光标位置插入Tab
+            const text = textarea.value;
+            textarea.value = text.substring(0, start) + '    ' + text.substring(end);
+            
+            // 重新设置光标位置
+            textarea.selectionStart = textarea.selectionEnd = start + 4;
+            
+            // 更新表单内容
+            this.form.content = textarea.value;
+        },
+
+        // 插入Markdown标记
+        insertMarkdown(template) {
+            const textarea = this.$refs.markdownEditor;
+            if (!textarea) return;
+            
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            // 如果有选中文本，使用选中的文本替换模板中的占位符
+            let insertion = template;
+            if (start !== end) {
+                const selection = text.substring(start, end);
+                if (template === '**粗体**') {
+                    insertion = `**${selection}**`;
+                } else if (template === '*斜体*') {
+                    insertion = `*${selection}*`;
+                } else if (template === '# 标题') {
+                    insertion = `# ${selection}`;
+                } else if (template === '[链接文本](https://example.com)') {
+                    insertion = `[${selection}](https://example.com)`;
+                } else if (template === '![图片描述](https://example.com/image.jpg)') {
+                    insertion = `![${selection}](https://example.com/image.jpg)`;
+                } else if (template === '```\n代码块\n```') {
+                    insertion = `\`\`\`\n${selection}\n\`\`\``;
+                }
+            }
+            
+            // 插入内容
+            textarea.value = text.substring(0, start) + insertion + text.substring(end);
+            
+            // 更新表单内容
+            this.form.content = textarea.value;
+            
+            // 设置新的光标位置
+            const newPosition = start + insertion.length;
+            textarea.selectionStart = textarea.selectionEnd = newPosition;
+            
+            // 聚焦回文本框
+            textarea.focus();
+        },
     };
 } 
