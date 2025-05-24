@@ -561,7 +561,46 @@ function adminLayoutManagement() {
   <path d="M22 17v1c0 .5-.5 1-1 1H3c-.5 0-1-.5-1-1v-1" />
 </svg>
 `,
-            
+          page: `
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 18h-5" />
+  <path d="M18 14h-8" />
+  <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" />
+  <rect width="8" height="4" x="10" y="6" rx="1" />
+</svg>
+`,
+          post: `
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2 6h4" />
+  <path d="M2 10h4" />
+  <path d="M2 14h4" />
+  <path d="M2 18h4" />
+  <rect width="16" height="20" x="4" y="2" rx="2" />
+  <path d="M9.5 8h5" />
+  <path d="M9.5 12H16" />
+  <path d="M9.5 16H14" />
+</svg>
+`,
         },
         get recentTabsKey() {
             return 'recentTabs_' + this.user.id;
