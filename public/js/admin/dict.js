@@ -35,11 +35,15 @@ function dictManagement() {
             sort: 0,
             remark: ''
         },
-        // 模态框状态
+        // 面板状态
+        showTypePanel: false,
+        showDataPanel: false,
         typeModalAction: 'add',
         dataModalAction: 'add',
         // 显示字典数据列表
         showDictData: false,
+        // 加载状态
+        loading: false,
 
         init() {
             this.loadDictTypes();
@@ -98,7 +102,7 @@ function dictManagement() {
             await this.loadDictData();
         },
 
-        // 打开添加字典类型模态框
+        // 打开添加字典类型面板
         openAddTypeModal() {
             this.typeForm = {
                 id: 0,
@@ -107,9 +111,10 @@ function dictManagement() {
                 remark: ''
             };
             this.typeModalAction = 'add';
+            this.showTypePanel = true;
         },
 
-        // 打开编辑字典类型模态框
+        // 打开编辑字典类型面板
         openEditTypeModal(dictType) {
             this.typeForm = {
                 id: dictType.id,
@@ -118,10 +123,25 @@ function dictManagement() {
                 remark: dictType.remark || ''
             };
             this.typeModalAction = 'edit';
+            this.showTypePanel = true;
+        },
+
+        // 关闭字典类型面板
+        closeTypePanel() {
+            this.showTypePanel = false;
+            this.typeForm = {
+                id: 0,
+                name: '',
+                type: '',
+                remark: ''
+            };
         },
 
         // 保存字典类型
         async saveType() {
+            if (this.loading) return;
+            this.loading = true;
+            
             try {
                 const url = this.typeModalAction === 'add' ? '/api/admin/dict/type/add' : '/api/admin/dict/type/edit';
                 
@@ -146,11 +166,11 @@ function dictManagement() {
 
                 await this.loadDictTypes();
                 Alpine.store('notification').show(this.typeModalAction === 'add' ? '添加字典类型成功' : '更新字典类型成功', 'success');
-                
-                // 关闭模态框
-                document.querySelector('#typeModal').querySelector('[x-ref="close"]').click();
+                this.closeTypePanel();
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
+            } finally {
+                this.loading = false;
             }
         },
 
@@ -190,7 +210,7 @@ function dictManagement() {
             }
         },
 
-        // 打开添加字典数据模态框
+        // 打开添加字典数据面板
         openAddDataModal() {
             if (!this.currentDictType) {
                 Alpine.store('notification').show('请先选择一个字典类型', 'warning');
@@ -206,9 +226,10 @@ function dictManagement() {
                 remark: ''
             };
             this.dataModalAction = 'add';
+            this.showDataPanel = true;
         },
 
-        // 打开编辑字典数据模态框
+        // 打开编辑字典数据面板
         openEditDataModal(dictData) {
             this.dataForm = {
                 id: dictData.id,
@@ -219,10 +240,27 @@ function dictManagement() {
                 remark: dictData.remark || ''
             };
             this.dataModalAction = 'edit';
+            this.showDataPanel = true;
+        },
+
+        // 关闭字典数据面板
+        closeDataPanel() {
+            this.showDataPanel = false;
+            this.dataForm = {
+                id: 0,
+                type: '',
+                label: '',
+                value: '',
+                sort: 0,
+                remark: ''
+            };
         },
 
         // 保存字典数据
         async saveData() {
+            if (this.loading) return;
+            this.loading = true;
+            
             try {
                 const url = this.dataModalAction === 'add' ? '/api/admin/dict/data/add' : '/api/admin/dict/data/edit';
                 
@@ -248,11 +286,11 @@ function dictManagement() {
 
                 await this.loadDictData();
                 Alpine.store('notification').show(this.dataModalAction === 'add' ? '添加字典数据成功' : '更新字典数据成功', 'success');
-                
-                // 关闭模态框
-                document.querySelector('#dataModal').querySelector('[x-ref="close"]').click();
+                this.closeDataPanel();
             } catch (error) {
                 Alpine.store('notification').show(error.message, 'error');
+            } finally {
+                this.loading = false;
             }
         },
 
