@@ -1,62 +1,180 @@
 package command
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityCommand = 4001 // 功能-命令行
+// 数据访问层
 
-var app *core.App
-
-type commandModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&Command{},
+		&CommandExecution{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&commandModule{}, ModulePriorityCommand)
-}
-
-func (m *commandModule) Awake(a *core.App) error {
-	app = a
-
-	// 数据迁移
-	return autoMigrate()
-}
-
-func (m *commandModule) Start() error {
-	// 初始化数据
-	if err := initData(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initPermissions(); err != nil {
 		return err
 	}
 
-	// 初始化服务
-	initService()
+	if err := initMenus(); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (m *commandModule) AddPublicRouters() error {
-	// 公开API
-	return nil
-}
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("command:permission") {
+		log.Println("[命令模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-func (m *commandModule) AddAuthRouters() error {
-	// 管理页面
-	app.RouterAdmin.Get("/command", app.HasPermission("command:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/command", fiber.Map{
-			"Title": "命令管理",
-			"Scripts": []string{
-				"/static/js/admin/command.js",
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建命令相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "命令查看",
+				Code:        "command:view",
+				Description: "查看命令列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
 			},
-		}, "admin/layout")
+			{
+				Name:        "命令管理",
+				Code:        "command:manage",
+				Description: "管理命令（创建、执行等）",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "command:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// API路由
-	app.RouterAdminApi.Get("/command/list", app.HasPermission("command:view"), getCommandsHandler)
-	app.RouterAdminApi.Post("/command", app.HasPermission("command:manage"), createCommandHandler)
-	app.RouterAdminApi.Post("/command/:id/execute", app.HasPermission("command:manage"), executeCommandHandler)
-	app.RouterAdminApi.Get("/command/:id/executions", app.HasPermission("command:view"), getCommandExecutionsHandler)
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("command:menu") {
+		log.Println("[命令模块]菜单数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建命令菜单
+		commandMenu := models.Menu{
+			MenuID:     2002,
+			ParentID:   enum.MenuIdTools,
+			Name:       "命令管理",
+			Path:       "/admin/command",
+			Icon:       "command",
+			Sort:       2,
+			Permission: "command:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&commandMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "command:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+// GetCommands 获取命令列表
+func GetCommands(page, limit int) ([]Command, int64, error) {
+	var commands []Command
+	var total int64
+
+	// 获取总记录数
+	if err := app.DB.Model(&Command{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 分页查询
+	offset := (page - 1) * limit
+	if err := app.DB.Order("created_at DESC").Offset(offset).Limit(limit).Find(&commands).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return commands, total, nil
+}
+
+// CreateCommand 创建命令
+func CreateCommand(cmd *Command) error {
+	return app.DB.Create(cmd).Error
+}
+
+// GetCommandByID 根据ID获取命令
+func GetCommandByID(id uint) (*Command, error) {
+	var cmd Command
+	if err := app.DB.First(&cmd, id).Error; err != nil {
+		return nil, err
+	}
+	return &cmd, nil
+}
+
+// UpdateCommand 更新命令
+func UpdateCommand(id uint, data map[string]interface{}) error {
+	return app.DB.Model(&Command{}).Where("id = ?", id).Updates(data).Error
+}
+
+// DeleteCommand 删除命令
+func DeleteCommand(id uint) error {
+	return app.DB.Delete(&Command{}, id).Error
+}
+
+// SaveCommandExecution 保存命令执行记录
+func SaveCommandExecution(execution *CommandExecution) error {
+	return app.DB.Create(execution).Error
+}
+
+// UpdateCommandExecution 更新命令执行记录
+func UpdateCommandExecution(id uint, data map[string]interface{}) error {
+	return app.DB.Model(&CommandExecution{}).Where("id = ?", id).Updates(data).Error
+}
+
+// GetCommandExecutionsByCommandID 根据命令ID获取执行记录
+func GetCommandExecutionsByCommandID(cmdID uint) ([]CommandExecution, error) {
+	var executions []CommandExecution
+	if err := app.DB.Where("command_id = ?", cmdID).Find(&executions).Error; err != nil {
+		return nil, err
+	}
+	return executions, nil
 }

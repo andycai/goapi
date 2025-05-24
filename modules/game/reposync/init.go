@@ -1,67 +1,132 @@
 package reposync
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityRepoSync = 9906 // 游戏-仓库同步
+// 数据访问层，目前暂时没有特殊的数据访问逻辑
+// 所有数据库操作都在 service 层完成
 
-var app *core.App
-
-type reposyncModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&models.RepoSyncRecord{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&reposyncModule{}, ModulePriorityRepoSync)
-}
-
-func (m *reposyncModule) Awake(a *core.App) error {
-	app = a
-
-	// 数据迁移
-	return autoMigrate()
-}
-
-func (m *reposyncModule) Start() error {
-	// 初始化数据
-	if err := initData(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
 		return err
 	}
 
-	// 初始化服务
-	initService()
+	if err := initPermissions(); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (m *reposyncModule) AddPublicRouters() error {
-	// 公开API
-	app.RouterPublicApi.Post("/reposync/rangesync", syncPublicCommitsHandler)
-	app.RouterPublicApi.Post("/reposync/autosync", syncPublicAutoHandler)
-	return nil
-}
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("reposync:menu") {
+		log.Println("[仓库同步模块]菜单数据已初始化，跳过")
+		return nil
+	}
 
-func (m *reposyncModule) AddAuthRouters() error {
-	// 管理页面
-	app.RouterAdmin.Get("/reposync", app.HasPermission("reposync:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/reposync", fiber.Map{
-			"Title": "仓库同步",
-			"Scripts": []string{
-				"/static/js/admin/reposync.js",
-			},
-		}, "admin/layout")
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建仓库同步菜单
+		repoMenu := models.Menu{
+			MenuID:     3006,
+			ParentID:   enum.MenuIdGame,
+			Name:       "仓库同步",
+			Path:       "/admin/reposync",
+			Icon:       "reposync",
+			Sort:       6,
+			Permission: "reposync:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&repoMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "reposync:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// API路由
-	app.RouterAdminApi.Post("/reposync/config", app.HasPermission("reposync:config"), saveConfigHandler)
-	app.RouterAdminApi.Get("/reposync/config", app.HasPermission("reposync:config"), getConfigHandler)
-	app.RouterAdminApi.Post("/reposync/checkout", app.HasPermission("reposync:checkout"), checkoutHandler)
-	app.RouterAdminApi.Get("/reposync/commits", app.HasPermission("reposync:view"), listCommitsHandler)
-	app.RouterAdminApi.Post("/reposync/sync", app.HasPermission("reposync:sync"), syncCommitsHandler)
-	app.RouterAdminApi.Post("/reposync/refresh", app.HasPermission("reposync:view"), refreshCommitsHandler)
-	app.RouterAdminApi.Post("/reposync/clear", app.HasPermission("reposync:config"), clearSyncDataHandler)
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("reposync:permission") {
+		log.Println("[仓库同步模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建仓库同步相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "仓库同步查看",
+				Code:        "reposync:view",
+				Description: "查看仓库同步",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "仓库同步配置",
+				Code:        "reposync:config",
+				Description: "配置仓库同步参数",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "仓库签出",
+				Code:        "reposync:checkout",
+				Description: "签出仓库",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "仓库同步",
+				Code:        "reposync:sync",
+				Description: "执行仓库同步",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "reposync:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

@@ -1,60 +1,135 @@
 package citask
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityCiTask = 4002 // 功能-CI/CD 任务
-
-var app *core.App
-
-type taskModule struct {
-	core.BaseModule
+// 数据迁移
+func autoMigrate() error {
+	return app.DB.AutoMigrate(&models.Task{}, &models.TaskLog{})
 }
 
-func init() {
-	core.RegisterModule(&taskModule{}, ModulePriorityCiTask)
-}
-
-func (m *taskModule) Awake(a *core.App) error {
-	app = a
-	return autoMigrate()
-}
-
-func (m *taskModule) Start() error {
-	if err := initData(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
 		return err
 	}
 
-	initCron()
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (m *taskModule) AddAuthRouters() error {
-	// admin
-	app.RouterAdmin.Get("/citask", app.HasPermission("citask:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/citask", fiber.Map{
-			"Title": "任务管理",
-			"Scripts": []string{
-				"/static/js/admin/citask.js",
-			},
-		}, "admin/layout")
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("citask:menu") {
+		log.Println("[构建任务模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建构建任务菜单
+		taskMenu := models.Menu{
+			MenuID:     2001,
+			ParentID:   enum.MenuIdTools,
+			Name:       "构建任务",
+			Path:       "/admin/citask",
+			Icon:       "citask",
+			Sort:       1,
+			Permission: "citask:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&taskMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "citask:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// api
-	app.RouterAdminApi.Get("/citask", app.HasPermission("citask:view"), listTasksHandler)                       // 获取任务列表
-	app.RouterAdminApi.Post("/citask", app.HasPermission("citask:create"), createTaskHandler)                   // 创建任务
-	app.RouterAdminApi.Get("/citask/running", app.HasPermission("citask:view"), listRunningTasksHandler)        // 获取正在执行的任务
-	app.RouterAdminApi.Get("/citask/next-run", app.HasPermission("citask:view"), getNextRunTimeHandler)         // 计算下次执行时间
-	app.RouterAdminApi.Get("/citask/search", app.HasPermission("citask:view"), searchTasksHandler)              // 添加搜索接口
-	app.RouterAdminApi.Get("/citask/:id", app.HasPermission("citask:view"), getTaskHandler)                     // 获取任务详情
-	app.RouterAdminApi.Put("/citask/:id", app.HasPermission("citask:update"), updateTaskHandler)                // 更新任务
-	app.RouterAdminApi.Delete("/citask/:id", app.HasPermission("citask:delete"), deleteTaskHandler)             // 删除任务
-	app.RouterAdminApi.Post("/citask/run/:id", app.HasPermission("citask:run"), runTaskHandler)                 // 执行任务
-	app.RouterAdminApi.Get("/citask/logs/:id", app.HasPermission("citask:view"), getTaskLogsHandler)            // 获取任务日志
-	app.RouterAdminApi.Get("/citask/progress/:logId", app.HasPermission("citask:view"), getTaskProgressHandler) // 获取任务进度
-	app.RouterAdminApi.Post("/citask/stop/:logId", app.HasPermission("citask:run"), stopTaskHandler)            // 停止任务
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("citask:permission") {
+		log.Println("[构建任务模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建任务管理相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "构建任务列表",
+				Code:        "citask:view",
+				Description: "查看构建任务列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "创建构建任务",
+				Code:        "citask:create",
+				Description: "创建新构建任务",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "更新构建任务",
+				Code:        "citask:update",
+				Description: "更新构建任务信息",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除构建任务",
+				Code:        "citask:delete",
+				Description: "删除构建任务",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "执行构建任务",
+				Code:        "citask:run",
+				Description: "执行构建任务",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "citask:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

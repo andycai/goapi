@@ -1,60 +1,121 @@
 package imagemanager
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityImageManager = 5003 // 功能-图片管理
-
-var app *core.App
-
-type imagemanagerModule struct {
-	core.BaseModule
+// 数据迁移
+func autoMigrate() error {
+	return nil
 }
 
-func init() {
-	core.RegisterModule(&imagemanagerModule{}, ModulePriorityImageManager)
-}
-
-func (m *imagemanagerModule) Awake(a *core.App) error {
-	app = a
-	// 数据迁移
-	if err := autoMigrate(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
 		return err
 	}
 
-	// Initialize Imagemanager service
-	initService()
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (m *imagemanagerModule) Start() error {
-	// 初始化数据
-	return initData()
-}
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("imagemanager:menu") {
+		log.Println("[图片管理模块]菜单数据已初始化，跳过")
+		return nil
+	}
 
-func (m *imagemanagerModule) AddAuthRouters() error {
-	// admin page
-	app.RouterAdmin.Get("/imagemanager", app.HasPermission("imagemanager:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/imagemanager", fiber.Map{
-			"Title": "图片管理",
-			"Scripts": []string{
-				"/static/js/admin/imagemanager.js",
-			},
-		}, "admin/layout")
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建图片管理菜单
+		imageMenu := models.Menu{
+			MenuID:     4002,
+			ParentID:   enum.MenuIdWebApp,
+			Name:       "图片管理",
+			Path:       "/admin/imagemanager",
+			Icon:       "imagemanager",
+			Sort:       2,
+			Permission: "imagemanager:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&imageMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "imagemanager:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// api routes
-	app.RouterAdminApi.Get("/imagemanager/list", app.HasPermission("imagemanager:view"), listFilesHandler)
-	app.RouterAdminApi.Post("/imagemanager/upload", app.HasPermission("imagemanager:upload"), uploadHandler)
-	app.RouterAdminApi.Post("/imagemanager/delete", app.HasPermission("imagemanager:delete"), deleteHandler)
-	app.RouterAdminApi.Post("/imagemanager/rename", app.HasPermission("imagemanager:rename"), renameHandler)
-	app.RouterAdminApi.Post("/imagemanager/move", app.HasPermission("imagemanager:move"), moveHandler)
-	app.RouterAdminApi.Post("/imagemanager/copy", app.HasPermission("imagemanager:copy"), copyHandler)
-	app.RouterAdminApi.Get("/imagemanager/info", app.HasPermission("imagemanager:info"), infoHandler)
-	app.RouterAdminApi.Get("/imagemanager/thumbnail", app.HasPermission("imagemanager:view"), thumbnailHandler)
-	app.RouterAdminApi.Get("/imagemanager/view", app.HasPermission("imagemanager:view"), viewHandler)
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("imagemanager:permission") {
+		log.Println("[图片管理模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建图片管理相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "图片管理列表",
+				Code:        "imagemanager:view",
+				Description: "查看图片管理列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "图片上传",
+				Code:        "imagemanager:upload",
+				Description: "上传图片",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "图片删除",
+				Code:        "imagemanager:delete",
+				Description: "删除图片",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "imagemanager:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

@@ -1,60 +1,121 @@
 package filemanager
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityFileManager = 5002 // 功能-文件管理
-
-var app *core.App
-
-type filemanagerModule struct {
-	core.BaseModule
+// 数据迁移
+func autoMigrate() error {
+	return nil
 }
 
-func init() {
-	core.RegisterModule(&filemanagerModule{}, ModulePriorityFileManager)
-}
-
-func (m *filemanagerModule) Awake(a *core.App) error {
-	app = a
-	// 数据迁移
-	return autoMigrate()
-}
-
-func (m *filemanagerModule) Start() error {
-	// 初始化数据
-	if err := initData(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
 		return err
 	}
 
-	// Initialize Filemanager service
-	initService()
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (m *filemanagerModule) AddAuthRouters() error {
-	// admin page
-	app.RouterAdmin.Get("/filemanager", app.HasPermission("filemanager:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/filemanager", fiber.Map{
-			"Title": "文件管理",
-			"Scripts": []string{
-				"/static/js/admin/filemanager.js",
-			},
-		}, "admin/layout")
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("filemanager:menu") {
+		log.Println("[文件管理模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建文件管理菜单
+		fileMenu := models.Menu{
+			MenuID:     4001,
+			ParentID:   enum.MenuIdWebApp,
+			Name:       "文件管理",
+			Path:       "/admin/filemanager",
+			Icon:       "filemanager",
+			Sort:       1,
+			Permission: "filemanager:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&fileMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "filemanager:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// api routes
-	app.RouterAdminApi.Get("/filemanager/list", app.HasPermission("filemanager:view"), listFilesHandler)
-	app.RouterAdminApi.Post("/filemanager/upload", app.HasPermission("filemanager:upload"), uploadFileHandler)
-	app.RouterAdminApi.Post("/filemanager/create", app.HasPermission("filemanager:create"), createHandler)
-	app.RouterAdminApi.Post("/filemanager/delete", app.HasPermission("filemanager:delete"), deleteHandler)
-	app.RouterAdminApi.Post("/filemanager/rename", app.HasPermission("filemanager:rename"), renameHandler)
-	app.RouterAdminApi.Post("/filemanager/move", app.HasPermission("filemanager:move"), moveHandler)
-	app.RouterAdminApi.Post("/filemanager/copy", app.HasPermission("filemanager:copy"), copyHandler)
-	app.RouterAdminApi.Get("/filemanager/download", app.HasPermission("filemanager:download"), downloadHandler)
-	app.RouterAdminApi.Get("/filemanager/info", app.HasPermission("filemanager:info"), infoHandler)
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("filemanager:permission") {
+		log.Println("[文件管理模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建文件管理相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "文件管理列表",
+				Code:        "filemanager:view",
+				Description: "查看文件管理列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "文件上传",
+				Code:        "filemanager:upload",
+				Description: "上传文件",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "文件删除",
+				Code:        "filemanager:delete",
+				Description: "删除文件",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "filemanager:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

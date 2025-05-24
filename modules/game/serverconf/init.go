@@ -1,66 +1,121 @@
 package serverconf
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityServerConf = 9904 // 游戏-服务器配置
-
-var app *core.App
-
-type serverconfModule struct {
-	core.BaseModule
+// 数据迁移
+func autoMigrate() error {
+	return nil
 }
 
-func init() {
-	core.RegisterModule(&serverconfModule{}, ModulePriorityServerConf)
-}
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
 
-func (m *serverconfModule) Awake(a *core.App) error {
-	app = a
-	// 数据迁移
-	return autoMigrate()
-}
-
-func (m *serverconfModule) Start() error {
-	// 初始化数据
-	return initData()
-}
-
-func (m *serverconfModule) AddPublicRouters() error {
-	// public
-	app.RouterPublicApi.Get("/game/serverlist", getServerList)
-	app.RouterPublicApi.Get("/game/lastserver", getLastServer)
-	app.RouterPublicApi.Get("/game/serverinfo", getServerInfo)
-	app.RouterPublicApi.Get("/game/noticelist", getNoticeList)
-	app.RouterPublicApi.Get("/game/noticenum", getNoticeNum)
-	app.RouterPublicApi.Get("/serverlist", getServerList)
-	app.RouterPublicApi.Get("/lastserver", getLastServer)
-	app.RouterPublicApi.Get("/serverinfo", getServerInfo)
-	app.RouterPublicApi.Get("/noticelist", getNoticeList)
-	app.RouterPublicApi.Get("/noticenum", getNoticeNum)
+	if err := initPermissions(); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (m *serverconfModule) AddAuthRouters() error {
-	// admin
-	app.RouterAdmin.Get("/serverconf", app.HasPermission("serverconf:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/serverconf", fiber.Map{
-			"Title": "服务器配置",
-			"Scripts": []string{
-				"/static/js/admin/serverconf.js",
-			},
-		}, "admin/layout")
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("serverconf:menu") {
+		log.Println("[服务器配置模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建服务器配置菜单
+		serverConfigMenu := models.Menu{
+			MenuID:     3007,
+			ParentID:   enum.MenuIdGame,
+			Name:       "服务器配置",
+			Path:       "/admin/serverconf",
+			Icon:       "serverconf",
+			Sort:       7,
+			Permission: "serverconf:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&serverConfigMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "serverconf:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// api
-	app.RouterAdminApi.Post("/game/serverlist", app.HasPermission("serverconf:update"), updateServerListHandler)
-	app.RouterAdminApi.Post("/game/lastserver", app.HasPermission("serverconf:update"), updateLastServerHandler)
-	app.RouterAdminApi.Post("/game/serverinfo", app.HasPermission("serverconf:update"), updateServerInfoHandler)
-	app.RouterAdminApi.Post("/game/noticelist", app.HasPermission("serverconf:update"), updateNoticeListHandler)
-	app.RouterAdminApi.Post("/game/noticenum", app.HasPermission("serverconf:update"), updateNoticeNumHandler)
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("serverconf:permission") {
+		log.Println("[服务器配置模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建服务器配置相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "服务器配置",
+				Code:        "serverconf:view",
+				Description: "查看服务器配置",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "服务器配置更新",
+				Code:        "serverconf:update",
+				Description: "更新服务器配置",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "服务器配置删除",
+				Code:        "serverconf:delete",
+				Description: "删除服务器配置",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "serverconf:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

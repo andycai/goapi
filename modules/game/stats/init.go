@@ -1,63 +1,119 @@
 package stats
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityStats = 9903 // 游戏-游戏统计
+// 数据访问层，目前暂时没有特殊的数据访问逻辑
+// 所有数据库操作都在 service 层完成
 
-var app *core.App
-
-type statsModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&models.StatsRecord{},
+		&models.StatsInfo{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&statsModule{}, ModulePriorityStats)
-}
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
 
-func (m *statsModule) Awake(a *core.App) error {
-	app = a
-	// 数据迁移
-	if err := autoMigrate(); err != nil {
+	if err := initPermissions(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *statsModule) Start() error {
-	// 初始化数据
-	return initData()
-}
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("stats:menu") {
+		log.Println("[统计模块]菜单数据已初始化，跳过")
+		return nil
+	}
 
-func (m *statsModule) AddPublicRouters() error {
-	app.RouterPublicApi.Post("/stats", CreateStats)
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建统计管理菜单
+		statsMenu := models.Menu{
+			MenuID:     3003,
+			ParentID:   enum.MenuIdGame,
+			Name:       "统计管理",
+			Path:       "/admin/stats",
+			Icon:       "stats",
+			Sort:       3,
+			Permission: "stats:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
 
-	return nil
-}
+		if err := tx.Create(&statsMenu).Error; err != nil {
+			return err
+		}
 
-func (m *statsModule) AddAuthRouters() error {
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "stats:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
 
-	app.RouterAdminApi.Get("/stats", app.HasPermission("stats:view"), listStatsHandler)
-	app.RouterAdminApi.Delete("/stats/before", app.HasPermission("stats:delete"), deleteStatsBeforeHandler)
-	app.RouterAdminApi.Get("/stats/details", app.HasPermission("stats:view"), getStatDetailsHandler)
-	app.RouterAdminApi.Delete("/stats/:id", app.HasPermission("stats:delete"), deleteStatHandler)
-
-	// admin
-	app.RouterAdmin.Get("/stats", app.HasPermission("stats:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/stats", fiber.Map{
-			"Title": "游戏统计",
-			"Scripts": []string{
-				"/static/js/chart-4.4.4.js",
-				"/static/js/hammer-2.0.8.js",
-				"/static/js/chartjs-plugin-zoom.min.js",
-				"/static/js/chartjs-adapter-date-fns.bundle.min.js",
-				"/static/js/admin/stats.js",
-			},
-		}, "admin/layout")
+		return nil
 	})
+}
 
-	return nil
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("stats:permission") {
+		log.Println("[统计模块]权限数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建统计相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "统计列表",
+				Code:        "stats:view",
+				Description: "查看统计列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除统计",
+				Code:        "stats:delete",
+				Description: "删除统计记录",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "stats:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

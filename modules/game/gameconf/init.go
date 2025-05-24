@@ -1,69 +1,134 @@
 package gameconf
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityGameConf = 9908 // 游戏-游戏配置管理
+// 数据访问层，目前暂时没有特殊的数据访问逻辑
+// 所有数据库操作都在 service 层完成
 
-var app *core.App
-
-type gameconfModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&models.GameConfProject{},
+		&models.GameConfTable{},
+		&models.GameConfExport{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&gameconfModule{}, ModulePriorityGameConf)
-}
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
 
-func (m *gameconfModule) Awake(a *core.App) error {
-	app = a
-	// 数据迁移
-	if err := autoMigrate(); err != nil {
+	if err := initPermissions(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *gameconfModule) Start() error {
-	// 初始化数据
-	return initData()
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("gameconf:menu") {
+		log.Println("[游戏配置模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建游戏配置菜单
+		confMenu := models.Menu{
+			MenuID:     3010,
+			ParentID:   enum.MenuIdGame,
+			Name:       "游戏配置",
+			Path:       "/admin/gameconf",
+			Icon:       "gameconf",
+			Sort:       10,
+			Permission: "gameconf:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&confMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "gameconf:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
-func (m *gameconfModule) AddAuthRouters() error {
-	// admin
-	app.RouterAdmin.Get("/gameconf", app.HasPermission("gameconf:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/gameconf", fiber.Map{
-			"Title": "游戏配置管理",
-			"Scripts": []string{
-				"/static/js/admin/gameconf.js",
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("gameconf:permission") {
+		log.Println("[游戏配置模块]权限数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建游戏配置相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "游戏配置列表",
+				Code:        "gameconf:view",
+				Description: "查看游戏配置列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
 			},
-		}, "admin/layout")
+			{
+				Name:        "创建游戏配置",
+				Code:        "gameconf:create",
+				Description: "创建新游戏配置",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "更新游戏配置",
+				Code:        "gameconf:update",
+				Description: "更新游戏配置信息",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除游戏配置",
+				Code:        "gameconf:delete",
+				Description: "删除游戏配置",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "gameconf:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
-
-	// api - projects
-	app.RouterAdminApi.Get("/gameconf/projects", app.HasPermission("gameconf:view"), listProjectsHandler)           // 获取项目列表
-	app.RouterAdminApi.Post("/gameconf/projects", app.HasPermission("gameconf:create"), createProjectHandler)       // 创建项目
-	app.RouterAdminApi.Get("/gameconf/projects/:id", app.HasPermission("gameconf:view"), getProjectHandler)         // 获取项目详情
-	app.RouterAdminApi.Put("/gameconf/projects/:id", app.HasPermission("gameconf:update"), updateProjectHandler)    // 更新项目
-	app.RouterAdminApi.Delete("/gameconf/projects/:id", app.HasPermission("gameconf:delete"), deleteProjectHandler) // 删除项目
-
-	// api - tables
-	app.RouterAdminApi.Get("/gameconf/tables", app.HasPermission("gameconf:view"), listTablesHandler)                    // 获取配置表列表
-	app.RouterAdminApi.Post("/gameconf/tables", app.HasPermission("gameconf:create"), createTableHandler)                // 创建配置表
-	app.RouterAdminApi.Get("/gameconf/tables/:id", app.HasPermission("gameconf:view"), getTableHandler)                  // 获取配置表详情
-	app.RouterAdminApi.Put("/gameconf/tables/:id", app.HasPermission("gameconf:update"), updateTableHandler)             // 更新配置表
-	app.RouterAdminApi.Delete("/gameconf/tables/:id", app.HasPermission("gameconf:delete"), deleteTableHandler)          // 删除配置表
-	app.RouterAdminApi.Post("/gameconf/tables/:id/validate", app.HasPermission("gameconf:update"), validateTableHandler) // 验证配置表
-
-	// api - exports
-	app.RouterAdminApi.Get("/gameconf/exports", app.HasPermission("gameconf:view"), listExportsHandler)                 // 获取导出记录列表
-	app.RouterAdminApi.Post("/gameconf/exports", app.HasPermission("gameconf:create"), createExportHandler)             // 创建导出记录
-	app.RouterAdminApi.Get("/gameconf/exports/:id", app.HasPermission("gameconf:view"), getExportHandler)               // 获取导出记录详情
-	app.RouterAdminApi.Delete("/gameconf/exports/:id", app.HasPermission("gameconf:delete"), deleteExportHandler)       // 删除导出记录
-	app.RouterAdminApi.Get("/gameconf/exports/:id/download", app.HasPermission("gameconf:view"), downloadExportHandler) // 下载导出文件
-
-	return nil
 }

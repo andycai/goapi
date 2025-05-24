@@ -1,112 +1,366 @@
 package channel
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityChannel = 9907 // 游戏-渠道管理
+// 数据访问层
 
-var app *core.App
-
-type channelModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&Channel{},
+		&PhysicalServer{},
+		&ServerGroup{},
+		&ServerGroupServer{},
+		&Announcement{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&channelModule{}, ModulePriorityChannel)
-}
-
-func (m *channelModule) Awake(a *core.App) error {
-	app = a
-
-	// 数据迁移
-	return autoMigrate()
-}
-
-func (m *channelModule) Start() error {
-	// 初始化数据
-	if err := initData(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
 		return err
 	}
 
-	// 初始化服务
-	initService()
+	if err := initPermissions(); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (m *channelModule) AddPublicRouters() error {
-	// 公开API
-	return nil
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("channel:menu") {
+		log.Println("[渠道模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建渠道菜单
+		channelMenus := []*models.Menu{
+			{
+				MenuID:     3002,
+				ParentID:   enum.MenuIdGame,
+				Name:       "渠道管理",
+				Path:       "/admin/channel",
+				Icon:       "channel",
+				Sort:       2,
+				Permission: "channel:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				MenuID:     3012,
+				ParentID:   enum.MenuIdGame,
+				Name:       "物理服务器",
+				Path:       "/admin/physical_servers",
+				Icon:       "physical_server",
+				Sort:       12,
+				Permission: "server:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				MenuID:     3013,
+				ParentID:   enum.MenuIdGame,
+				Name:       "服务器分组",
+				Path:       "/admin/server_groups",
+				Icon:       "server_group",
+				Sort:       13,
+				Permission: "server:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+			{
+				MenuID:     3014,
+				ParentID:   enum.MenuIdGame,
+				Name:       "公告管理",
+				Path:       "/admin/announcement",
+				Icon:       "announcement",
+				Sort:       14,
+				Permission: "announcement:view",
+				IsShow:     true,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
+			},
+		}
+
+		if err := tx.CreateInBatches(channelMenus, len(channelMenus)).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "channel:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
-func (m *channelModule) AddAuthRouters() error {
-	// 管理页面
-	app.RouterAdmin.Get("/channel", app.HasPermission("channel:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/channel", fiber.Map{
-			"Title": "渠道管理",
-			"Scripts": []string{
-				"/static/js/admin/channel.js",
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("channel:permission") {
+		log.Println("[渠道模块]权限数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建渠道相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "渠道查看",
+				Code:        "channel:view",
+				Description: "查看渠道列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
 			},
-		}, "admin/layout")
-	})
-
-	app.RouterAdmin.Get("/physical_servers", app.HasPermission("server:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/physical_server", fiber.Map{
-			"Title": "物理服务器管理",
-			"Scripts": []string{
-				"/static/js/admin/physical_server.js",
+			{
+				Name:        "渠道管理",
+				Code:        "channel:manage",
+				Description: "管理渠道（创建、编辑等）",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
 			},
-		}, "admin/layout")
-	})
-
-	app.RouterAdmin.Get("/server_groups", app.HasPermission("server:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/server_group", fiber.Map{
-			"Title": "服务器分组管理",
-			"Scripts": []string{
-				"/static/js/admin/server_group.js",
+			{
+				Name:        "服务器查看",
+				Code:        "server:view",
+				Description: "查看服务器列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
 			},
-		}, "admin/layout")
-	})
-
-	app.RouterAdmin.Get("/announcement", app.HasPermission("announcement:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/announcement", fiber.Map{
-			"Title": "公告管理",
-			"Scripts": []string{
-				"/static/js/admin/announcement.js",
+			{
+				Name:        "服务器管理",
+				Code:        "server:manage",
+				Description: "管理服务器（创建、编辑等）",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
 			},
-		}, "admin/layout")
+			{
+				Name:        "公告查看",
+				Code:        "announcement:view",
+				Description: "查看公告列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "公告管理",
+				Code:        "announcement:manage",
+				Description: "管理公告（创建、编辑等）",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "channel:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// API路由
-	// 渠道相关
-	app.RouterAdminApi.Get("/channel/list", app.HasPermission("channel:view"), getChannelsHandler)
-	app.RouterAdminApi.Post("/channel", app.HasPermission("channel:manage"), createChannelHandler)
-	app.RouterAdminApi.Put("/channel/:id", app.HasPermission("channel:manage"), updateChannelHandler)
-	app.RouterAdminApi.Delete("/channel/:id", app.HasPermission("channel:manage"), deleteChannelHandler)
+// Channel DAO operations
+func GetChannels(page, limit int) ([]Channel, int64, error) {
+	var channels []Channel
+	var total int64
 
-	// 物理服务器相关
-	app.RouterAdminApi.Get("/physical_servers", app.HasPermission("server:view"), getPhysicalServersHandler)
-	app.RouterAdminApi.Post("/physical_servers", app.HasPermission("server:manage"), createPhysicalServerHandler)
-	app.RouterAdminApi.Put("/physical_servers/:id", app.HasPermission("server:manage"), updatePhysicalServerHandler)
-	app.RouterAdminApi.Delete("/physical_servers/:id", app.HasPermission("server:manage"), deletePhysicalServerHandler)
+	if err := app.DB.Model(&Channel{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
 
-	// 服务器分组相关
-	app.RouterAdminApi.Get("/server_groups", app.HasPermission("server:view"), getServerGroupsHandler)
-	app.RouterAdminApi.Post("/server_groups", app.HasPermission("server:manage"), createServerGroupHandler)
-	app.RouterAdminApi.Put("/server_groups/:id", app.HasPermission("server:manage"), updateServerGroupHandler)
-	app.RouterAdminApi.Delete("/server_groups/:id", app.HasPermission("server:manage"), deleteServerGroupHandler)
-	app.RouterAdminApi.Get("/server_groups/:id/servers", app.HasPermission("server:view"), getServerGroupServersHandler)
-	app.RouterAdminApi.Post("/server_groups/:id/servers/:serverId", app.HasPermission("server:manage"), addServerToGroupHandler)
-	app.RouterAdminApi.Delete("/server_groups/:id/servers/:serverId", app.HasPermission("server:manage"), removeServerFromGroupHandler)
-	app.RouterAdminApi.Put("/server_groups/:id/servers/:groupServerId", app.HasPermission("server:manage"), updateServerGroupServerHandler)
+	offset := (page - 1) * limit
+	if err := app.DB.Preload("ServerGroups").Preload("Announcements").
+		Order("created_at DESC").Offset(offset).Limit(limit).Find(&channels).Error; err != nil {
+		return nil, 0, err
+	}
 
-	// 公告相关
-	app.RouterAdminApi.Get("/announcements", app.HasPermission("announcement:view"), getAnnouncementsHandler)
-	app.RouterAdminApi.Post("/announcements", app.HasPermission("announcement:manage"), createAnnouncementHandler)
-	app.RouterAdminApi.Put("/announcements/:id", app.HasPermission("announcement:manage"), updateAnnouncementHandler)
-	app.RouterAdminApi.Delete("/announcements/:id", app.HasPermission("announcement:manage"), deleteAnnouncementHandler)
+	return channels, total, nil
+}
 
-	return nil
+func CreateChannel(channel *Channel) error {
+	return app.DB.Create(channel).Error
+}
+
+func GetChannelByID(id uint) (*Channel, error) {
+	var channel Channel
+	if err := app.DB.Preload("ServerGroups").Preload("Announcements").
+		First(&channel, id).Error; err != nil {
+		return nil, err
+	}
+	return &channel, nil
+}
+
+func UpdateChannel(id uint, data map[string]interface{}) error {
+	return app.DB.Model(&Channel{}).Where("id = ?", id).Updates(data).Error
+}
+
+func DeleteChannel(id uint) error {
+	return app.DB.Delete(&Channel{}, id).Error
+}
+
+// PhysicalServer DAO operations
+func GetPhysicalServers(page, limit int) ([]PhysicalServer, int64, error) {
+	var servers []PhysicalServer
+	var total int64
+
+	if err := app.DB.Model(&PhysicalServer{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	if err := app.DB.Order("created_at DESC").Offset(offset).Limit(limit).Find(&servers).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return servers, total, nil
+}
+
+func CreatePhysicalServer(server *PhysicalServer) error {
+	return app.DB.Create(server).Error
+}
+
+func GetPhysicalServerByID(id uint) (*PhysicalServer, error) {
+	var server PhysicalServer
+	if err := app.DB.First(&server, id).Error; err != nil {
+		return nil, err
+	}
+	return &server, nil
+}
+
+func UpdatePhysicalServer(id uint, data map[string]interface{}) error {
+	return app.DB.Model(&PhysicalServer{}).Where("id = ?", id).Updates(data).Error
+}
+
+func DeletePhysicalServer(id uint) error {
+	return app.DB.Delete(&PhysicalServer{}, id).Error
+}
+
+// ServerGroup DAO operations
+func GetServerGroups(page, limit int) ([]ServerGroup, int64, error) {
+	var groups []ServerGroup
+	var total int64
+
+	if err := app.DB.Model(&ServerGroup{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	if err := app.DB.Preload("Servers.PhysicalServer").
+		Order("created_at DESC").Offset(offset).Limit(limit).Find(&groups).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return groups, total, nil
+}
+
+func CreateServerGroup(group *ServerGroup) error {
+	return app.DB.Create(group).Error
+}
+
+func GetServerGroupByID(id uint) (*ServerGroup, error) {
+	var group ServerGroup
+	if err := app.DB.Preload("Servers.PhysicalServer").
+		First(&group, id).Error; err != nil {
+		return nil, err
+	}
+	return &group, nil
+}
+
+func UpdateServerGroup(id uint, data map[string]interface{}) error {
+	return app.DB.Model(&ServerGroup{}).Where("id = ?", id).Updates(data).Error
+}
+
+func DeleteServerGroup(id uint) error {
+	return app.DB.Delete(&ServerGroup{}, id).Error
+}
+
+// ServerGroupServer DAO operations
+func GetServerGroupServers(groupId uint) ([]*ServerGroupServer, error) {
+	var servers []*ServerGroupServer
+	if err := app.DB.Where("group_id = ?", groupId).Find(&servers).Error; err != nil {
+		return nil, err
+	}
+	return servers, nil
+}
+
+func AddServerToGroup(groupId uint, server *PhysicalServer) error {
+	serverGroupServer := &ServerGroupServer{
+		GroupID:          groupId,
+		ServerID:         server.ServerID,
+		Name:             server.Name,
+		ServerStatus:     server.ServerStatus,
+		Available:        server.Available,
+		MergeID:          server.MergeID,
+		PhysicalServerID: server.ID,
+		PhysicalServer:   *server,
+	}
+	return app.DB.Create(serverGroupServer).Error
+}
+
+func RemoveServerFromGroup(groupId, serverId uint) error {
+	return app.DB.Where("group_id = ? AND server_id = ?", groupId, serverId).Delete(&ServerGroupServer{}).Error
+}
+
+// Announcement DAO operations
+func GetAnnouncements(page, limit int) ([]Announcement, int64, error) {
+	var announcements []Announcement
+	var total int64
+
+	if err := app.DB.Model(&Announcement{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	if err := app.DB.Order("created_at DESC").Offset(offset).Limit(limit).Find(&announcements).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return announcements, total, nil
+}
+
+func CreateAnnouncement(announcement *Announcement) error {
+	return app.DB.Create(announcement).Error
+}
+
+func GetAnnouncementByID(id uint) (*Announcement, error) {
+	var announcement Announcement
+	if err := app.DB.First(&announcement, id).Error; err != nil {
+		return nil, err
+	}
+	return &announcement, nil
+}
+
+func UpdateAnnouncement(id uint, data map[string]interface{}) error {
+	return app.DB.Model(&Announcement{}).Where("id = ?", id).Updates(data).Error
+}
+
+func DeleteAnnouncement(id uint) error {
+	return app.DB.Delete(&Announcement{}, id).Error
 }

@@ -1,60 +1,138 @@
 package git
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityGit = 9003 // 接口-Git 接口
-
-var app *core.App
-
-type gitModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return nil
 }
 
-func init() {
-	core.RegisterModule(&gitModule{}, ModulePriorityGit)
-}
-
-func (m *gitModule) Awake(a *core.App) error {
-	app = a
-	return autoMigrate()
-}
-
-func (m *gitModule) Start() error {
-	if err := initData(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
 		return err
 	}
 
-	// Initialize Git service
-	initService()
+	if err := initPermissions(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (m *gitModule) AddAuthRouters() error {
-	// admin page
-	app.RouterAdmin.Get("/git", app.HasPermission("git:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/git", fiber.Map{
-			"Title": "Git管理",
-			"Scripts": []string{
-				"/static/js/admin/git.js",
-			},
-		}, "admin/layout")
-	})
-
-	// api routes
-	app.RouterAdminApi.Post("/git/clone", app.HasPermission("git:clone"), cloneHandler)
-	app.RouterAdminApi.Post("/git/pull", app.HasPermission("git:pull"), pullHandler)
-	app.RouterAdminApi.Post("/git/push", app.HasPermission("git:push"), pushHandler)
-	app.RouterAdminApi.Get("/git/status", app.HasPermission("git:status"), statusHandler)
-	app.RouterAdminApi.Get("/git/log", app.HasPermission("git:log"), logHandler)
-	app.RouterAdminApi.Post("/git/commit", app.HasPermission("git:commit"), commitHandler)
-	app.RouterAdminApi.Post("/git/checkout", app.HasPermission("git:checkout"), checkoutHandler)
-	app.RouterAdminApi.Post("/git/branch", app.HasPermission("git:branch"), branchHandler)
-	app.RouterAdminApi.Post("/git/merge", app.HasPermission("git:merge"), mergeHandler)
-	app.RouterAdminApi.Post("/git/reset", app.HasPermission("git:reset"), resetHandler)
-	app.RouterAdminApi.Post("/git/stash", app.HasPermission("git:stash"), stashHandler)
-
+func initMenus() error {
 	return nil
+}
+
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("git:permission") {
+		log.Println("[git模块]权限数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建git相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "Git列表",
+				Code:        "git:view",
+				Description: "查看Git列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git克隆",
+				Code:        "git:clone",
+				Description: "克隆Git仓库",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git拉取",
+				Code:        "git:pull",
+				Description: "拉取Git仓库更新",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git推送",
+				Code:        "git:push",
+				Description: "推送Git仓库更新",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git状态",
+				Code:        "git:status",
+				Description: "查看Git仓库状态",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git日志",
+				Code:        "git:log",
+				Description: "查看Git提交日志",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git提交",
+				Code:        "git:commit",
+				Description: "提交Git更改",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git检出",
+				Code:        "git:checkout",
+				Description: "检出Git分支或标签",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git分支",
+				Code:        "git:branch",
+				Description: "管理Git分支",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git合并",
+				Code:        "git:merge",
+				Description: "合并Git分支",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "Git重置",
+				Code:        "git:reset",
+				Description: "重置Git仓库状态",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "git:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

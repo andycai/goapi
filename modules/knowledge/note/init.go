@@ -1,63 +1,177 @@
 package note
 
 import (
-	"github.com/andycai/goapi/core"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const ModulePriorityNote = 5001 // 功能-笔记
+// 数据访问层，目前暂时没有特殊的数据访问逻辑
+// 所有数据库操作都在 service 层完成
 
-var app *core.App
-
-type noteModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&models.NoteCategory{},
+		&models.Note{},
+		&models.NotePermission{},
+		&models.CategoryPermission{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&noteModule{}, ModulePriorityNote)
-}
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
+		return err
+	}
 
-func (m *noteModule) Awake(a *core.App) error {
-	app = a
-	// 数据迁移
-	if err := autoMigrate(); err != nil {
+	if err := initPermissions(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *noteModule) Start() error {
-	// 初始化数据
-	return initData()
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("note:menu") {
+		log.Println("[笔记模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建笔记管理菜单
+		noteMenu := models.Menu{
+			MenuID:     4003,
+			ParentID:   enum.MenuIdWebApp,
+			Name:       "笔记管理",
+			Path:       "/admin/notes",
+			Icon:       "notes",
+			Sort:       3,
+			Permission: "note:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&noteMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "note:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
-func (m *noteModule) AddPublicRouters() error {
-	// 公开API路由
-	app.RouterPublicApi.Get("/notes/public", getPublicNotesHandler)
-	app.RouterPublicApi.Get("/notes/public/:id", getPublicNoteDetailHandler)
-	app.RouterPublicApi.Get("/notes/categories/public", getPublicCategoriesHandler)
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("note:permission") {
+		log.Println("[笔记模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
-}
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建笔记相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "笔记列表",
+				Code:        "note:view",
+				Description: "查看笔记列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "创建笔记",
+				Code:        "note:create",
+				Description: "创建新笔记",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "更新笔记",
+				Code:        "note:update",
+				Description: "更新笔记信息",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除笔记",
+				Code:        "note:delete",
+				Description: "删除笔记",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "分类列表",
+				Code:        "note:category:view",
+				Description: "查看笔记分类列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "创建分类",
+				Code:        "note:category:create",
+				Description: "创建笔记分类",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "更新分类",
+				Code:        "note:category:update",
+				Description: "更新笔记分类",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除分类",
+				Code:        "note:category:delete",
+				Description: "删除笔记分类",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
 
-func (m *noteModule) AddAuthRouters() error {
-	// 管理后台路由
-	app.RouterAdmin.Get("/notes", app.HasPermission("note:view"), listNotesHandler)
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
 
-	// API路由 - 调整顺序，将具体路径放在参数路径之前
-	app.RouterAdminApi.Get("/notes/tree", app.HasPermission("note:view"), getNoteTreeHandler)
+		// 初始化笔记类型
+		noteCategories := []models.NoteCategory{
+			{
+				Name:        "笔记",
+				Description: "笔记",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
 
-	// 分类操作 - 移动到参数路由之前
-	app.RouterAdminApi.Get("/notes/categories", app.HasPermission("note:category:view"), listCategoriesHandler)
-	app.RouterAdminApi.Post("/notes/categories", app.HasPermission("note:category:create"), createCategoryHandler)
-	app.RouterAdminApi.Put("/notes/categories/:id", app.HasPermission("note:category:update"), updateCategoryHandler)
-	app.RouterAdminApi.Delete("/notes/categories/:id", app.HasPermission("note:category:delete"), deleteCategoryHandler)
+		if err := tx.Create(&noteCategories).Error; err != nil {
+			return err
+		}
 
-	// 参数路由放在最后
-	app.RouterAdminApi.Get("/notes/:id", app.HasPermission("note:view"), getNoteDetailHandler)
-	app.RouterAdminApi.Post("/notes", app.HasPermission("note:create"), createNoteHandler)
-	app.RouterAdminApi.Put("/notes/:id", app.HasPermission("note:update"), updateNoteHandler)
-	app.RouterAdminApi.Delete("/notes/:id", app.HasPermission("note:delete"), deleteNoteHandler)
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "note:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }

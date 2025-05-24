@@ -1,55 +1,125 @@
 package adminlog
 
 import (
-	"github.com/andycai/goapi/core"
-	"github.com/gofiber/fiber/v2"
+	"log"
+	"time"
+
+	"github.com/andycai/goapi/enum"
+	"github.com/andycai/goapi/models"
+	"gorm.io/gorm"
 )
 
-const (
-	ModulePriorityAdminLog = 1005 // 系统-管理员活动日志
-)
+// 数据访问层，目前暂时没有特殊的数据访问逻辑
+// 所有数据库操作都在 service 层完成
 
-var app *core.App
-
-type adminlogModule struct {
-	core.BaseModule
+func autoMigrate() error {
+	return app.DB.AutoMigrate(
+		&models.AdminLog{},
+	)
 }
 
-func init() {
-	core.RegisterModule(&adminlogModule{}, ModulePriorityAdminLog)
-}
-
-func (m *adminlogModule) Awake(a *core.App) error {
-	app = a
-	// 数据迁移
-	return autoMigrate()
-}
-
-func (m *adminlogModule) Start() error {
-	// 初始化数据
-	if err := initData(); err != nil {
+// 初始化数据
+func initData() error {
+	if err := initMenus(); err != nil {
 		return err
 	}
 
-	subscribeEvents(app.Bus)
+	if err := initPermissions(); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (m *adminlogModule) AddAuthRouters() error {
-	// admin
-	app.RouterAdmin.Get("/adminlog", app.HasPermission("adminlog:view"), func(c *fiber.Ctx) error {
-		return c.Render("admin/adminlog", fiber.Map{
-			"Title": "操作日志",
-			"Scripts": []string{
-				"/static/js/admin/adminlog.js",
-			},
-		}, "admin/layout")
+func initMenus() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("adminlog:menu") {
+		log.Println("[后台日志模块]菜单数据已初始化，跳过")
+		return nil
+	}
+
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建管理员日志菜单
+		adminlogMenu := models.Menu{
+			MenuID:     1005,
+			ParentID:   enum.MenuIdSystem,
+			Name:       "操作日志",
+			Path:       "/admin/adminlog",
+			Icon:       "adminlog",
+			Sort:       5,
+			Permission: "adminlog:view",
+			IsShow:     true,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+
+		if err := tx.Create(&adminlogMenu).Error; err != nil {
+			return err
+		}
+
+		// 标记菜单已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "adminlog:menu",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
+}
 
-	// api
-	app.RouterAdminApi.Get("/adminlog", app.HasPermission("adminlog:view"), listLogsHandler)
-	app.RouterAdminApi.Delete("/adminlog", app.HasPermission("adminlog:delete"), deleteLogsHandler)
+func initPermissions() error {
+	// 检查是否已初始化
+	if app.IsInitializedModule("adminlog:permission") {
+		log.Println("[后台日志模块]权限数据已初始化，跳过")
+		return nil
+	}
 
-	return nil
+	// 开始事务
+	return app.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建管理员日志相关权限
+		permissions := []models.Permission{
+			{
+				Name:        "管理员日志列表",
+				Code:        "adminlog:view",
+				Description: "查看管理员日志列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "管理员日志收集",
+				Code:        "adminlog:create",
+				Description: "收集管理员日志列表",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+			{
+				Name:        "删除管理员日志",
+				Code:        "adminlog:delete",
+				Description: "删除管理员日志",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			},
+		}
+
+		if err := tx.Create(&permissions).Error; err != nil {
+			return err
+		}
+
+		// 标记模块已初始化
+		if err := tx.Create(&models.ModuleInit{
+			Module:      "adminlog:permission",
+			Initialized: 1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
