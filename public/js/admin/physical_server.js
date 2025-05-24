@@ -105,11 +105,13 @@ function physicalServerManagement() {
                 if (response.ok) {
                     this.closePanel();
                     this.loadPhysicalServers();
+                    ShowMessage(this.editMode ? '服务器更新成功' : '服务器创建成功');
                 } else {
                     console.error('Failed to create physical server');
                 }
             } catch (error) {
                 console.error('Error creating physical server:', error);
+                ShowError(error.message);
             }
         },
 
@@ -137,11 +139,13 @@ function physicalServerManagement() {
                 if (response.ok) {
                     this.closePanel();
                     this.loadPhysicalServers();
+                    ShowMessage(this.editMode ? '服务器更新成功' : '服务器创建成功');
                 } else {
                     console.error('Failed to update physical server');
                 }
             } catch (error) {
                 console.error('Error updating physical server:', error);
+                ShowError(error.message);
             }
         },
 
@@ -154,11 +158,13 @@ function physicalServerManagement() {
 
                     if (response.ok) {
                         this.loadPhysicalServers();
+                        ShowMessage('服务器删除成功');
                     } else {
                         console.error('Failed to delete physical server');
                     }
                 } catch (error) {
                     console.error('Error deleting physical server:', error);
+                    ShowError(error.message);
                 }
             }
         }

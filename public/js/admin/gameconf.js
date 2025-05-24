@@ -44,7 +44,7 @@ function gameconfManagement() {
                 this.projects = await response.json();
             } catch (error) {
                 console.error('加载项目列表失败:', error);
-                Alpine.store('notification').show('加载项目列表失败', 'error');
+                ShowError('加载项目列表失败');
             }
         },
 
@@ -96,13 +96,10 @@ function gameconfManagement() {
 
                 await this.loadProjects();
                 this.showProjectForm = false;
-                Alpine.store('notification').show(
-                    this.editingProject ? '项目更新成功' : '项目创建成功',
-                    'success'
-                );
+                ShowMessage(this.editingProject ? '项目更新成功' : '项目创建成功');
             } catch (error) {
                 console.error('保存项目失败:', error);
-                Alpine.store('notification').show('保存项目失败', 'error');
+                ShowError('保存项目失败');
             }
         },
 
@@ -123,10 +120,10 @@ function gameconfManagement() {
                 }
 
                 await this.loadProjects();
-                Alpine.store('notification').show('项目删除成功', 'success');
+                ShowMessage('项目删除成功');
             } catch (error) {
                 console.error('删除项目失败:', error);
-                Alpine.store('notification').show('删除项目失败', 'error');
+                ShowError('删除项目失败');
             }
         },
 
@@ -146,7 +143,7 @@ function gameconfManagement() {
                 this.tables = await response.json();
             } catch (error) {
                 console.error('加载配置表列表失败:', error);
-                Alpine.store('notification').show('加载配置表列表失败', 'error');
+                ShowError('加载配置表列表失败');
             }
         },
 
@@ -200,13 +197,10 @@ function gameconfManagement() {
 
                 await this.loadTables();
                 this.showTableForm = false;
-                Alpine.store('notification').show(
-                    this.editingTable ? '配置表更新成功' : '配置表创建成功',
-                    'success'
-                );
+                ShowMessage(this.editingTable ? '配置表更新成功' : '配置表创建成功');
             } catch (error) {
                 console.error('保存配置表失败:', error);
-                Alpine.store('notification').show('保存配置表失败', 'error');
+                ShowError('保存配置表失败');
             }
         },
 
@@ -227,10 +221,10 @@ function gameconfManagement() {
                 }
 
                 await this.loadTables();
-                Alpine.store('notification').show('配置表删除成功', 'success');
+                ShowMessage('配置表删除成功');
             } catch (error) {
                 console.error('删除配置表失败:', error);
-                Alpine.store('notification').show('删除配置表失败', 'error');
+                ShowError('删除配置表失败');
             }
         },
 
@@ -247,13 +241,10 @@ function gameconfManagement() {
                 }
 
                 const result = await response.json();
-                Alpine.store('notification').show(
-                    result.valid ? '验证通过' : result.message,
-                    result.valid ? 'success' : 'error'
-                );
+                ShowMessage(result.valid ? '验证通过' : result.message);
             } catch (error) {
                 console.error('验证配置表失败:', error);
-                Alpine.store('notification').show('验证配置表失败', 'error');
+                ShowError('验证配置表失败');
             }
         },
 
@@ -279,7 +270,7 @@ function gameconfManagement() {
 
                 const result = await response.json();
                 this.showExportForm = false;
-                Alpine.store('notification').show('导出任务已创建，请稍后查看结果', 'success');
+                ShowMessage('导出任务已创建，请稍后查看结果');
 
                 // 如果导出成功，自动下载文件
                 if (result.status === 'success') {
@@ -287,7 +278,7 @@ function gameconfManagement() {
                 }
             } catch (error) {
                 console.error('创建导出记录失败:', error);
-                Alpine.store('notification').show('创建导出记录失败', 'error');
+                ShowError('创建导出记录失败');
             }
         },
 

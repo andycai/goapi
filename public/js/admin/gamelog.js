@@ -46,7 +46,7 @@ function gameLogManagement() {
                 this.logs = data.logs;
                 this.total = data.total;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -97,10 +97,10 @@ function gameLogManagement() {
                     throw new Error(error.error || '删除失败');
                 }
 
-                Alpine.store('notification').show('日志记录删除成功', 'success');
+                ShowMessage('日志记录删除成功');
                 this.fetchLogs();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -117,10 +117,10 @@ function gameLogManagement() {
                     throw new Error(error.error || '清理失败');
                 }
 
-                Alpine.store('notification').show('旧日志清理成功', 'success');
+                ShowMessage('旧日志清理成功');
                 this.fetchLogs();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 

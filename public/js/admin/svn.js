@@ -27,7 +27,7 @@ function svnManagement() {
                 const data = await response.json();
                 this.repositories = data.repositories;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         checkoutRepository() {
@@ -54,11 +54,11 @@ function svnManagement() {
                     throw new Error(error.error || '检出失败');
                 }
 
-                Alpine.store('notification').show('仓库检出成功', 'success');
+                ShowMessage('仓库检出成功');
                 this.showCheckoutModal = false;
                 this.fetchRepositories();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         async updateRepository(repo) {
@@ -76,10 +76,10 @@ function svnManagement() {
                     throw new Error(error.error || '更新失败');
                 }
 
-                Alpine.store('notification').show('仓库更新成功', 'success');
+                ShowMessage('仓库更新成功');
                 this.fetchRepositories();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         async viewStatus(repo) {
@@ -95,7 +95,7 @@ function svnManagement() {
                 this.detailsContent = data.status;
                 this.showDetailsModal = true;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         async viewLog(repo) {
@@ -111,7 +111,7 @@ function svnManagement() {
                 this.detailsContent = data.log;
                 this.showDetailsModal = true;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         commitChanges(repo) {
@@ -137,11 +137,11 @@ function svnManagement() {
                     throw new Error(error.error || '提交失败');
                 }
 
-                Alpine.store('notification').show('更改提交成功', 'success');
+                ShowMessage('更改提交成功');
                 this.showCommitModal = false;
                 this.fetchRepositories();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         async revertChanges(repo) {
@@ -163,10 +163,10 @@ function svnManagement() {
                     throw new Error(error.error || '还原失败');
                 }
 
-                Alpine.store('notification').show('更改还原成功', 'success');
+                ShowMessage('更改还原成功');
                 this.fetchRepositories();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         getStatusText(status) {

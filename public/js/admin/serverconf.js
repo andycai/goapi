@@ -115,7 +115,7 @@ function serverConfig() {
                 this.serverList = await response.json();
             } catch (error) {
                 console.error('加载服务器列表失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -126,7 +126,7 @@ function serverConfig() {
                 this.lastServer = await response.json();
             } catch (error) {
                 console.error('加载最后登录服务器失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -138,7 +138,7 @@ function serverConfig() {
                 this.parseServerInfoFromAPI(data);
             } catch (error) {
                 console.error('加载服务器信息失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -149,7 +149,7 @@ function serverConfig() {
                 this.noticeList = await response.json();
             } catch (error) {
                 console.error('加载公告列表失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -160,7 +160,7 @@ function serverConfig() {
                 this.noticeNum = await response.json();
             } catch (error) {
                 console.error('加载公告数量失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -182,12 +182,12 @@ function serverConfig() {
                     throw new Error(error.error || '保存失败');
                 }
 
-                Alpine.store('notification').show('服务器信息保存成功', 'success');
+                ShowMessage(this.editMode ? '服务器配置更新成功' : '服务器配置创建成功');
                 
                 await this.loadServerInfo();
             } catch (error) {
                 console.error('保存服务器信息失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -243,10 +243,10 @@ function serverConfig() {
                     body: JSON.stringify(this.serverList),
                 });
                 if (!response.ok) throw new Error('保存失败');
-                Alpine.store('notification').show('服务器列表保存成功', 'success');
+                ShowMessage('服务器列表保存成功');
             } catch (error) {
                 console.error('保存服务器列表失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -260,10 +260,10 @@ function serverConfig() {
                     body: JSON.stringify(this.lastServer),
                 });
                 if (!response.ok) throw new Error('保存失败');
-                Alpine.store('notification').show('最后登录服务器保存成功', 'success');
+                ShowMessage('最后登录服务器保存成功');
             } catch (error) {
                 console.error('保存最后登录服务器失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -277,10 +277,10 @@ function serverConfig() {
                     body: JSON.stringify(this.noticeList),
                 });
                 if (!response.ok) throw new Error('保存失败');
-                Alpine.store('notification').show('公告列表保存成功', 'success');
+                ShowMessage('公告列表保存成功');
             } catch (error) {
                 console.error('保存公告列表失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -294,12 +294,12 @@ function serverConfig() {
                     body: JSON.stringify(this.noticeNum),
                 });
                 if (!response.ok) throw new Error('保存失败');
-                Alpine.store('notification').show('公告数量保存成功', 'success');
+                ShowMessage('公告数量保存成功');
 
                 await this.loadServerInfo();
             } catch (error) {
                 console.error('保存公告数量失败:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         }
     }

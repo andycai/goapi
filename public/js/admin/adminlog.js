@@ -30,7 +30,7 @@ function adminLogManagement() {
                 this.logs = data.data;
                 this.total = data.total;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         search() {
@@ -50,10 +50,10 @@ function adminLogManagement() {
                     throw new Error(error.error || '清理日志失败');
                 }
 
-                Alpine.store('notification').show('日志清理成功', 'success');
+                ShowMessage('日志清理成功');
                 this.fetchLogs();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         previousPage() {

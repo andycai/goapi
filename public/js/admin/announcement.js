@@ -31,7 +31,7 @@ function announcementManagement() {
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
                 console.error('Error loading announcements:', error);
-                alert('加载公告列表失败');
+                ShowError('加载公告列表失败');
             }
         },
 
@@ -68,10 +68,10 @@ function announcementManagement() {
 
                 this.closePanel();
                 this.loadAnnouncements();
-                alert('创建公告成功');
+                ShowMessage('创建公告成功');
             } catch (error) {
                 console.error('Error creating announcement:', error);
-                alert('创建公告失败');
+                ShowError('创建公告失败');
             }
         },
 
@@ -91,10 +91,10 @@ function announcementManagement() {
 
                 this.closePanel();
                 this.loadAnnouncements();
-                alert('更新公告成功');
+                ShowMessage('更新公告成功');
             } catch (error) {
                 console.error('Error updating announcement:', error);
-                alert('更新公告失败');
+                ShowError('更新公告失败');
             }
         },
 
@@ -113,10 +113,10 @@ function announcementManagement() {
                 }
 
                 this.loadAnnouncements();
-                alert('删除公告成功');
+                ShowMessage('删除公告成功');
             } catch (error) {
                 console.error('Error deleting announcement:', error);
-                alert('删除公告失败');
+                ShowError('删除公告失败');
             }
         },
 

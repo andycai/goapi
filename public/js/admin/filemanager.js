@@ -30,7 +30,7 @@ function filemanagerManagement() {
                 if (!response.ok) throw new Error('获取文件列表失败');
                 this.items = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -69,9 +69,9 @@ function filemanagerManagement() {
                 await this.fetchItems();
                 this.showUploadModal = false;
                 this.selectedFiles = [];
-                Alpine.store('notification').show('文件上传成功', 'success');
+                ShowMessage('文件上传成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -100,9 +100,9 @@ function filemanagerManagement() {
 
                 await this.fetchItems();
                 this.showFolderModal = false;
-                Alpine.store('notification').show('文件夹创建成功', 'success');
+                ShowMessage('文件夹创建成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -132,9 +132,9 @@ function filemanagerManagement() {
 
                 await this.fetchItems();
                 this.showRenameModal = false;
-                Alpine.store('notification').show('重命名成功', 'success');
+                ShowMessage('重命名成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -158,9 +158,9 @@ function filemanagerManagement() {
                 }
 
                 await this.fetchItems();
-                Alpine.store('notification').show('删除成功', 'success');
+                ShowMessage('删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -179,7 +179,7 @@ function filemanagerManagement() {
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 

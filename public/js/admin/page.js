@@ -39,7 +39,7 @@ function pageManagement() {
                 this.totalRecords = data.total;
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -120,10 +120,10 @@ function pageManagement() {
                 }
 
                 await this.loadPages();
-                Alpine.store('notification').show(this.modalAction === 'add' ? '添加页面成功' : '更新页面成功', 'success');
+                ShowMessage(this.modalAction === 'add' ? '添加页面成功' : '更新页面成功');
                 this.closePanel();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             } finally {
                 this.loading = false;
             }
@@ -150,9 +150,9 @@ function pageManagement() {
                 }
 
                 await this.loadPages();
-                Alpine.store('notification').show('删除页面成功', 'success');
+                ShowMessage('页面删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         

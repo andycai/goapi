@@ -59,7 +59,7 @@ function dictManagement() {
                 this.totalTypeRecords = data.total;
                 this.typePages = Math.ceil(this.totalTypeRecords / this.typesPageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -75,7 +75,7 @@ function dictManagement() {
                 this.totalDataRecords = data.total;
                 this.dataPages = Math.ceil(this.totalDataRecords / this.dataPageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -165,10 +165,10 @@ function dictManagement() {
                 }
 
                 await this.loadDictTypes();
-                Alpine.store('notification').show(this.typeModalAction === 'add' ? '添加字典类型成功' : '更新字典类型成功', 'success');
+                ShowMessage(this.typeModalAction === 'add' ? '添加字典类型成功' : '更新字典类型成功');
                 this.closeTypePanel();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             } finally {
                 this.loading = false;
             }
@@ -204,16 +204,16 @@ function dictManagement() {
                     }
                 }
                 
-                Alpine.store('notification').show('删除字典类型成功', 'success');
+                ShowMessage('删除字典类型成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
         // 打开添加字典数据面板
         openAddDataModal() {
             if (!this.currentDictType) {
-                Alpine.store('notification').show('请先选择一个字典类型', 'warning');
+                ShowError('请先选择一个字典类型');
                 return;
             }
             
@@ -285,10 +285,10 @@ function dictManagement() {
                 }
 
                 await this.loadDictData();
-                Alpine.store('notification').show(this.dataModalAction === 'add' ? '添加字典数据成功' : '更新字典数据成功', 'success');
+                ShowMessage(this.dataModalAction === 'add' ? '添加字典数据成功' : '更新字典数据成功');
                 this.closeDataPanel();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             } finally {
                 this.loading = false;
             }
@@ -315,9 +315,9 @@ function dictManagement() {
                 }
 
                 await this.loadDictData();
-                Alpine.store('notification').show('删除字典数据成功', 'success');
+                ShowMessage('删除字典数据成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         

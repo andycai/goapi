@@ -39,7 +39,7 @@ function postManagement() {
                 this.totalRecords = data.total;
                 this.pages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -120,10 +120,10 @@ function postManagement() {
                 }
 
                 await this.loadPosts();
-                Alpine.store('notification').show(this.modalAction === 'add' ? '添加文章成功' : '更新文章成功', 'success');
+                ShowMessage(this.modalAction === 'add' ? '文章添加成功' : '文章更新成功');
                 this.closePanel();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             } finally {
                 this.loading = false;
             }
@@ -150,9 +150,9 @@ function postManagement() {
                 }
 
                 await this.loadPosts();
-                Alpine.store('notification').show('删除文章成功', 'success');
+                ShowMessage('文章删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         

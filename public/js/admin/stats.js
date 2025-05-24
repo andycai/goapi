@@ -226,7 +226,7 @@ function statsManagement() {
                 this.total = data.total;
                 this.updateCharts();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -254,7 +254,7 @@ function statsManagement() {
                 this.detailData = data;
                 this.updateDetailCharts(data.statsInfo);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -650,10 +650,10 @@ function statsManagement() {
                     throw new Error(error.error || '删除失败');
                 }
 
-                Alpine.store('notification').show('统计记录删除成功', 'success');
+                ShowMessage('统计记录删除成功');
                 this.fetchStats();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -670,10 +670,10 @@ function statsManagement() {
                     throw new Error(error.error || '清理失败');
                 }
 
-                Alpine.store('notification').show('旧数据清理成功', 'success');
+                ShowMessage('旧数据清理成功');
                 this.fetchStats();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 

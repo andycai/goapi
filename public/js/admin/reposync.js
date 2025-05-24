@@ -36,7 +36,7 @@ function reposyncManagement() {
                     this.config = data;
                 }
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -55,9 +55,9 @@ function reposyncManagement() {
                     throw new Error(error.error || '保存配置失败');
                 }
 
-                Alpine.store('notification').show('配置保存成功', 'success');
+                ShowMessage('配置保存成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -73,9 +73,9 @@ function reposyncManagement() {
                 }
 
                 await this.loadCommits();
-                Alpine.store('notification').show('仓库检出成功', 'success');
+                ShowMessage('仓库检出成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -91,7 +91,7 @@ function reposyncManagement() {
                 this.selectAll = false;
                 this.openFileLists = new Set(); // 重置打开的文件列表
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -118,7 +118,7 @@ function reposyncManagement() {
 
         async syncSelectedCommits() {
             if (this.selectedCommits.length === 0) {
-                Alpine.store('notification').show('请选择要同步的提交记录', 'error');
+                ShowError('请选择要同步的提交记录');
                 return;
             }
 
@@ -149,9 +149,9 @@ function reposyncManagement() {
                 }
 
                 await this.loadCommits();
-                Alpine.store('notification').show('批量同步成功', 'success');
+                ShowMessage('批量同步成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -171,9 +171,9 @@ function reposyncManagement() {
                 }
 
                 await this.loadCommits();
-                Alpine.store('notification').show('同步成功', 'success');
+                ShowMessage('同步成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -233,9 +233,9 @@ function reposyncManagement() {
                 }
 
                 await this.loadCommits();
-                Alpine.store('notification').show('刷新提交记录成功', 'success');
+                ShowMessage('刷新提交记录成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -255,9 +255,9 @@ function reposyncManagement() {
                 }
 
                 await this.loadCommits();
-                Alpine.store('notification').show('清空数据成功', 'success');
+                ShowMessage('清空数据成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         }
     };

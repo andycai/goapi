@@ -26,8 +26,7 @@ function fundManagement() {
                     this.marketIndices = data.indices;
                 }
             } catch (error) {
-                console.error('加载市场数据失败:', error);
-                Alpine.store('notification').show('加载市场数据失败: ' + error.message, 'error');
+                ShowError('加载市场数据失败: ' + error.message);
             }
         },
 
@@ -42,8 +41,7 @@ function fundManagement() {
                     this.totalPages = Math.max(1, Math.ceil(this.total / this.pageSize));
                 }
             } catch (error) {
-                console.error('加载基金列表失败:', error);
-                Alpine.store('notification').show('加载基金列表失败: ' + error.message, 'error');
+                ShowError('加载基金列表失败: ' + error.message);
             }
         },
 
@@ -63,10 +61,9 @@ function fundManagement() {
 
                 await this.loadMarketData();
                 await this.loadFunds();
-                Alpine.store('notification').show('数据同步成功', 'success');
+                ShowMessage('数据同步成功');
             } catch (error) {
-                console.error('同步数据失败:', error);
-                Alpine.store('notification').show(error.message || '同步数据失败', 'error');
+                ShowError(error.message || '同步数据失败');
             } finally {
                 this.isSyncing = false;
             }

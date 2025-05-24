@@ -37,7 +37,7 @@ function gitManagement() {
                 this.repositories = await response.json();
             } catch (error) {
                 console.error('Error loading repositories:', error);
-                toast.error('加载仓库列表失败');
+                ShowError('加载仓库列表失败');
             }
         },
 
@@ -68,13 +68,13 @@ function gitManagement() {
                     body: JSON.stringify(this.cloneForm)
                 });
                 if (!response.ok) throw new Error('Failed to clone repository');
-                toast.success('仓库克隆成功');
+                ShowMessage('仓库克隆成功');
                 this.showCloneModal = false;
                 this.loadRepositories();
                 this.cloneForm = { url: '', path: '', branch: '', username: '', password: '' };
             } catch (error) {
                 console.error('Error cloning repository:', error);
-                toast.error('克隆仓库失败');
+                ShowError('克隆仓库失败');
             }
         },
 
@@ -86,11 +86,11 @@ function gitManagement() {
                     body: JSON.stringify({ path: repo.path })
                 });
                 if (!response.ok) throw new Error('Failed to pull changes');
-                toast.success('拉取更改成功');
+                ShowMessage('拉取更改成功');
                 this.loadRepositories();
             } catch (error) {
                 console.error('Error pulling changes:', error);
-                toast.error('拉取更改失败');
+                ShowError('拉取更改失败');
             }
         },
 
@@ -102,11 +102,11 @@ function gitManagement() {
                     body: JSON.stringify({ path: repo.path })
                 });
                 if (!response.ok) throw new Error('Failed to push changes');
-                toast.success('推送更改成功');
+                ShowMessage('推送更改成功');
                 this.loadRepositories();
             } catch (error) {
                 console.error('Error pushing changes:', error);
-                toast.error('推送更改失败');
+                ShowError('推送更改失败');
             }
         },
 
@@ -120,7 +120,7 @@ function gitManagement() {
                 this.showDetailsModal = true;
             } catch (error) {
                 console.error('Error getting status:', error);
-                toast.error('获取状态失败');
+                ShowError('获取状态失败');
             }
         },
 
@@ -134,7 +134,7 @@ function gitManagement() {
                 this.showDetailsModal = true;
             } catch (error) {
                 console.error('Error getting log:', error);
-                toast.error('获取日志失败');
+                ShowError('获取日志失败');
             }
         },
 
@@ -155,13 +155,13 @@ function gitManagement() {
                     })
                 });
                 if (!response.ok) throw new Error('Failed to commit changes');
-                toast.success('提交更改成功');
+                ShowMessage('提交更改成功');
                 this.showCommitModal = false;
                 this.commitForm.message = '';
                 this.loadRepositories();
             } catch (error) {
                 console.error('Error committing changes:', error);
-                toast.error('提交更改失败');
+                ShowError('提交更改失败');
             }
         },
 
@@ -175,13 +175,13 @@ function gitManagement() {
                 this.showBranchModal = true;
             } catch (error) {
                 console.error('Error getting branches:', error);
-                toast.error('获取分支��表失败');
+                ShowError('获取分支列表失败');
             }
         },
 
         async createBranch() {
             if (!this.branchForm.name) {
-                toast.error('请输入分支名称');
+                ShowError('请输入分支名称');
                 return;
             }
             try {
@@ -194,12 +194,12 @@ function gitManagement() {
                     })
                 });
                 if (!response.ok) throw new Error('Failed to create branch');
-                toast.success('创建分支成功');
+                ShowMessage('创建分支成功');
                 this.branchForm.name = '';
                 await this.manageBranches(this.selectedRepo);
             } catch (error) {
                 console.error('Error creating branch:', error);
-                toast.error('创建分支失败');
+                ShowError('创建分支失败');
             }
         },
 
@@ -214,11 +214,11 @@ function gitManagement() {
                     })
                 });
                 if (!response.ok) throw new Error('Failed to checkout branch');
-                toast.success('切换分支成功');
+                ShowMessage('切换分支成功');
                 this.loadRepositories();
             } catch (error) {
                 console.error('Error checking out branch:', error);
-                toast.error('切换分支失败');
+                ShowError('切换分支失败');
             }
         },
 
@@ -233,11 +233,11 @@ function gitManagement() {
                     })
                 });
                 if (!response.ok) throw new Error('Failed to merge branch');
-                toast.success('合并分支成功');
+                ShowMessage('合并分支成功');
                 this.loadRepositories();
             } catch (error) {
                 console.error('Error merging branch:', error);
-                toast.error('合并分支失败');
+                ShowError('合并分支失败');
             }
         },
 
@@ -254,11 +254,11 @@ function gitManagement() {
                     body: JSON.stringify({ path: this.selectedRepo.path })
                 });
                 if (!response.ok) throw new Error('Failed to stash changes');
-                toast.success('暂存更改成功');
+                ShowMessage('暂存更改成功');
                 this.loadRepositories();
             } catch (error) {
                 console.error('Error stashing changes:', error);
-                toast.error('暂存更改失败');
+                ShowError('暂存更改失败');
             }
         },
 
@@ -270,11 +270,11 @@ function gitManagement() {
                     body: JSON.stringify({ path: this.selectedRepo.path })
                 });
                 if (!response.ok) throw new Error('Failed to pop stash');
-                toast.success('恢复暂存成功');
+                ShowMessage('恢复暂存成功');
                 this.loadRepositories();
             } catch (error) {
                 console.error('Error popping stash:', error);
-                toast.error('恢复暂存失败');
+                ShowError('恢复暂存失败');
             }
         }
     };

@@ -52,7 +52,7 @@ function patchManagement() {
                     }
                 }
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -74,9 +74,9 @@ function patchManagement() {
                     throw new Error(error.error || '保存配置失败');
                 }
 
-                Alpine.store('notification').show('配置保存成功', 'success');
+                ShowMessage('配置保存成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -89,7 +89,7 @@ function patchManagement() {
                 this.totalRecords = data.total;
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -101,7 +101,7 @@ function patchManagement() {
 
         async generatePatch() {
             if (!this.oldVersion || !this.newVersion) {
-                Alpine.store('notification').show('请输入版本号', 'error');
+                ShowError('请输入版本号');
                 return;
             }
 
@@ -129,9 +129,9 @@ function patchManagement() {
                 // this.oldVersion = '';
                 // this.newVersion = '';
                 // this.description = '';
-                Alpine.store('notification').show('补丁包生成成功', 'success');
+                ShowMessage('补丁包生成成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -151,9 +151,9 @@ function patchManagement() {
                 }
 
                 await this.loadRecords();
-                Alpine.store('notification').show('补丁包应用成功', 'success');
+                ShowMessage('补丁包应用成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 

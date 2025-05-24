@@ -25,7 +25,7 @@ function unitoolManagement() {
                 this.totalRecords = data.total;
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -37,7 +37,7 @@ function unitoolManagement() {
 
         async findDuplicateGuids() {
             if (!this.searchParams.targetPath || !this.searchParams.notificationUrl) {
-                Alpine.store('notification').show('目标路径和通知URL不能为空', 'error');
+                ShowError('目标路径和通知URL不能为空');
                 return;
             }
 
@@ -59,12 +59,12 @@ function unitoolManagement() {
                 }
 
                 const data = await response.json();
-                Alpine.store('notification').show('查找任务已开始', 'success');
+                ShowMessage('查找任务已开始');
                 
                 // 一段时间后刷新列表
                 setTimeout(() => this.loadLogs(), 2000);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -76,7 +76,7 @@ function unitoolManagement() {
                 this.duplicateGuids = data.duplicates;
                 this.showDetailModal = true;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 

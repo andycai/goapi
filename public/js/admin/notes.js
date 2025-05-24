@@ -45,7 +45,7 @@ function noteManagement() {
                 });
             } catch (error) {
                 console.error('Failed to load categories:', error);
-                Alpine.store('notification').show('加载分类失败', 'error');
+                ShowError('加载分类失败');
             }
         },
 
@@ -65,7 +65,7 @@ function noteManagement() {
                 this.organizeNotes();
             } catch (error) {
                 console.error('Failed to load notes:', error);
-                Alpine.store('notification').show('加载笔记失败', 'error');
+                ShowError('加载笔记失败');
             }
         },
 
@@ -77,7 +77,7 @@ function noteManagement() {
                 this.roles = await response.json();
             } catch (error) {
                 console.error('Failed to load roles:', error);
-                Alpine.store('notification').show('加载角色失败', 'error');
+                ShowError('加载角色失败');
             }
         },
 
@@ -101,7 +101,7 @@ function noteManagement() {
                 this.selectedNote = await response.json();
             } catch (error) {
                 console.error('Failed to load note details:', error);
-                Alpine.store('notification').show('加载笔记详情失败', 'error');
+                ShowError('加载笔记详情失败');
             }
         },
 
@@ -154,11 +154,11 @@ function noteManagement() {
 
                     if (!response.ok) throw new Error('保存笔记失败');
                     
-                    Alpine.store('notification').show('保存成功', 'success');
+                    ShowMessage('保存成功');
                     await this.loadNotes();
                 } catch (error) {
                     console.error('Failed to save note:', error);
-                    Alpine.store('notification').show('保存笔记失败', 'error');
+                    ShowError('保存笔记失败');
                 }
             }
         },
@@ -201,11 +201,11 @@ function noteManagement() {
                         }
                     }
                 });
-                Alpine.store('notification').show(isEdit ? '笔记更新成功' : '笔记创建成功', 'success');
+                ShowMessage(this.editMode ? '笔记更新成功' : '笔记创建成功');
             })
             .catch(error => {
                 console.error('Error:', error);
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             });
         },
 
@@ -224,11 +224,11 @@ function noteManagement() {
                     this.selectedNote = null;
                 }
 
-                Alpine.store('notification').show('删除成功', 'success');
+                ShowMessage('删除成功');
                 await this.loadNotes();
             } catch (error) {
                 console.error('Failed to delete note:', error);
-                Alpine.store('notification').show('删除笔记失败', 'error');
+                ShowError('删除笔记失败');
             }
         },
 
@@ -281,11 +281,11 @@ function noteManagement() {
                 if (!response.ok) throw new Error('保存分类失败');
 
                 this.showCategoryModal = false;
-                Alpine.store('notification').show('保存成功', 'success');
+                ShowMessage('保存成功');
                 await this.loadCategories();
             } catch (error) {
                 console.error('Failed to save category:', error);
-                Alpine.store('notification').show('保存分类失败', 'error');
+                ShowError('保存分类失败');
             }
         },
 
@@ -303,11 +303,11 @@ function noteManagement() {
                     throw new Error(error.message || '删除分类失败');
                 }
 
-                Alpine.store('notification').show('删除成功', 'success');
+                ShowMessage('删除成功');
                 await this.loadCategories();
             } catch (error) {
                 console.error('Failed to delete category:', error);
-                Alpine.store('notification').show(error.message || '删除分类失败', 'error');
+                ShowError(error.message || '删除分类失败');
             }
         },
 

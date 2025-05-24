@@ -37,7 +37,7 @@ function bugtrackerManagement() {
                 if (!response.ok) throw new Error('获取项目列表失败');
                 this.projects = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -83,9 +83,9 @@ function bugtrackerManagement() {
 
                 await this.fetchProjects();
                 this.showProjectModal = false;
-                Alpine.store('notification').show(this.editMode ? '项目更新成功' : '项目创建成功', 'success');
+                ShowMessage(this.editMode ? '项目更新成功' : '项目创建成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -100,9 +100,9 @@ function bugtrackerManagement() {
                 if (!response.ok) throw new Error('删除项目失败');
 
                 await this.fetchProjects();
-                Alpine.store('notification').show('项目删除成功', 'success');
+                ShowMessage('项目删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -118,7 +118,7 @@ function bugtrackerManagement() {
                 if (!response.ok) throw new Error('获取问题列表失败');
                 this.currentProjectIssues = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -167,9 +167,9 @@ function bugtrackerManagement() {
 
                 await this.fetchProjectIssues(this.currentProject.id);
                 this.showIssueModal = false;
-                Alpine.store('notification').show(this.editMode ? '问题更新成功' : '问题创建成功', 'success');
+                ShowMessage(this.editMode ? '问题更新成功' : '问题创建成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -184,9 +184,9 @@ function bugtrackerManagement() {
                 if (!response.ok) throw new Error('删除问题失败');
 
                 await this.fetchProjectIssues(this.currentProject.id);
-                Alpine.store('notification').show('问题删除成功', 'success');
+                ShowMessage('问题删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -202,7 +202,7 @@ function bugtrackerManagement() {
                 if (!response.ok) throw new Error('获取评论列表失败');
                 this.currentIssueComments = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -223,9 +223,9 @@ function bugtrackerManagement() {
 
                 await this.fetchIssueComments(this.currentIssue.id);
                 this.commentForm.content = '';
-                Alpine.store('notification').show('评论添加成功', 'success');
+                ShowMessage('评论添加成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 

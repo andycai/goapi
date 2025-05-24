@@ -39,7 +39,7 @@ function channelManagement() {
                 this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
             } catch (error) {
                 console.error('Error loading channels:', error);
-                alert('加载渠道列表失败');
+                ShowError('加载渠道列表失败');
             }
         },
 
@@ -84,10 +84,10 @@ function channelManagement() {
 
                 this.closePanel();
                 this.loadChannels();
-                alert('创建渠道成功');
+                ShowMessage('创建渠道成功');
             } catch (error) {
                 console.error('Error creating channel:', error);
-                alert('创建渠道失败');
+                ShowError('创建渠道失败');
             }
         },
 
@@ -107,10 +107,10 @@ function channelManagement() {
 
                 this.closePanel();
                 this.loadChannels();
-                alert('更新渠道成功');
+                ShowMessage('更新渠道成功');
             } catch (error) {
                 console.error('Error updating channel:', error);
-                alert('更新渠道失败');
+                ShowError('更新渠道失败');
             }
         },
 
@@ -129,10 +129,10 @@ function channelManagement() {
                 }
 
                 this.loadChannels();
-                alert('删除渠道成功');
+                ShowMessage('删除渠道成功');
             } catch (error) {
                 console.error('Error deleting channel:', error);
-                alert('删除渠道失败');
+                ShowError('删除渠道失败');
             }
         },
 

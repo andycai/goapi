@@ -16,7 +16,7 @@ function imagemanagerManagement() {
                 if (!response.ok) throw new Error('获取图片列表失败');
                 this.images = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -64,9 +64,9 @@ function imagemanagerManagement() {
                 await this.fetchImages();
                 this.showUploadModal = false;
                 this.selectedImages = [];
-                Alpine.store('notification').show('图片上传成功', 'success');
+                ShowMessage('图片上传成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -84,9 +84,9 @@ function imagemanagerManagement() {
                 }
 
                 await this.fetchImages();
-                Alpine.store('notification').show('删除成功', 'success');
+                ShowMessage('图片删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -98,9 +98,9 @@ function imagemanagerManagement() {
         async copyUrl(image) {
             try {
                 await navigator.clipboard.writeText(image.url);
-                Alpine.store('notification').show('图片链接已复制到剪贴板', 'success');
+                ShowMessage('图片链接已复制到剪贴板');
             } catch (error) {
-                Alpine.store('notification').show('复制失败，请手动复制', 'error');
+                ShowError('复制失败，请手动复制');
             }
         },
 

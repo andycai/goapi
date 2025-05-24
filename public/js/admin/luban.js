@@ -46,7 +46,7 @@ function lubanManagement() {
                 if (!response.ok) throw new Error('获取项目列表失败');
                 this.projects = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -94,9 +94,9 @@ function lubanManagement() {
 
                 await this.fetchProjects();
                 this.showProjectModal = false;
-                Alpine.store('notification').show(this.editMode ? '项目更新成功' : '项目创建成功', 'success');
+                ShowMessage(this.editMode ? '项目更新成功' : '项目创建成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -111,9 +111,9 @@ function lubanManagement() {
                 if (!response.ok) throw new Error('删除项目失败');
 
                 await this.fetchProjects();
-                Alpine.store('notification').show('项目删除成功', 'success');
+                ShowMessage('项目删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -129,7 +129,7 @@ function lubanManagement() {
                 if (!response.ok) throw new Error('获取配置表列表失败');
                 this.currentProjectTables = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -182,9 +182,9 @@ function lubanManagement() {
 
                 await this.fetchProjectTables(this.currentProject.id);
                 this.showTableModal = false;
-                Alpine.store('notification').show(this.editMode ? '配置表更新成功' : '配置表创建成功', 'success');
+                ShowMessage(this.editMode ? '配置表更新成功' : '配置表创建成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -199,9 +199,9 @@ function lubanManagement() {
                 if (!response.ok) throw new Error('删除配置表失败');
 
                 await this.fetchProjectTables(this.currentProject.id);
-                Alpine.store('notification').show('配置表删除成功', 'success');
+                ShowMessage('配置表删除成功');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -233,9 +233,9 @@ function lubanManagement() {
 
                 const result = await response.json();
                 this.startProgressPolling(result.id);
-                Alpine.store('notification').show('导出任务已开始', 'success');
+                ShowMessage('导出任务已开始');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
 
@@ -256,15 +256,15 @@ function lubanManagement() {
                         this.progressTimer = null;
 
                         if (this.exportProgress.status === 'success') {
-                            Alpine.store('notification').show('导出成功', 'success');
+                            ShowMessage('导出成功');
                         } else if (this.exportProgress.status === 'failed') {
-                            Alpine.store('notification').show('导出失败: ' + this.exportProgress.error, 'error');
+                            ShowError('导出失败: ' + this.exportProgress.error);
                         }
                     }
                 } catch (error) {
                     clearInterval(this.progressTimer);
                     this.progressTimer = null;
-                    Alpine.store('notification').show(error.message, 'error');
+                    ShowError(error.message);
                 }
             };
 

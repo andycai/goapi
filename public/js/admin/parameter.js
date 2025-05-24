@@ -32,7 +32,7 @@ function parameterManagement() {
                 this.parameters = data.parameters;
                 this.totalPages = Math.ceil(data.total / this.pageSize);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         search() {
@@ -105,7 +105,7 @@ function parameterManagement() {
                     this.showPanel = true;
                 })
                 .catch(error => {
-                    Alpine.store('notification').show(error.message, 'error');
+                    ShowError(error.message);
                 })
                 .finally(() => {
                     this.loading = false;
@@ -149,12 +149,12 @@ function parameterManagement() {
         validateForm() {
             // 验证参数类型和名称
             if (!this.form.type.trim()) {
-                Alpine.store('notification').show('参数类型不能为空', 'error');
+                ShowError('参数类型不能为空');
                 return false;
             }
             
             if (!this.form.name.trim()) {
-                Alpine.store('notification').show('参数名称不能为空', 'error');
+                ShowError('参数名称不能为空');
                 return false;
             }
             
@@ -163,13 +163,13 @@ function parameterManagement() {
             
             for (const field of this.form.parameters) {
                 if (!field.name.trim()) {
-                    Alpine.store('notification').show('字段名称不能为空', 'error');
+                    ShowError('字段名称不能为空');
                     return false;
                 }
                 
                 // 检查字段名称是否重复
                 if (fieldNames.has(field.name.trim())) {
-                    Alpine.store('notification').show(`字段名称 '${field.name.trim()}' 重复`, 'error');
+                    ShowError(`字段名称 '${field.name.trim()}' 重复`);
                     return false;
                 }
                 
@@ -225,15 +225,12 @@ function parameterManagement() {
                     throw new Error(error.error || '操作失败');
                 }
                 
-                Alpine.store('notification').show(
-                    this.editMode ? '参数更新成功' : '参数创建成功',
-                    'success'
-                );
+                ShowMessage(this.editMode ? '参数更新成功' : '参数创建成功');
                 
                 this.closePanel();
                 this.fetchParameters();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             } finally {
                 this.loading = false;
             }
@@ -251,10 +248,10 @@ function parameterManagement() {
                     throw new Error(error.error || '删除失败');
                 }
                 
-                Alpine.store('notification').show('参数删除成功', 'success');
+                ShowMessage('参数删除成功');
                 this.fetchParameters();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         formatDate(date) {

@@ -51,7 +51,7 @@ function taskManagement() {
                 if (!response.ok) throw new Error('获取任务列表失败');
                 this.tasks = await response.json();
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         createTask() {
@@ -107,10 +107,10 @@ function taskManagement() {
 
                 await this.fetchTasks();
                 this.showTaskModal = false;
-                Alpine.store('notification').show(this.editMode ? '任务更新成功' : '任务创建成功', 'success');
+                ShowMessage(this.editMode ? '任务更新成功' : '任务创建成功');
             } catch (error) {
                 console.error('保存任务失败:', error);
-                Alpine.store('notification').show('保存任务失败', 'error');
+                ShowError('保存任务失败');
             }
         },
         async deleteTask(id) {
@@ -124,10 +124,10 @@ function taskManagement() {
                 if (!response.ok) throw new Error('删除任务失败');
 
                 await this.fetchTasks();
-                Alpine.store('notification').show('任务删除成功', 'success');
+                ShowMessage('任务删除成功');
             } catch (error) {
                 console.error('删除任务失败:', error);
-                Alpine.store('notification').show('删除任务失败', 'error');
+                ShowError('删除任务失败');
             }
         },
         async runTask(task) {
@@ -151,9 +151,9 @@ function taskManagement() {
                     this.scrollOutputToBottom();
                 });
 
-                Alpine.store('notification').show('任务已开始执行', 'success');
+                ShowMessage('任务已开始执行');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         async stopTask() {
@@ -168,9 +168,9 @@ function taskManagement() {
                 // 停止进度轮询
                 this.stopProgressPolling();
                 
-                Alpine.store('notification').show('任务已停止', 'success');
+                ShowMessage('任务已停止');
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         async viewLogs(task) {
@@ -182,7 +182,7 @@ function taskManagement() {
                 this.updatePaginatedLogs();
                 this.showLogsModal = true;
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         viewLogDetail(log) {
@@ -387,7 +387,7 @@ function taskManagement() {
                 // 否则显示结果界面
                 this.viewLogDetail(log);
             } catch (error) {
-                Alpine.store('notification').show(error.message, 'error');
+                ShowError(error.message);
             }
         },
         // 获取状态显示样式
