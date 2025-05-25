@@ -260,7 +260,7 @@ function basesManagement() {
                 if (!response.ok) throw new Error('删除字段失败');
                 
                 ShowMessage('字段删除成功');
-                this.openFieldPanel({ id: this.fields[0].entity_id });
+                this.openFieldPanel({ id: this.currentEntityId });
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -396,7 +396,7 @@ function basesManagement() {
                 if (!response.ok) throw new Error('删除数据失败');
                 
                 ShowMessage('数据删除成功');
-                this.openDataPanel({ id: this.entityData[0].entity_id });
+                this.openDataPanel({ id: this.currentEntityId });
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -411,8 +411,50 @@ function basesManagement() {
             // 验证表单
             if (!this.validateDataForm()) return;
 
+            // 根据字段类型转换数据
+            const convertedData = {};
+            for (const field of this.fields) {
+                let value = this.dataForm[field.name];
+                
+                // 如果值为空且字段可为空，则跳过
+                if (value === '' && field.is_nullable) {
+                    continue;
+                }
+
+                // 根据字段类型转换值
+                switch (field.type) {
+                    case 'int':
+                        value = value === '' ? 0 : parseInt(value);
+                        break;
+                    case 'float':
+                        value = value === '' ? 0 : parseFloat(value);
+                        break;
+                    case 'bool':
+                        value = value === 'true' || value === true;
+                        break;
+                    case 'json':
+                        try {
+                            value = value === '' ? {} : JSON.parse(value);
+                        } catch (e) {
+                            ShowError(`字段 ${field.name} 的 JSON 格式不正确`);
+                            return;
+                        }
+                        break;
+                    case 'datetime':
+                    case 'date':
+                    case 'time':
+                        // 保持日期时间格式不变，由服务器处理
+                        break;
+                    default:
+                        // string, text 等类型保持原样
+                        break;
+                }
+                
+                convertedData[field.name] = value;
+            }
+            
             const fieldDataForm = {
-                ...this.dataForm,
+                data: convertedData,
                 entity_id: parseInt(this.currentEntityId) || 0,
             }
             
