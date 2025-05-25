@@ -21,8 +21,8 @@ type Channel struct {
 	ServerListURL string         `gorm:"type:varchar(255);comment:服务器列表地址" json:"server_list_url"`
 	NoticeURL     string         `gorm:"type:varchar(255);comment:公告地址" json:"notice_url"`
 	NoticeNumURL  string         `gorm:"type:varchar(255);comment:公告数量地址" json:"notice_num_url"`
-	ServerGroups  []ServerGroup  `gorm:"many2many:channel_server_groups;" json:"server_groups"`
-	Announcements []Announcement `gorm:"many2many:channel_announcements;" json:"announcements"`
+	ServerGroups  []ServerGroup  `gorm:"many2many:channel_to_server_groups;" json:"server_groups"`
+	Announcements []Announcement `gorm:"many2many:channel_to_announcements;" json:"announcements"`
 	CreatedAt     time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt     time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
@@ -87,20 +87,20 @@ func (Channel) TableName() string {
 
 // TableName specifies the table name for PhysicalServer
 func (PhysicalServer) TableName() string {
-	return "physical_servers"
+	return "channel_physical_servers"
 }
 
 // TableName specifies the table name for ServerGroup
 func (ServerGroup) TableName() string {
-	return "server_groups"
+	return "channel_server_groups"
 }
 
 // TableName specifies the table name for ServerGroupServer
 func (ServerGroupServer) TableName() string {
-	return "server_group_servers"
+	return "channel_server_group_servers"
 }
 
 // TableName specifies the table name for Announcement
 func (Announcement) TableName() string {
-	return "announcements"
+	return "channel_announcements"
 }

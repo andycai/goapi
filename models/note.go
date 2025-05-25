@@ -20,7 +20,7 @@ type NoteCategory struct {
 	Parent   *NoteCategory   `json:"parent,omitempty" gorm:"foreignKey:ParentID"`
 	Children []*NoteCategory `json:"children,omitempty" gorm:"foreignKey:ParentID"`
 	Notes    []*Note         `json:"notes,omitempty" gorm:"foreignKey:CategoryID"`
-	Roles    []*Role         `json:"roles,omitempty" gorm:"many2many:category_permissions;foreignKey:ID;joinForeignKey:CategoryID;References:ID;joinReferences:RoleID"`
+	Roles    []*Role         `json:"roles,omitempty" gorm:"many2many:note_category_permissions;foreignKey:ID;joinForeignKey:CategoryID;References:ID;joinReferences:RoleID"`
 }
 
 // Note 笔记
@@ -84,7 +84,7 @@ func (NotePermission) TableName() string {
 }
 
 func (CategoryPermission) TableName() string {
-	return "category_permissions"
+	return "note_category_permissions"
 }
 
 // 检查用户是否有权限访问笔记
