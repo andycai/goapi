@@ -14,6 +14,10 @@ function userManagement() {
         showPanel: false,
         isEditing: false,
         panelTitle: '创建用户',
+        currentPage: 1,
+        pageSize: 10,
+        totalPages: 1,
+        totalRecords: 0,
 
         init() {
             this.loadUsers();
@@ -22,9 +26,16 @@ function userManagement() {
 
         async loadUsers() {
             try {
-                const response = await fetch('/api/admin/users');
+                const response = await fetch(`/api/admin/users?page=${this.currentPage}&limit=${this.pageSize}`);
                 if (!response.ok) throw new Error('Failed to load users');
-                this.users = await response.json();
+                const ret = await response.json();
+                if (ret.code === 0) {
+                    this.users = ret.data.users;
+                    this.totalRecords = ret.data.total;
+                    this.totalPages = Math.ceil(ret.data.total / this.pageSize);
+                } else {
+                    ShowError(ret.message);
+                }
             } catch (error) {
                 console.error('Error loading users:', error);
                 ShowError('加载用户列表失败');
@@ -40,6 +51,12 @@ function userManagement() {
                 console.error('Error loading roles:', error);
                 ShowError('加载角色列表失败');
             }
+        },
+
+        changePage(page) {
+            if (page < 1 || page > this.totalPages) return;
+            this.currentPage = page;
+            this.loadUsers();
         },
 
         openCreatePanel() {

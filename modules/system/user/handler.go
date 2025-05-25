@@ -2,8 +2,10 @@ package user
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
+	"github.com/andycai/goapi/core"
 	"github.com/andycai/goapi/models"
 	"github.com/andycai/goapi/modules/system/adminlog"
 	"github.com/gofiber/fiber/v2"
@@ -12,11 +14,39 @@ import (
 
 // listUsersHandler 获取用户列表
 func listUsersHandler(c *fiber.Ctx) error {
-	var users []models.User
-	if err := app.DB.Preload("Role").Find(&users).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "获取用户列表失败"})
+	// 获取分页参数
+	limit, err := strconv.Atoi(c.Query("limit", "10"))
+	if err != nil || limit <= 0 {
+		limit = 10
 	}
-	return c.JSON(users)
+
+	page, err := strconv.Atoi(c.Query("page", "1"))
+	if err != nil || page <= 0 {
+		page = 1
+	}
+
+	users, total, err := QueryUserList(page, limit)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(core.Response{
+			Code:    1,
+			Message: "获取用户列表失败: " + err.Error(),
+		})
+	}
+
+	// var users []models.User
+	// if err := app.DB.Preload("Role").Offset((page - 1) * limit).Limit(limit).Find(&users).Error; err != nil {
+	// 	return c.Status(500).JSON(fiber.Map{"error": "获取用户列表失败"})
+	// }
+
+	var response = core.Response{
+		Code: 0,
+		Data: fiber.Map{
+			"users": users,
+			"total": total,
+		},
+	}
+
+	return c.JSON(response)
 }
 
 // createUserHandler 创建用户
