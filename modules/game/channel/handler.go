@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -33,7 +34,7 @@ func getChannelsHandler(c *fiber.Ctx) error {
 }
 
 func createChannelHandler(c *fiber.Ctx) error {
-	var channel Channel
+	var channel models.Channel
 	if err := c.BodyParser(&channel); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的请求数据",
@@ -120,7 +121,7 @@ func getPhysicalServersHandler(c *fiber.Ctx) error {
 }
 
 func createPhysicalServerHandler(c *fiber.Ctx) error {
-	var server PhysicalServer
+	var server models.PhysicalServer
 	if err := c.BodyParser(&server); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的请求数据",
@@ -207,7 +208,7 @@ func getServerGroupsHandler(c *fiber.Ctx) error {
 }
 
 func createServerGroupHandler(c *fiber.Ctx) error {
-	var group ServerGroup
+	var group models.ServerGroup
 	if err := c.BodyParser(&group); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的请求数据",
@@ -455,7 +456,7 @@ func getAnnouncementsHandler(c *fiber.Ctx) error {
 }
 
 func createAnnouncementHandler(c *fiber.Ctx) error {
-	var announcement Announcement
+	var announcement models.Announcement
 	if err := c.BodyParser(&announcement); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "无效的请求数据",

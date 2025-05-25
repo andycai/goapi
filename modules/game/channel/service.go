@@ -3,6 +3,7 @@ package channel
 import (
 	"errors"
 
+	"github.com/andycai/goapi/models"
 	"gorm.io/gorm"
 )
 
@@ -12,7 +13,7 @@ func initService() {
 }
 
 // Channel Service operations
-func CreateChannelWithRelations(channel *Channel) error {
+func CreateChannelWithRelations(channel *models.Channel) error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(channel).Error; err != nil {
 			return err
@@ -64,7 +65,7 @@ func UpdateChannelWithRelations(id uint, data map[string]interface{}) error {
 }
 
 // ServerGroup Service operations
-func CreateServerGroupWithServers(group *ServerGroup) error {
+func CreateServerGroupWithServers(group *models.ServerGroup) error {
 	return app.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(group).Error; err != nil {
 			return err
@@ -96,12 +97,12 @@ func UpdateServerGroupWithServers(id uint, data map[string]interface{}) error {
 		// 更新服务器列表
 		if servers, ok := data["servers"]; ok {
 			// 删除旧的服务器关联
-			if err := tx.Where("group_id = ?", id).Delete(&ServerGroupServer{}).Error; err != nil {
+			if err := tx.Where("group_id = ?", id).Delete(&models.ServerGroupServer{}).Error; err != nil {
 				return err
 			}
 
 			// 添加新的服务器关联
-			for _, server := range servers.([]ServerGroupServer) {
+			for _, server := range servers.([]models.ServerGroupServer) {
 				server.GroupID = id
 				if err := tx.Create(&server).Error; err != nil {
 					return err
@@ -145,7 +146,7 @@ func AddServerToGroupWithValidation(groupID uint, physicalServerId uint) error {
 
 	// 验证服务器是否已经在分组中
 	var count int64
-	if err := app.DB.Model(&ServerGroupServer{}).
+	if err := app.DB.Model(&models.ServerGroupServer{}).
 		Where("group_id = ? AND physical_server_id = ?", groupID, physicalServerId).
 		Count(&count).Error; err != nil {
 		return err
@@ -159,7 +160,7 @@ func AddServerToGroupWithValidation(groupID uint, physicalServerId uint) error {
 }
 
 // Announcement Service operations
-func CreateAnnouncementWithValidation(announcement *Announcement) error {
+func CreateAnnouncementWithValidation(announcement *models.Announcement) error {
 	if announcement.Title == "" {
 		return errors.New("公告标题不能为空")
 	}
@@ -191,7 +192,7 @@ func UpdateServerGroupServer(groupID uint, groupServerID uint, data map[string]i
 	}
 
 	// 验证服务器记录是否存在
-	var server ServerGroupServer
+	var server models.ServerGroupServer
 	if err := app.DB.Where("id = ? AND group_id = ?", groupServerID, groupID).First(&server).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return errors.New("服务器记录不存在")
@@ -214,7 +215,7 @@ func UpdateServerGroupServer(groupID uint, groupServerID uint, data map[string]i
 
 		// 验证新的服务器ID是否已经在同一分组中的其他记录中使用
 		var count int64
-		if err := app.DB.Model(&ServerGroupServer{}).
+		if err := app.DB.Model(&models.ServerGroupServer{}).
 			Where("group_id = ? AND server_id = ? AND id != ?", groupID, serverID, groupServerID).
 			Count(&count).Error; err != nil {
 			return err
