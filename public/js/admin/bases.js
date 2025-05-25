@@ -12,6 +12,7 @@ function basesManagement() {
         searchKeyword: '',
         loading: false,
         editMode: false,
+        currentEntityId: 0,
 
         // 面板状态
         showPanel: false,
@@ -212,6 +213,7 @@ function basesManagement() {
                 
                 this.fields = data.fields;
                 this.showFieldPanel = true;
+                this.currentEntityId = entity.id;
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -230,7 +232,7 @@ function basesManagement() {
             this.editMode = false;
             this.fieldForm = {
                 name: '',
-                type: '',
+                type: 'string',
                 length: 0,
                 is_nullable: false,
                 is_unique: false,
@@ -276,6 +278,7 @@ function basesManagement() {
             const fieldData = {
                 ...this.fieldForm,
                 id: parseInt(this.fieldForm.id) || 0,
+                entity_id: parseInt(this.currentEntityId) || 0,
                 length: parseInt(this.fieldForm.length) || 0,
                 is_nullable: this.fieldForm.is_nullable === 'true' || this.fieldForm.is_nullable === true,
             }
@@ -295,7 +298,7 @@ function basesManagement() {
                 
                 ShowMessage(this.editMode ? '字段更新成功' : '字段创建成功');
                 this.closeFieldForm();
-                this.openFieldPanel({ id: this.fields[0].entity_id });
+                // this.openFieldPanel({ id: this.currentEntityId });
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -328,6 +331,7 @@ function basesManagement() {
                 default: '',
                 description: ''
             };
+            this.openFieldPanel({ id: this.currentEntityId });
         },
 
         // 打开数据面板
@@ -349,6 +353,7 @@ function basesManagement() {
                 this.fields = fieldsData.fields;
                 this.entityData = dataData.data;
                 this.showDataPanel = true;
+                this.currentEntityId = entity.id;
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -359,7 +364,7 @@ function basesManagement() {
         // 关闭数据面板
         closeDataPanel() {
             this.showDataPanel = false;
-            this.fields = [];
+            // this.fields = [];
             this.entityData = [];
         },
 
@@ -405,6 +410,11 @@ function basesManagement() {
             
             // 验证表单
             if (!this.validateDataForm()) return;
+
+            const fieldDataForm = {
+                ...this.dataForm,
+                entity_id: parseInt(this.currentEntityId) || 0,
+            }
             
             try {
                 this.loading = true;
@@ -415,13 +425,13 @@ function basesManagement() {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.dataForm)
+                    body: JSON.stringify(fieldDataForm)
                 });
                 if (!response.ok) throw new Error('保存数据失败');
                 
                 ShowMessage(this.editMode ? '数据更新成功' : '数据创建成功');
                 this.closeDataForm();
-                this.openDataPanel({ id: this.entityData[0].entity_id });
+                // this.openDataPanel({ id: this.currentEntityId });
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -444,6 +454,7 @@ function basesManagement() {
         closeDataForm() {
             this.showDataForm = false;
             this.dataForm = {};
+            this.openDataPanel({ id: this.currentEntityId });
         },
 
         // 格式化日期
