@@ -1,120 +1,177 @@
 package bases
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 
 	"github.com/andycai/goapi/models"
-	"gorm.io/gorm"
 )
 
-// QueryEntities 获取实体列表
-func QueryEntities(limit, page int, search string) ([]models.Entity, int64, error) {
-	var entities []models.Entity
-	var total int64
-
-	query := app.DB.Model(&models.Entity{})
-
-	if search != "" {
-		query = query.Where("name LIKE ? OR table_name LIKE ?", "%"+search+"%", "%"+search+"%")
-	}
-
-	if err := query.Count(&total).Error; err != nil {
+// QueryEntities 查询实体列表
+func QueryEntities(limit, page int, search string) ([]*EntityResponse, int64, error) {
+	entities, total, err := getEntities(limit, page, search)
+	if err != nil {
 		return nil, 0, err
 	}
 
-	offset := (page - 1) * limit
-	if err := query.Offset(offset).Limit(limit).Find(&entities).Error; err != nil {
-		return nil, 0, err
+	responses := make([]*EntityResponse, len(entities))
+	for i, entity := range entities {
+		responses[i] = &EntityResponse{
+			ID:          entity.ID,
+			Name:        entity.Name,
+			TableName:   entity.TableName,
+			Description: entity.Description,
+			CreatedAt:   entity.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:   entity.UpdatedAt.Format("2006-01-02 15:04:05"),
+			CreatedBy:   entity.CreatedBy,
+			UpdatedBy:   entity.UpdatedBy,
+		}
 	}
 
-	return entities, total, nil
+	return responses, total, nil
 }
 
-// QueryEntity 获取单个实体
-func QueryEntity(id uint) (*models.Entity, error) {
-	var entity models.Entity
-	if err := app.DB.First(&entity, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrEntityNotFound
-		}
+// QueryEntity 查询单个实体
+func QueryEntity(id uint) (*EntityResponse, error) {
+	entity, err := getEntity(id)
+	if err != nil {
 		return nil, err
 	}
-	return &entity, nil
+
+	return &EntityResponse{
+		ID:          entity.ID,
+		Name:        entity.Name,
+		TableName:   entity.TableName,
+		Description: entity.Description,
+		CreatedAt:   entity.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:   entity.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedBy:   entity.CreatedBy,
+		UpdatedBy:   entity.UpdatedBy,
+	}, nil
 }
 
-// QueryFields 获取字段列表
-func QueryFields(entityID uint, limit, page int, search string) ([]models.Field, int64, error) {
-	var fields []models.Field
-	var total int64
-
-	query := app.DB.Model(&models.Field{}).Where("entity_id = ?", entityID)
-
-	if search != "" {
-		query = query.Where("name LIKE ?", "%"+search+"%")
-	}
-
-	if err := query.Count(&total).Error; err != nil {
+// QueryFields 查询字段列表
+func QueryFields(entityID uint, limit, page int, search string) ([]*FieldResponse, int64, error) {
+	fields, total, err := getFields(entityID, limit, page, search)
+	if err != nil {
 		return nil, 0, err
 	}
 
-	offset := (page - 1) * limit
-	if err := query.Offset(offset).Limit(limit).Find(&fields).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return fields, total, nil
-}
-
-// QueryField 获取单个字段
-func QueryField(id uint) (*models.Field, error) {
-	var field models.Field
-	if err := app.DB.First(&field, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrFieldNotFound
+	responses := make([]*FieldResponse, len(fields))
+	for i, field := range fields {
+		responses[i] = &FieldResponse{
+			ID:          field.ID,
+			EntityID:    field.EntityID,
+			Name:        field.Name,
+			Type:        field.Type,
+			Length:      field.Length,
+			IsNullable:  field.IsNullable,
+			IsUnique:    field.IsUnique,
+			Default:     field.Default,
+			Description: field.Description,
+			CreatedAt:   field.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:   field.UpdatedAt.Format("2006-01-02 15:04:05"),
+			CreatedBy:   field.CreatedBy,
+			UpdatedBy:   field.UpdatedBy,
 		}
+	}
+
+	return responses, total, nil
+}
+
+// QueryField 查询单个字段
+func QueryField(id uint) (*FieldResponse, error) {
+	field, err := getField(id)
+	if err != nil {
 		return nil, err
 	}
-	return &field, nil
+
+	return &FieldResponse{
+		ID:          field.ID,
+		EntityID:    field.EntityID,
+		Name:        field.Name,
+		Type:        field.Type,
+		Length:      field.Length,
+		IsNullable:  field.IsNullable,
+		IsUnique:    field.IsUnique,
+		Default:     field.Default,
+		Description: field.Description,
+		CreatedAt:   field.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:   field.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedBy:   field.CreatedBy,
+		UpdatedBy:   field.UpdatedBy,
+	}, nil
 }
 
-// QueryEntityData 获取实体数据列表
-func QueryEntityData(entityID uint, limit, page int) ([]models.EntityData, int64, error) {
-	var data []models.EntityData
-	var total int64
-
-	query := app.DB.Model(&models.EntityData{}).Where("entity_id = ?", entityID)
-
-	if err := query.Count(&total).Error; err != nil {
+// QueryEntityData 查询实体数据列表
+func QueryEntityData(entityID uint, limit, page int) ([]*EntityDataResponse, int64, error) {
+	data, total, err := getEntityData(entityID, limit, page)
+	if err != nil {
 		return nil, 0, err
 	}
 
-	offset := (page - 1) * limit
-	if err := query.Offset(offset).Limit(limit).Find(&data).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return data, total, nil
-}
-
-// QueryEntityDataByID 获取单个实体数据
-func QueryEntityDataByID(id uint) (*models.EntityData, error) {
-	var data models.EntityData
-	if err := app.DB.First(&data, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrDataNotFound
+	responses := make([]*EntityDataResponse, len(data))
+	for i, d := range data {
+		// 解析JSON数据
+		var fields map[string]interface{}
+		if d.Data != "" {
+			if err := json.Unmarshal([]byte(d.Data), &fields); err != nil {
+				// 解析失败时使用空对象
+				fields = make(map[string]interface{})
+			}
+		} else {
+			fields = make(map[string]interface{})
 		}
+
+		responses[i] = &EntityDataResponse{
+			ID:        d.ID,
+			EntityID:  d.EntityID,
+			Data:      fields,
+			CreatedAt: d.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt: d.UpdatedAt.Format("2006-01-02 15:04:05"),
+			CreatedBy: d.CreatedBy,
+			UpdatedBy: d.UpdatedBy,
+		}
+	}
+
+	return responses, total, nil
+}
+
+// QueryEntityDataByID 查询单个实体数据
+func QueryEntityDataByID(id uint) (*EntityDataResponse, error) {
+	data, err := getEntityDataByID(id)
+	if err != nil {
 		return nil, err
 	}
-	return &data, nil
+
+	// 解析JSON数据
+	var fields map[string]interface{}
+	if data.Data != "" {
+		if err := json.Unmarshal([]byte(data.Data), &fields); err != nil {
+			// 解析失败时使用空对象
+			fields = make(map[string]interface{})
+		}
+	} else {
+		fields = make(map[string]interface{})
+	}
+
+	return &EntityDataResponse{
+		ID:        data.ID,
+		EntityID:  data.EntityID,
+		Data:      fields,
+		CreatedAt: data.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: data.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedBy: data.CreatedBy,
+		UpdatedBy: data.UpdatedBy,
+	}, nil
 }
 
 // ValidateEntityData 验证实体数据
 func ValidateEntityData(entityID uint, data map[string]interface{}) error {
-	// 获取实体的所有字段
-	var fields []models.Field
-	if err := app.DB.Where("entity_id = ?", entityID).Find(&fields).Error; err != nil {
-		return fmt.Errorf("获取字段失败: %v", err)
+	// 查询实体的所有字段
+	fields, err := getEntityFields(entityID)
+	if err != nil {
+		return err
 	}
 
 	// 验证每个字段
@@ -130,6 +187,19 @@ func ValidateEntityData(entityID uint, data map[string]interface{}) error {
 		// 验证字段类型
 		if err := validateFieldValue(field.Type, value); err != nil {
 			return fmt.Errorf("字段 %s 的值类型错误: %v", field.Name, err)
+		}
+
+		// 验证唯一性
+		if field.IsUnique {
+			var count int64
+			if err := app.DB.Model(&models.EntityData{}).
+				Where("entity_id = ? AND data->>'$.%s' = ?", entityID, field.Name, value).
+				Count(&count).Error; err != nil {
+				return err
+			}
+			if count > 0 {
+				return fmt.Errorf("字段 %s 的值必须唯一", field.Name)
+			}
 		}
 	}
 
@@ -155,11 +225,7 @@ func validateFieldValue(fieldType string, value interface{}) error {
 		if _, ok := value.(bool); !ok {
 			return fmt.Errorf("期望布尔类型")
 		}
-	case "date":
-		if _, ok := value.(string); !ok {
-			return fmt.Errorf("期望日期类型")
-		}
-	case "datetime":
+	case "date", "datetime":
 		if _, ok := value.(string); !ok {
 			return fmt.Errorf("期望日期时间类型")
 		}

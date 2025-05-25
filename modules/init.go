@@ -2,6 +2,7 @@ package modules
 
 // 新增的模块必须在这里进行导入，不然模块 init 方法不会执行
 import (
+	_ "github.com/andycai/goapi/modules/datacenter/bases"     // 基础数据管理
 	_ "github.com/andycai/goapi/modules/datacenter/dict"      // 字典
 	_ "github.com/andycai/goapi/modules/datacenter/page"      // 静态页面
 	_ "github.com/andycai/goapi/modules/datacenter/parameter" // 参数配置

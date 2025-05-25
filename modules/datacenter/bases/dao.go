@@ -71,12 +71,29 @@ func deleteEntity(id uint) error {
 }
 
 // 获取字段列表
-func getFields(entityID uint) ([]models.Field, error) {
+func getFields(entityID uint, limit, page int, search string) ([]models.Field, int64, error) {
 	var fields []models.Field
-	if err := app.DB.Where("entity_id = ?", entityID).Order("id").Find(&fields).Error; err != nil {
-		return nil, err
+	var total int64
+	offset := (page - 1) * limit
+
+	query := app.DB.Model(&models.Field{}).Where("entity_id = ?", entityID)
+
+	// 如果有搜索条件
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
 	}
-	return fields, nil
+
+	// 获取总数
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 获取分页数据
+	if err := query.Limit(limit).Offset(offset).Order("id DESC").Find(&fields).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return fields, total, nil
 }
 
 // 获取单个字段
@@ -84,7 +101,7 @@ func getField(id uint) (models.Field, error) {
 	var field models.Field
 	if err := app.DB.First(&field, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return field, errors.New("字段不存在")
+			return field, ErrFieldNotFound
 		}
 		return field, err
 	}
@@ -107,7 +124,7 @@ func deleteField(id uint) error {
 	var field models.Field
 	if err := app.DB.First(&field, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("字段不存在")
+			return ErrFieldNotFound
 		}
 		return err
 	}
@@ -141,7 +158,7 @@ func getEntityDataByID(id uint) (models.EntityData, error) {
 	var data models.EntityData
 	if err := app.DB.First(&data, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return data, errors.New("数据不存在")
+			return data, ErrDataNotFound
 		}
 		return data, err
 	}
@@ -164,7 +181,7 @@ func deleteEntityData(id uint) error {
 	var data models.EntityData
 	if err := app.DB.First(&data, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("数据不存在")
+			return ErrDataNotFound
 		}
 		return err
 	}
@@ -174,7 +191,7 @@ func deleteEntityData(id uint) error {
 
 // 验证实体数据
 func validateEntityData(entityID uint, data map[string]interface{}) error {
-	fields, err := getFields(entityID)
+	fields, err := getEntityFields(entityID)
 	if err != nil {
 		return err
 	}
@@ -222,4 +239,13 @@ func validateEntityData(entityID uint, data map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+// 获取实体的所有字段
+func getEntityFields(entityID uint) ([]models.Field, error) {
+	var fields []models.Field
+	if err := app.DB.Where("entity_id = ?", entityID).Order("id").Find(&fields).Error; err != nil {
+		return nil, err
+	}
+	return fields, nil
 }
