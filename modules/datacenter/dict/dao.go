@@ -42,6 +42,18 @@ func getDictTypeByType(typeCode string) (models.DictType, error) {
 	return dictType, nil
 }
 
+// 根据ID获取字典类型
+func getDictTypeByID(id int64) (models.DictType, error) {
+	var dictType models.DictType
+	if err := app.DB.First(&dictType, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return dictType, ErrDictTypeNotFound
+		}
+		return dictType, err
+	}
+	return dictType, nil
+}
+
 // 添加字典类型
 func addDictType(dictType *models.DictType) error {
 	// 检查类型是否已存在
@@ -134,6 +146,38 @@ func getDictDataList(typeCode string, page, limit int) ([]models.DictData, int64
 	return dictData, total, nil
 }
 
+// 根据字典类型ID获取字典数据列表
+func getDictDataListByTypeID(typeID int64, page, limit int) ([]models.DictData, int64, error) {
+	var dictData []models.DictData
+	var total int64
+
+	db := app.DB.Model(&models.DictData{}).Where("type_id = ?", typeID)
+	db.Count(&total)
+
+	if page > 0 && limit > 0 {
+		offset := (page - 1) * limit
+		db = db.Offset(offset).Limit(limit)
+	}
+
+	if err := db.Order("sort").Find(&dictData).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return dictData, total, nil
+}
+
+// 根据ID获取字典数据
+func getDictDataByID(id int64) (models.DictData, error) {
+	var dictData models.DictData
+	if err := app.DB.First(&dictData, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return dictData, ErrDictDataNotFound
+		}
+		return dictData, err
+	}
+	return dictData, nil
+}
+
 // 获取所有字典数据（不分页）
 func getAllDictData(typeCode string) ([]models.DictData, error) {
 	var dictData []models.DictData
@@ -147,7 +191,7 @@ func getAllDictData(typeCode string) ([]models.DictData, error) {
 func addDictData(dictData *models.DictData) error {
 	// 检查字典类型是否存在
 	var count int64
-	if err := app.DB.Model(&models.DictType{}).Where("type = ?", dictData.Type).Count(&count).Error; err != nil {
+	if err := app.DB.Model(&models.DictType{}).Where("id = ?", dictData.TypeID).Count(&count).Error; err != nil {
 		return err
 	}
 
@@ -174,7 +218,7 @@ func updateDictData(dictData *models.DictData) error {
 
 	// 更新字段
 	updates := map[string]interface{}{
-		"type":       dictData.Type,
+		"type_id":    dictData.TypeID,
 		"label":      dictData.Label,
 		"value":      dictData.Value,
 		"sort":       dictData.Sort,

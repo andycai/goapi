@@ -18,6 +18,7 @@ function dictManagement() {
         totalDataRecords: 0,
         dataPages: 1,
         // 当前选中的字典类型
+        currentDictTypeID: 0,
         currentDictType: '',
         currentDictTypeName: '',
         // 表单数据
@@ -68,7 +69,7 @@ function dictManagement() {
             if (!this.currentDictType) return;
             
             try {
-                const response = await fetch(`/api/admin/dict/data/list?type=${this.currentDictType}&page=${this.currentDataPage}&limit=${this.dataPageSize}`);
+                const response = await fetch(`/api/admin/dict/data/list?type_id=${this.currentDictTypeID}&page=${this.currentDataPage}&limit=${this.dataPageSize}`);
                 if (!response.ok) throw new Error('加载字典数据失败');
                 const data = await response.json();
                 this.dictData = data.dictData;
@@ -94,7 +95,8 @@ function dictManagement() {
         },
 
         // 查看字典数据
-        async viewDictData(type, name) {
+        async viewDictData(type_id, type, name) {
+            this.currentDictTypeID = type_id;
             this.currentDictType = type;
             this.currentDictTypeName = name;
             this.showDictData = true;
@@ -219,6 +221,7 @@ function dictManagement() {
             
             this.dataForm = {
                 id: 0,
+                type_id: this.currentDictTypeID,
                 type: this.currentDictType,
                 label: '',
                 value: '',
@@ -233,6 +236,7 @@ function dictManagement() {
         openEditDataModal(dictData) {
             this.dataForm = {
                 id: dictData.id,
+                type_id: dictData.type_id,
                 type: dictData.type,
                 label: dictData.label,
                 value: dictData.value,
@@ -248,6 +252,7 @@ function dictManagement() {
             this.showDataPanel = false;
             this.dataForm = {
                 id: 0,
+                type_id: 0,
                 type: '',
                 label: '',
                 value: '',

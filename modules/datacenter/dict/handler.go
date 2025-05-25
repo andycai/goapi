@@ -144,10 +144,10 @@ func deleteDictTypeHandler(c *fiber.Ctx) error {
 
 // listDictDataHandler 获取字典数据列表
 func listDictDataHandler(c *fiber.Ctx) error {
-	typeCode := c.Query("type")
-	if typeCode == "" {
+	typeID, err := strconv.ParseInt(c.Query("type_id"), 10, 64)
+	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "字典类型不能为空",
+			"error": "字典类型ID不能为空",
 		})
 	}
 
@@ -163,7 +163,7 @@ func listDictDataHandler(c *fiber.Ctx) error {
 	}
 
 	// 首先检查字典类型是否存在
-	_, err = QueryDictTypeByType(typeCode)
+	_, err = QueryDictTypeByID(typeID)
 	if err != nil {
 		if err == ErrDictTypeNotFound {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -175,7 +175,7 @@ func listDictDataHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	dictData, total, err := QueryDictDataList(typeCode, page, limit)
+	dictData, total, err := QueryDictDataListByTypeID(typeID, page, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "获取字典数据列表失败: " + err.Error(),
@@ -198,9 +198,9 @@ func addDictDataHandler(c *fiber.Ctx) error {
 	}
 
 	// 验证必填字段
-	if dictData.Type == "" || dictData.Label == "" || dictData.Value == "" {
+	if dictData.TypeID == 0 || dictData.Label == "" || dictData.Value == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "类型、标签和值不能为空",
+			"error": "类型ID、标签和值不能为空",
 		})
 	}
 
@@ -231,9 +231,9 @@ func editDictDataHandler(c *fiber.Ctx) error {
 	}
 
 	// 验证必填字段
-	if dictData.ID == 0 || dictData.Type == "" || dictData.Label == "" || dictData.Value == "" {
+	if dictData.ID == 0 || dictData.Label == "" || dictData.Value == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "ID、类型、标签和值不能为空",
+			"error": "ID、标签和值不能为空",
 		})
 	}
 
