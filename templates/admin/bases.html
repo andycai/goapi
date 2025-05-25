@@ -321,9 +321,9 @@
                 <!-- 面板底部按钮 -->
                 <div class="mt-6 flex justify-end space-x-3">
                     <button type="button" 
-                            @click="closeFieldForm()"
+                            @click="backToFieldList()"
                             class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200">
-                        取消
+                        返回列表
                     </button>
                     <button type="submit" 
                             :disabled="loading"
@@ -472,9 +472,9 @@
                 <!-- 面板底部按钮 -->
                 <div class="mt-6 flex justify-end space-x-3">
                     <button type="button" 
-                            @click="closeDataForm()"
+                            @click="backToDataList()"
                             class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200">
-                        取消
+                        返回列表
                     </button>
                     <button type="submit" 
                             :disabled="loading"

@@ -297,8 +297,7 @@ function basesManagement() {
                 if (!response.ok) throw new Error('保存字段失败');
                 
                 ShowMessage(this.editMode ? '字段更新成功' : '字段创建成功');
-                this.closeFieldForm();
-                // this.openFieldPanel({ id: this.currentEntityId });
+                this.backToFieldList();
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -331,6 +330,11 @@ function basesManagement() {
                 default: '',
                 description: ''
             };
+        },
+
+        // 返回字段列表
+        backToFieldList() {
+            this.closeFieldForm();
             this.openFieldPanel({ id: this.currentEntityId });
         },
 
@@ -472,8 +476,7 @@ function basesManagement() {
                 if (!response.ok) throw new Error('保存数据失败');
                 
                 ShowMessage(this.editMode ? '数据更新成功' : '数据创建成功');
-                this.closeDataForm();
-                // this.openDataPanel({ id: this.currentEntityId });
+                this.backToDataList
             } catch (error) {
                 ShowError(error.message);
             } finally {
@@ -496,6 +499,11 @@ function basesManagement() {
         closeDataForm() {
             this.showDataForm = false;
             this.dataForm = {};
+        },
+
+        // 返回数据列表
+        backToDataList() {
+            this.closeDataForm();
             this.openDataPanel({ id: this.currentEntityId });
         },
 
