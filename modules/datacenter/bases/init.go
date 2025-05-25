@@ -42,7 +42,7 @@ func initMenus() error {
 			ParentID:   enum.MenuIdSystem,
 			Name:       "数据管理",
 			Path:       "/admin/bases",
-			Icon:       "database",
+			Icon:       "bases",
 			Sort:       10,
 			Permission: "bases:view",
 			IsShow:     true,
