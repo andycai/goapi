@@ -19,7 +19,7 @@ func QueryEntities(limit, page int, search string) ([]*EntityResponse, int64, er
 		responses[i] = &EntityResponse{
 			ID:          entity.ID,
 			Name:        entity.Name,
-			TableName:   entity.TableName,
+			BasesName:   entity.BasesName,
 			Description: entity.Description,
 			CreatedAt:   entity.CreatedAt.Format("2006-01-02 15:04:05"),
 			UpdatedAt:   entity.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -41,7 +41,7 @@ func QueryEntity(id uint) (*EntityResponse, error) {
 	return &EntityResponse{
 		ID:          entity.ID,
 		Name:        entity.Name,
-		TableName:   entity.TableName,
+		BasesName:   entity.BasesName,
 		Description: entity.Description,
 		CreatedAt:   entity.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   entity.UpdatedAt.Format("2006-01-02 15:04:05"),

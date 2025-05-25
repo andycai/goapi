@@ -15,7 +15,7 @@ var (
 type EntityResponse struct {
 	ID          uint   `json:"id"`
 	Name        string `json:"name"`
-	TableName   string `json:"table_name"`
+	BasesName   string `json:"bases_name"`
 	Description string `json:"description"`
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
@@ -54,7 +54,7 @@ type EntityDataResponse struct {
 // EntityRequest 实体请求
 type EntityRequest struct {
 	Name        string `json:"name" binding:"required"`
-	TableName   string `json:"table_name" binding:"required"`
+	BasesName   string `json:"bases_name" binding:"required"`
 	Description string `json:"description"`
 }
 

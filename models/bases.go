@@ -8,12 +8,17 @@ import (
 type Entity struct {
 	ID          uint      `gorm:"primarykey" json:"id"`
 	Name        string    `gorm:"size:100;not null" json:"name"`       // 实体名称
-	TableName   string    `gorm:"size:100;not null" json:"table_name"` // 表名
+	BasesName   string    `gorm:"size:100;not null" json:"bases_name"` // 表名
 	Description string    `gorm:"size:500" json:"description"`         // 描述
 	CreatedAt   time.Time `json:"created_at"`                          // 创建时间
 	UpdatedAt   time.Time `json:"updated_at"`                          // 更新时间
 	CreatedBy   uint      `gorm:"not null" json:"created_by"`          // 创建者
 	UpdatedBy   uint      `gorm:"not null" json:"updated_by"`          // 更新者
+}
+
+// TableName specifies the table name for the Entity model
+func (Entity) TableName() string {
+	return "bases_entities"
 }
 
 // Field 字段定义
@@ -33,6 +38,11 @@ type Field struct {
 	UpdatedBy   uint      `gorm:"not null" json:"updated_by"`    // 更新者
 }
 
+// TableName specifies the table name for the Field model
+func (Field) TableName() string {
+	return "bases_fields"
+}
+
 // EntityData 实体数据
 type EntityData struct {
 	ID        uint      `gorm:"primarykey" json:"id"`
@@ -42,4 +52,9 @@ type EntityData struct {
 	UpdatedAt time.Time `json:"updated_at"`                     // 更新时间
 	CreatedBy uint      `gorm:"not null" json:"created_by"`     // 创建者
 	UpdatedBy uint      `gorm:"not null" json:"updated_by"`     // 更新者
+}
+
+// TableName specifies the table name for the EntityData model
+func (EntityData) TableName() string {
+	return "bases_entity_data"
 }

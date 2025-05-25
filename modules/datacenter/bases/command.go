@@ -70,14 +70,14 @@ func CommandCreateEntity(req *EntityRequest, userID uint) (*EntityResponse, erro
 		return nil, errors.New("实体名称不能为空")
 	}
 
-	if req.TableName == "" {
+	if req.BasesName == "" {
 		return nil, errors.New("表名不能为空")
 	}
 
 	// 创建实体
 	entity := &models.Entity{
 		Name:        req.Name,
-		TableName:   req.TableName,
+		BasesName:   req.BasesName,
 		Description: req.Description,
 		CreatedBy:   userID,
 		UpdatedBy:   userID,
@@ -91,7 +91,7 @@ func CommandCreateEntity(req *EntityRequest, userID uint) (*EntityResponse, erro
 	return &EntityResponse{
 		ID:          entity.ID,
 		Name:        entity.Name,
-		TableName:   entity.TableName,
+		BasesName:   entity.BasesName,
 		Description: entity.Description,
 		CreatedAt:   entity.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   entity.UpdatedAt.Format("2006-01-02 15:04:05"),
@@ -113,13 +113,13 @@ func CommandUpdateEntity(id uint, req *EntityRequest, userID uint) (*EntityRespo
 		return nil, errors.New("实体名称不能为空")
 	}
 
-	if req.TableName == "" {
+	if req.BasesName == "" {
 		return nil, errors.New("表名不能为空")
 	}
 
 	// 更新实体
 	entity.Name = req.Name
-	entity.TableName = req.TableName
+	entity.BasesName = req.BasesName
 	entity.Description = req.Description
 	entity.UpdatedBy = userID
 	entity.UpdatedAt = time.Now()
@@ -132,7 +132,7 @@ func CommandUpdateEntity(id uint, req *EntityRequest, userID uint) (*EntityRespo
 	return &EntityResponse{
 		ID:          entity.ID,
 		Name:        entity.Name,
-		TableName:   entity.TableName,
+		BasesName:   entity.BasesName,
 		Description: entity.Description,
 		CreatedAt:   entity.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   entity.UpdatedAt.Format("2006-01-02 15:04:05"),

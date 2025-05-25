@@ -24,7 +24,7 @@ function basesManagement() {
         // 表单数据
         form: {
             name: '',
-            table_name: '',
+            bases_name: '',
             description: ''
         },
         fieldForm: {
@@ -118,7 +118,7 @@ function basesManagement() {
             this.editMode = false;
             this.form = {
                 name: '',
-                table_name: '',
+                bases_name: '',
                 description: ''
             };
             this.showPanel = true;
@@ -186,7 +186,7 @@ function basesManagement() {
                 ShowError('实体名称不能为空');
                 return false;
             }
-            if (!this.form.table_name.trim()) {
+            if (!this.form.bases_name.trim()) {
                 ShowError('表名不能为空');
                 return false;
             }
@@ -198,7 +198,7 @@ function basesManagement() {
             this.showPanel = false;
             this.form = {
                 name: '',
-                table_name: '',
+                bases_name: '',
                 description: ''
             };
         },
