@@ -1,7 +1,6 @@
+# Goapi
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/andycai/goapi)
-
-# Goapi
 
 Goapi is a comprehensive web-based management platform designed for Unity
 game development teams. It provides a suite of tools and services to streamline
