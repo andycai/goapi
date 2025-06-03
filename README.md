@@ -1,3 +1,6 @@
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/andycai/goapi)
+
 # Goapi
 
 Goapi is a comprehensive web-based management platform designed for Unity
