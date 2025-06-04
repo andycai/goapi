@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andycai/goapi/core/utility/path"
+	"github.com/andycai/goapi/pkg/utility/path"
 )
 
 var config *PatchConfig

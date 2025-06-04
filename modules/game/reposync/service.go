@@ -14,10 +14,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andycai/goapi/core/utility/path"
 	"github.com/andycai/goapi/models"
 	"github.com/andycai/goapi/modules/interface/git"
 	"github.com/andycai/goapi/modules/interface/svn"
+	"github.com/andycai/goapi/pkg/utility/path"
 )
 
 var config *RepoConfig

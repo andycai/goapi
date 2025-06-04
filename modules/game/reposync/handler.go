@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/andycai/goapi/core/utility/path"
 	"github.com/andycai/goapi/models"
+	"github.com/andycai/goapi/pkg/utility/path"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -3,7 +3,7 @@ package patch
 import (
 	"strconv"
 
-	"github.com/andycai/goapi/core/utility/path"
+	"github.com/andycai/goapi/pkg/utility/path"
 	"github.com/gofiber/fiber/v2"
 )
 

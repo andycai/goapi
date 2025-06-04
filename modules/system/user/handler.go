@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/andycai/goapi/models"
 	"github.com/andycai/goapi/modules/system/adminlog"
 	"github.com/gofiber/fiber/v2"
@@ -27,7 +27,7 @@ func listUsersHandler(c *fiber.Ctx) error {
 
 	users, total, err := QueryUserList(page, limit)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(core.Response{
+		return c.Status(fiber.StatusInternalServerError).JSON(internal.Response{
 			Code:    1,
 			Message: "获取用户列表失败: " + err.Error(),
 		})
@@ -38,7 +38,7 @@ func listUsersHandler(c *fiber.Ctx) error {
 	// 	return c.Status(500).JSON(fiber.Map{"error": "获取用户列表失败"})
 	// }
 
-	var response = core.Response{
+	var response = internal.Response{
 		Code: 0,
 		Data: fiber.Map{
 			"users": users,
