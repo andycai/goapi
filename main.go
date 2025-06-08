@@ -10,8 +10,8 @@ import (
 
 	"github.com/andycai/goapi/core"
 	_ "github.com/andycai/goapi/docs" // 导入 swagger docs
-	"github.com/andycai/goapi/lib/database"
 	_ "github.com/andycai/goapi/modules"
+	"github.com/andycai/goapi/pkg/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/swagger"

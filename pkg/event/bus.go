@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/andycai/goapi/lib/work"
+	"github.com/andycai/goapi/pkg/work"
 )
 
 // Event 定义了事件的基础接口，所有事件都应可被断言为 interface{}

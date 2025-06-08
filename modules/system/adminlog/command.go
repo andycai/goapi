@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/andycai/goapi/events"
-	"github.com/andycai/goapi/lib/event"
 	"github.com/andycai/goapi/models"
+	"github.com/andycai/goapi/pkg/event"
 )
 
 func subscribeEvents(bus *event.EventBus) {

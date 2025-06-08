@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/andycai/goapi/events"
-	"github.com/andycai/goapi/lib/event"
 	"github.com/andycai/goapi/modules/system/adminlog"
+	"github.com/andycai/goapi/pkg/event"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jlaffaye/ftp"
 	"github.com/saintfish/chardet"
