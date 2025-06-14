@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/andycai/goapi/core/collections"
+	"github.com/andycai/goapi/pkg/collections"
 )
 
 type Module interface {
