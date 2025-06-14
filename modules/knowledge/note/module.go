@@ -1,22 +1,22 @@
 package note
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 )
 
 const ModulePriorityNote = 5001 // 功能-笔记
 
-var app *core.App
+var app *internal.App
 
 type noteModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&noteModule{}, ModulePriorityNote)
+	internal.RegisterModule(&noteModule{}, ModulePriorityNote)
 }
 
-func (m *noteModule) Awake(a *core.App) error {
+func (m *noteModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

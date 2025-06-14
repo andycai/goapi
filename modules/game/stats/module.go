@@ -1,23 +1,23 @@
 package stats
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityStats = 9903 // 游戏-游戏统计
 
-var app *core.App
+var app *internal.App
 
 type statsModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&statsModule{}, ModulePriorityStats)
+	internal.RegisterModule(&statsModule{}, ModulePriorityStats)
 }
 
-func (m *statsModule) Awake(a *core.App) error {
+func (m *statsModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

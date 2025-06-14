@@ -1,23 +1,23 @@
 package channel
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityChannel = 9907 // 游戏-渠道管理
 
-var app *core.App
+var app *internal.App
 
 type channelModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&channelModule{}, ModulePriorityChannel)
+	internal.RegisterModule(&channelModule{}, ModulePriorityChannel)
 }
 
-func (m *channelModule) Awake(a *core.App) error {
+func (m *channelModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

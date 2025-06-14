@@ -1,7 +1,7 @@
 package menu
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,18 +9,18 @@ const (
 	ModulePriorityMenu = 1004 // 系统-菜单管理
 )
 
-var app *core.App
+var app *internal.App
 var dao *MenuDao
 
 type menuModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&menuModule{}, ModulePriorityMenu)
+	internal.RegisterModule(&menuModule{}, ModulePriorityMenu)
 }
 
-func (m *menuModule) Awake(a *core.App) error {
+func (m *menuModule) Awake(a *internal.App) error {
 	app = a
 	if err := autoMigrate(); err != nil {
 		return err

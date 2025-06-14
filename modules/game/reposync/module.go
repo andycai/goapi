@@ -1,23 +1,23 @@
 package reposync
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityRepoSync = 9906 // 游戏-仓库同步
 
-var app *core.App
+var app *internal.App
 
 type reposyncModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&reposyncModule{}, ModulePriorityRepoSync)
+	internal.RegisterModule(&reposyncModule{}, ModulePriorityRepoSync)
 }
 
-func (m *reposyncModule) Awake(a *core.App) error {
+func (m *reposyncModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

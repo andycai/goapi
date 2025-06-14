@@ -1,23 +1,23 @@
 package patch
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityPatch = 9905 // 游戏-热更新
 
-var app *core.App
+var app *internal.App
 
 type patchModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&patchModule{}, ModulePriorityPatch)
+	internal.RegisterModule(&patchModule{}, ModulePriorityPatch)
 }
 
-func (m *patchModule) Awake(a *core.App) error {
+func (m *patchModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

@@ -1,7 +1,7 @@
 package page
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityPage = 2002 // 数据中心-页面管理
 )
 
-var app *core.App
+var app *internal.App
 
 type pageModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&pageModule{}, ModulePriorityPage)
+	internal.RegisterModule(&pageModule{}, ModulePriorityPage)
 }
 
-func (m *pageModule) Awake(a *core.App) error {
+func (m *pageModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

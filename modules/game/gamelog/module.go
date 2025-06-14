@@ -1,23 +1,23 @@
 package gamelog
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityGameLog = 9902 // 游戏-游戏日志
 
-var app *core.App
+var app *internal.App
 
 type gamelogModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&gamelogModule{}, ModulePriorityGameLog)
+	internal.RegisterModule(&gamelogModule{}, ModulePriorityGameLog)
 }
 
-func (m *gamelogModule) Awake(a *core.App) error {
+func (m *gamelogModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	return autoMigrate()

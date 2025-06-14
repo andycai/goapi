@@ -1,22 +1,22 @@
 package shell
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 )
 
 const ModulePriorityShell = 9001 // 接口-shell脚本
 
-var app *core.App
+var app *internal.App
 
 type shellModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&shellModule{}, ModulePriorityShell)
+	internal.RegisterModule(&shellModule{}, ModulePriorityShell)
 }
 
-func (m *shellModule) Awake(a *core.App) error {
+func (m *shellModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

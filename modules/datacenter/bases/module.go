@@ -1,7 +1,7 @@
 package bases
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityBases = 2002 // 数据中心-基础数据
 )
 
-var app *core.App
+var app *internal.App
 
 type basesModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&basesModule{}, ModulePriorityBases)
+	internal.RegisterModule(&basesModule{}, ModulePriorityBases)
 }
 
-func (m *basesModule) Awake(a *core.App) error {
+func (m *basesModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

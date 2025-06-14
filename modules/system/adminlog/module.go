@@ -1,7 +1,7 @@
 package adminlog
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityAdminLog = 1005 // 系统-管理员活动日志
 )
 
-var app *core.App
+var app *internal.App
 
 type adminlogModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&adminlogModule{}, ModulePriorityAdminLog)
+	internal.RegisterModule(&adminlogModule{}, ModulePriorityAdminLog)
 }
 
-func (m *adminlogModule) Awake(a *core.App) error {
+func (m *adminlogModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	return autoMigrate()

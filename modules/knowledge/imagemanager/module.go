@@ -1,23 +1,23 @@
 package imagemanager
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityImageManager = 5003 // 功能-图片管理
 
-var app *core.App
+var app *internal.App
 
 type imagemanagerModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&imagemanagerModule{}, ModulePriorityImageManager)
+	internal.RegisterModule(&imagemanagerModule{}, ModulePriorityImageManager)
 }
 
-func (m *imagemanagerModule) Awake(a *core.App) error {
+func (m *imagemanagerModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

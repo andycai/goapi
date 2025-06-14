@@ -1,23 +1,23 @@
 package bugtracker
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityBugTracker = 4003 // 功能-Bug 跟踪
 
-var app *core.App
+var app *internal.App
 
 type bugtrackerModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&bugtrackerModule{}, ModulePriorityBugTracker)
+	internal.RegisterModule(&bugtrackerModule{}, ModulePriorityBugTracker)
 }
 
-func (m *bugtrackerModule) Awake(a *core.App) error {
+func (m *bugtrackerModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	return autoMigrate()

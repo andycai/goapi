@@ -1,23 +1,23 @@
 package fund
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityFund = 5100 // 功能-基金管理
 
-var app *core.App
+var app *internal.App
 
 type fundModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&fundModule{}, ModulePriorityFund)
+	internal.RegisterModule(&fundModule{}, ModulePriorityFund)
 }
 
-func (m *fundModule) Awake(a *core.App) error {
+func (m *fundModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

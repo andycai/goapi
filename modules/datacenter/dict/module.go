@@ -1,7 +1,7 @@
 package dict
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityDict = 2000 // 数据中心-字典管理
 )
 
-var app *core.App
+var app *internal.App
 
 type dictModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&dictModule{}, ModulePriorityDict)
+	internal.RegisterModule(&dictModule{}, ModulePriorityDict)
 }
 
-func (m *dictModule) Awake(a *core.App) error {
+func (m *dictModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

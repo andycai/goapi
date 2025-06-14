@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andycai/goapi/core"
 	_ "github.com/andycai/goapi/docs" // 导入 swagger docs
+	"github.com/andycai/goapi/internal"
 	_ "github.com/andycai/goapi/modules"
 	"github.com/andycai/goapi/pkg/database"
 	"github.com/gofiber/fiber/v2"
@@ -40,12 +40,12 @@ var (
 // @BasePath /api/v1
 func main() {
 	// 加载配置文件
-	if err := core.LoadConfig(); err != nil {
+	if err := internal.LoadConfig(); err != nil {
 		log.Fatalf("无法加载配置文件: %v", err)
 	}
 
 	// 初始化数据库
-	dbConfig := core.GetDatabaseConfig()
+	dbConfig := internal.GetDatabaseConfig()
 	db, err := database.InitRDBMS(
 		os.Stdout,
 		dbConfig.Driver,
@@ -61,7 +61,7 @@ func main() {
 	// 初始化模板引擎
 	engine := html.New("./templates", ".html")
 
-	if core.IsDevelopment() {
+	if internal.IsDevelopment() {
 		engine.Reload(true) // 开发模式下启用模板重载
 		engine.Debug(true)  // 开发模式下启用调试信息
 	}
@@ -114,7 +114,7 @@ func main() {
 	})
 
 	// 配置 CORS 中间件
-	corsConfig := core.GetCorsConfig()
+	corsConfig := internal.GetCorsConfig()
 	if corsConfig.Enabled {
 		fiberApp.Use(cors.New(cors.Config{
 			AllowOrigins:     strings.Join(corsConfig.AllowedOrigins, ","),
@@ -132,7 +132,7 @@ func main() {
 		DocExpansion: "list",
 	}))
 
-	app := core.NewApp()
+	app := internal.NewApp()
 	app.Start([]*gorm.DB{db}, fiberApp)
 
 	// 启动服务器

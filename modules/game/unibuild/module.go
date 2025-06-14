@@ -1,22 +1,22 @@
 package unibuild
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 )
 
 const ModulePriorityUnibuild = 9911 // 游戏-游戏构建
 
-var app *core.App
+var app *internal.App
 
 type uniBuildModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&uniBuildModule{}, ModulePriorityUnibuild)
+	internal.RegisterModule(&uniBuildModule{}, ModulePriorityUnibuild)
 }
 
-func (m *uniBuildModule) Awake(a *core.App) error {
+func (m *uniBuildModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

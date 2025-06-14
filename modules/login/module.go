@@ -1,7 +1,7 @@
 package login
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityLogin = 100 // 登录管理
 )
 
-var app *core.App
+var app *internal.App
 
 type loginModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&loginModule{}, ModulePriorityLogin)
+	internal.RegisterModule(&loginModule{}, ModulePriorityLogin)
 }
 
-func (m *loginModule) Awake(a *core.App) error {
+func (m *loginModule) Awake(a *internal.App) error {
 	app = a
 	return nil
 }

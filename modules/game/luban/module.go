@@ -1,23 +1,23 @@
 package luban
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityLuban = 9909 // 游戏-游戏配置管理(Luban)
 
-var app *core.App
+var app *internal.App
 
 type lubanModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&lubanModule{}, ModulePriorityLuban)
+	internal.RegisterModule(&lubanModule{}, ModulePriorityLuban)
 }
 
-func (m *lubanModule) Awake(a *core.App) error {
+func (m *lubanModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	return autoMigrate()

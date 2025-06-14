@@ -1,7 +1,7 @@
 package post
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityPost = 2003 // 数据中心-文章管理
 )
 
-var app *core.App
+var app *internal.App
 
 type postModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&postModule{}, ModulePriorityPost)
+	internal.RegisterModule(&postModule{}, ModulePriorityPost)
 }
 
-func (m *postModule) Awake(a *core.App) error {
+func (m *postModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

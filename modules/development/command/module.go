@@ -1,23 +1,23 @@
 package command
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityCommand = 4001 // 功能-命令行
 
-var app *core.App
+var app *internal.App
 
 type commandModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&commandModule{}, ModulePriorityCommand)
+	internal.RegisterModule(&commandModule{}, ModulePriorityCommand)
 }
 
-func (m *commandModule) Awake(a *core.App) error {
+func (m *commandModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

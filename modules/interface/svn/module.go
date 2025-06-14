@@ -1,23 +1,23 @@
 package svn
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePrioritySVN = 9002 // 接口-SVN 接口
 
-var app *core.App
+var app *internal.App
 
 type svnModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&svnModule{}, ModulePrioritySVN)
+	internal.RegisterModule(&svnModule{}, ModulePrioritySVN)
 }
 
-func (m *svnModule) Awake(a *core.App) error {
+func (m *svnModule) Awake(a *internal.App) error {
 	app = a
 	return autoMigrate()
 }

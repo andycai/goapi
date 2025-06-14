@@ -1,23 +1,23 @@
 package gameconf
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityGameConf = 9908 // 游戏-游戏配置管理
 
-var app *core.App
+var app *internal.App
 
 type gameconfModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&gameconfModule{}, ModulePriorityGameConf)
+	internal.RegisterModule(&gameconfModule{}, ModulePriorityGameConf)
 }
 
-func (m *gameconfModule) Awake(a *core.App) error {
+func (m *gameconfModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

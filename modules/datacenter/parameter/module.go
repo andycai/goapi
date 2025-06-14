@@ -1,7 +1,7 @@
 package parameter
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityParameter = 2001 // 数据中心-参数管理
 )
 
-var app *core.App
+var app *internal.App
 
 type parameterModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&parameterModule{}, ModulePriorityParameter)
+	internal.RegisterModule(&parameterModule{}, ModulePriorityParameter)
 }
 
-func (m *parameterModule) Awake(a *core.App) error {
+func (m *parameterModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

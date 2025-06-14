@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/andycai/goapi/models"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +18,7 @@ func GetByID(id uint) *models.User {
 
 // Current 获取当前用户
 func Current(c *fiber.Ctx) *models.User {
-	isAuthenticated, userID := core.GetSession(c)
+	isAuthenticated, userID := internal.GetSession(c)
 
 	if !isAuthenticated {
 		return nil

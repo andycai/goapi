@@ -1,7 +1,7 @@
 package role
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityRole = 1001 // 系统-角色管理
 )
 
-var app *core.App
+var app *internal.App
 
 type roleModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&roleModule{}, ModulePriorityRole)
+	internal.RegisterModule(&roleModule{}, ModulePriorityRole)
 }
 
-func (m *roleModule) Awake(a *core.App) error {
+func (m *roleModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

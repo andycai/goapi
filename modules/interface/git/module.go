@@ -1,23 +1,23 @@
 package git
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityGit = 9003 // 接口-Git 接口
 
-var app *core.App
+var app *internal.App
 
 type gitModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&gitModule{}, ModulePriorityGit)
+	internal.RegisterModule(&gitModule{}, ModulePriorityGit)
 }
 
-func (m *gitModule) Awake(a *core.App) error {
+func (m *gitModule) Awake(a *internal.App) error {
 	app = a
 	return autoMigrate()
 }

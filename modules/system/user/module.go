@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityUser = 1000 // 系统-用户管理
 )
 
-var app *core.App
+var app *internal.App
 
 type userModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&userModule{}, ModulePriorityUser)
+	internal.RegisterModule(&userModule{}, ModulePriorityUser)
 }
 
-func (m *userModule) Awake(a *core.App) error {
+func (m *userModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

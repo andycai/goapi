@@ -1,23 +1,23 @@
 package unitool
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityUnitool = 9910 // 游戏-其他工具集合
 
-var app *core.App
+var app *internal.App
 
 type unitoolModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&unitoolModule{}, ModulePriorityUnitool)
+	internal.RegisterModule(&unitoolModule{}, ModulePriorityUnitool)
 }
 
-func (m *unitoolModule) Awake(a *core.App) error {
+func (m *unitoolModule) Awake(a *internal.App) error {
 	app = a
 
 	// 数据迁移

@@ -1,23 +1,23 @@
 package serverconf
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityServerConf = 9904 // 游戏-服务器配置
 
-var app *core.App
+var app *internal.App
 
 type serverconfModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&serverconfModule{}, ModulePriorityServerConf)
+	internal.RegisterModule(&serverconfModule{}, ModulePriorityServerConf)
 }
 
-func (m *serverconfModule) Awake(a *core.App) error {
+func (m *serverconfModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	return autoMigrate()

@@ -1,7 +1,7 @@
 package permission
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,17 +9,17 @@ const (
 	ModulePriorityPermission = 1002 // 系统-权限管理
 )
 
-var app *core.App
+var app *internal.App
 
 type permissionModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&permissionModule{}, ModulePriorityPermission)
+	internal.RegisterModule(&permissionModule{}, ModulePriorityPermission)
 }
 
-func (m *permissionModule) Awake(a *core.App) error {
+func (m *permissionModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	if err := autoMigrate(); err != nil {

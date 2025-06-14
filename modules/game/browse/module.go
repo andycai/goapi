@@ -1,22 +1,22 @@
 package browse
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 )
 
 const ModulePriorityBrowse = 9901 // 游戏-文件浏览
 
-var app *core.App
+var app *internal.App
 
 type browseModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&browseModule{}, ModulePriorityBrowse)
+	internal.RegisterModule(&browseModule{}, ModulePriorityBrowse)
 }
 
-func (m *browseModule) Awake(a *core.App) error {
+func (m *browseModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	return autoMigrate()

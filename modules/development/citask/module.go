@@ -1,23 +1,23 @@
 package citask
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityCiTask = 4002 // 功能-CI/CD 任务
 
-var app *core.App
+var app *internal.App
 
 type taskModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&taskModule{}, ModulePriorityCiTask)
+	internal.RegisterModule(&taskModule{}, ModulePriorityCiTask)
 }
 
-func (m *taskModule) Awake(a *core.App) error {
+func (m *taskModule) Awake(a *internal.App) error {
 	app = a
 	return autoMigrate()
 }

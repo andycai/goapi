@@ -1,23 +1,23 @@
 package filemanager
 
 import (
-	"github.com/andycai/goapi/core"
+	"github.com/andycai/goapi/internal"
 	"github.com/gofiber/fiber/v2"
 )
 
 const ModulePriorityFileManager = 5002 // 功能-文件管理
 
-var app *core.App
+var app *internal.App
 
 type filemanagerModule struct {
-	core.BaseModule
+	internal.BaseModule
 }
 
 func init() {
-	core.RegisterModule(&filemanagerModule{}, ModulePriorityFileManager)
+	internal.RegisterModule(&filemanagerModule{}, ModulePriorityFileManager)
 }
 
-func (m *filemanagerModule) Awake(a *core.App) error {
+func (m *filemanagerModule) Awake(a *internal.App) error {
 	app = a
 	// 数据迁移
 	return autoMigrate()
